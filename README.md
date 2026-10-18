@@ -1,72 +1,314 @@
-# WapForm for Web — samples
+# WapForm for Web — sample platform
+
+English · [中文](README.zh-TW.md) · 日本語：[Install-Guide.html](Install-Guide.html)（日本語の章）
 
 The sample platform installed by **WapForm for Web** (`wapsetup.exe`, download at
-[wapform.com/web](https://wapform.com/web)): an online shop served by WapForm for Web,
-a back office for Windows and Flutter built from the same WML pages, and the shared
-sample database.
+[wapform.com/web](https://wapform.com/web)): an online shop served by WapForm for Web, a back
+office for Windows and Flutter built from the same WML pages, and the shared sample database.
 
-The installer copies these files to `C:\Wapform`. This repository holds the same files so
-you can read them, compare versions or start your own project from them.
+The installer copies these files to `C:\Wapform`. This repository holds the same files so you
+can read them, compare versions or start your own project from them.
 
-| Folder | Contents |
+> All accounts, passwords and LINE values in the samples are **simulated** (for example
+> `xyz` / `123`) and meant for local testing only. Replace them before going live — see
+> [Before going live](#before-going-live).
+
+## Contents
+
+- [Architecture](#architecture)
+- [Repository layout](#repository-layout)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Sample database](#sample-database)
+- [wapform.ini](#wapformini)
+- [Interface languages: language.txt](#interface-languages-languagetxt)
+- [Running the samples](#running-the-samples)
+- [Setting up Flutter](#setting-up-flutter)
+- [License and trial](#license-and-trial)
+- [Before going live](#before-going-live)
+
+## Architecture
+
+One WML definition, three ways to run it, one database:
+
+```
+                         ┌──────────────────────────────┐
+  Browser  ──HTTP──▶     │ IIS + WapServ.dll (licensed)  │──┐
+  (shop customers)       │  or WapServer.exe (free,      │  │
+                         │      localhost:8080 only)     │  │
+                         │  runs shop\*.wml              │  │
+                         └──────────────────────────────┘  │
+                                                            ▼
+  Windows PC ──────▶  WapForm Runtime / Toolkit          ┌──────────┐
+  (back office)       opens flutter\lib\*.wml directly ──▶│  MySQL / │
+                                                          │ MariaDB  │
+  Phone / browser ──▶ Flutter app (flutter\lib\*.dart,   │ "sales"  │
+  (back office)       generated from the same .wml)      └──────────┘
+                         │                                    ▲
+                         └──REST──▶ flutter\server\server.js ─┘
+                                    (Node.js, port 3000)
+```
+
+- **Shop (Web).** `shop\` is a complete online store written in WML. Each request runs a `.wml`
+  page in WapForm for Web; the page layout comes from the template `wapform.htm` / `wapform.html`,
+  so layout and logic are maintained separately.
+- **Back office (Windows).** WapForm Runtime or Toolkit (Microsoft Store) opens the `.wml`
+  pages in `flutter\lib\` directly as Windows forms and reports.
+- **Back office (Flutter).** WapForm Toolkit generates a `.dart` page from each of those `.wml`
+  pages. The Flutter app (Web and Android) uses the open-source runtime
+  [wapform_flutter](https://pub.dev/packages/wapform_flutter) and reaches the database through the
+  REST back end in `flutter\server\`.
+- **One database.** Orders and members created in the shop are managed directly in the back
+  office, on Windows or Flutter.
+
+## Repository layout
+
+| Path | Contents |
 |---|---|
-| `shop/` | The online store (English): WML pages served by WapForm for Web — IIS with WapServ.dll, or the free WapForm Web Server on localhost. Cart, members, orders, reports, crosstab, charts, uploads, LINE Bot / push samples. |
-| `flutter/` | The back office, a WapForm for Flutter project. One set of WML pages: WapForm Runtime / Toolkit (Microsoft Store) opens `flutter/lib/*.wml` on Windows; the `.dart` pages generated from the same `.wml` files run on Flutter (Web and Android) with [wapform_flutter](https://pub.dev/packages/wapform_flutter) ^1.6.8. |
-| `flutter/server/` | REST back end of the Flutter back office (Node.js, `start_server.bat`, port 3000). |
-| `database/sales.sql` | The shared MySQL / MariaDB sample database. |
-| `wapform.ini` | Settings file of the WapForm programs (database, date format, font, language). |
-| `Install-Guide.html` | Full installation guide in English, Chinese and Japanese. |
+| `shop/` | Sample online store (English): catalog, products, cart, members, orders, reports, crosstab, charts, uploads, LINE Bot and LINE push samples. `wapform.htm` / `wapform.html` are the page templates. |
+| `shop/wapform.ini` | Settings of the store site (see [wapform.ini](#wapformini)). |
+| `shop/upload/` | Upload folder of the upload samples. Its `web.config` (IIS only) adds a CORS header so a Flutter Web app can show the uploaded images. |
+| `flutter/` | WapForm for Flutter project (Web and Android platform folders included), using `wapform_flutter` ^1.6.8 from pub.dev. |
+| `flutter/lib/` | The back office: the same `.wml` pages run on Windows, the generated `.dart` pages run on Flutter. `wapform.ini` here is read by the Windows back office. |
+| `flutter/server/` | REST back end of the Flutter back office (Node.js `server.js`, `start_server.bat`, port 3000). |
+| `database/sales.sql` | Sample database `sales` (fictitious English data). |
+| `wapform.ini` | Shared settings file in `C:\Wapform`. |
+| `Install-Guide.html` | The installation guide in English, Chinese and Japanese (the same content as this README, plus Chinese and Japanese). |
 
-## Database
-
-Both parts share one MySQL / MariaDB database named `sales`:
-
-```
-mysql -u root -p < database/sales.sql
-```
-
-The data is fictitious (stationery catalog, 5,390 products, customers, vendors, staff, orders,
-articles). The script re-creates the sample tables and the MySQL account `xyz` / `123`.
-To use another server or account, change Server / Username / Password in
-`wapform.ini`, `shop/wapform.ini`, `flutter/lib/wapform.ini` and `flutter/server/server.js`.
-
-Logins: back office `admin` / `123` or `demo` / `123`; web shop `demo@example.com` / `123`.
-
-**All accounts, passwords and LINE values in the samples are simulated — replace them before
-going live.** `shop/forget.wml` (password-reset mail) needs your own mail account and app password.
-
-## Running the Flutter back office
-
-```
-flutter/server/start_server.bat
-cd flutter
-flutter pub get
-flutter run -d chrome          # Web
-adb reverse tcp:3000 tcp:3000
-flutter run -d android         # Android phone or emulator
-```
+The installer also places `WapServ.dll`, `WapServer.exe` and the IIS setup scripts in
+`C:\Wapform`; those are not part of this repository.
 
 ## Requirements
 
-- The shop needs **WapForm for Web** (IIS + WapServ.dll, or WapForm Web Server for local testing):
-  [wapform.com/web](https://wapform.com/web)
-- The Windows back office needs **WapForm Runtime** or **WapForm Toolkit** from the Microsoft Store.
-- The Flutter back office needs Flutter and the open-source
-  [wapform_flutter](https://github.com/wapform/wapform_flutter) package.
+| Item | Used for | Needed |
+|---|---|---|
+| Windows 10 / 11 or Windows Server | All components | Always |
+| MySQL or MariaDB (for example XAMPP) | The sample database `sales` | To run the samples |
+| IIS with ISAPI Extensions | Serving sites with WapServ.dll | IIS module only |
+| WapForm for Web (`wapsetup.exe`) | WapServ.dll / WapServer.exe to run the shop | To run the shop |
+| WapForm Runtime or Toolkit (Microsoft Store) | Running the back office on Windows | Windows back office |
+| Node.js | `flutter\server\server.js` | Flutter back office |
+| Flutter SDK, Chrome, Android Studio | Building and running the Flutter back office | Flutter back office |
 
-## 中文簡介
+Turning on IIS: Control Panel › Programs › Turn Windows features on or off › Internet Information
+Services › World Wide Web Services › Application Development Features › check **ISAPI Extensions**.
 
-WapForm for Web 安裝程式附帶的範例平台：`shop/` 是網路商店（WapForm for Web 執行），`flutter/` 是用同一組 WML
-做成的 Windows／Flutter 後台，`database/sales.sql` 是共用的範例資料庫。安裝說明見 `Install-Guide.html`。
-範例中的帳號、密碼與 LINE 設定都是模擬值，正式上線前請換掉。
+## Installation
 
-## 日本語の概要
+### With the installer (recommended)
 
-WapForm for Web のインストーラーに含まれるサンプル一式です。`shop/` は WapForm for Web で動くオンラインショップ、
-`flutter/` は同じ WML から作った Windows／Flutter のバックオフィス、`database/sales.sql` は共通のサンプルデータベースです。
-インストール手順は `Install-Guide.html` をご覧ください。サンプルのアカウント、パスワード、LINE の設定値はすべて仮の値です。
-本番運用の前に必ず置き換えてください。
+1. Download `wapsetup.exe` from [wapform.com/web](https://wapform.com/web) and run it as administrator.
+2. Choose **Full environment** (Web, samples and Flutter) or **Custom**.
+3. With the IIS module, confirm the IIS site (default *Default Web Site*) and application pool
+   (default *DefaultAppPool*). Setup enables 32-bit applications, allows the ISAPI extension, maps
+   `*.wml` to `C:\Wapform\WapServ.dll`, adds `index.wml` as default document, grants write access
+   to the license and upload folders and restarts the pool. Log: `C:\Wapform\setup\iis-setup.log`.
+4. The sample store is placed in `C:\Wapform\shop` (for WapForm Web Server) and in the `shop`
+   folder of the IIS site (for IIS).
+
+Running setup again never overwrites samples or a `wapform.ini` you have changed. Uninstalling
+keeps them too, unless you answer **Yes** to *Remove everything as well?*. The license data
+(`C:\ProgramData\WapForm\License`) and the `sales` database are always kept.
+
+### From this repository
+
+To use the files from GitHub instead (for example a newer sample version), install WapForm for
+Web first, then copy the folders over the installed ones:
+
+| Repository | Copy to |
+|---|---|
+| `shop\` | `C:\Wapform\shop\` and, for IIS, `C:\inetpub\wwwroot\shop\` |
+| `flutter\` | `C:\Wapform\flutter\` |
+| `database\sales.sql` | `C:\Wapform\database\` |
+| `wapform.ini` | `C:\Wapform\` |
+
+Then create the database and adjust `wapform.ini` as described below.
+
+## Sample database
+
+```
+cd C:\Wapform\database
+mysql -u root -p < sales.sql
+```
+
+With XAMPP the client is `C:\xampp\mysql\bin\mysql.exe`; you can also use phpMyAdmin › Import.
+
+`sales.sql`:
+
+- creates the database `sales` (if it exists, its sample tables are re-created — back up a
+  database with that name first);
+- creates the MySQL account `xyz` / `123` (simulated values) with access to `sales` only;
+- loads fictitious English data: a stationery catalog with 271 categories, 5,390 products (22 per
+  category, 4 of them recommended), 30 customers, 10 vendors, 6 staff, 3 carriers, 120 orders and
+  8 articles.
+
+| Table | Contents |
+|---|---|
+| `pa` | Catalog (`mnu='m'`: `gid='0000'` = top level, others = sub-categories) and products (`mnu='n'`, `gid` = sub-category code). `active`: 0 hidden, 1 listed, 2 and up recommended (sorted by the number) |
+| `menu`, `web` | The store's category menu and category list |
+| `cu` / `ve` / `em` / `fm` | Customers (including store members) / vendors / staff / carriers |
+| `sh` / `sn` | Shipping orders (header / lines); also the source of the store's best sellers |
+| `rh` / `rn` | Store carts and web orders |
+| `sys` | Company profile, tax rate, accounting period |
+| `mnu` / `users` / `login` | Back-office menu / accounts / permissions |
+| `topic`, `counter`, `num` | Articles, visit counter, document number sequence |
+
+## wapform.ini
+
+`wapform.ini` is the settings file of the WapForm programs. There are three copies, and each
+program or site folder reads the one next to it:
+
+| File | Read by |
+|---|---|
+| `C:\Wapform\wapform.ini` | Shared settings of the installation folder |
+| `shop\wapform.ini` | The store site (WapServ.dll / WapServer.exe) |
+| `flutter\lib\wapform.ini` | The Windows back office (WapForm Runtime / Toolkit opening `flutter\lib\*.wml`) |
+
+The Flutter back office does not read `wapform.ini`: its REST back end has the same database
+settings in `flutter\server\server.js`.
+
+Format: `name=value`, one per line; names are case-insensitive; lines starting with `;` are
+comments; save the file as **UTF-8**. Only the database lines are required — leave out any other
+line to use its default.
+
+```ini
+; ---- Database (required) ----
+Driver=mysql
+Server=localhost
+Database=sales
+Username=xyz
+Password=123
+
+; ---- Optional ----
+DateFormat=yyyy/mm/dd
+FontName=MingLiU
+FontSize=10
+CharWidth=7
+CharHeight=13
+unicode=yes
+language=en
+line_bot_id=
+line_channel_secret=
+line_channel_access_token=
+```
+
+| Key | Sample | Meaning |
+|---|---|---|
+| `driver` | `mysql` | **Required.** Database type: `mysql` (MySQL / MariaDB); the Professional edition also supports `mssql` (SQL Server). |
+| `server` | `localhost` | **Required.** Database host name or IP; use `host:port` for a non-default port. |
+| `database` | `sales` | **Required.** Database name. |
+| `username` | `xyz` | **Required.** Database account — use one limited to this database, not `root`. |
+| `password` | `123` | **Required.** Database password (simulated — always change it for a real installation). |
+| `dateformat` | `yyyy/mm/dd` | Optional (default: Windows regional settings). Date format on screens and reports. |
+| `fontname` | `MingLiU` | Optional (default: system font). Default font of Windows forms and reports. Use a monospaced font, because layouts are measured in character cells (`charwidth` / `charheight`). MingLiU is built into Windows and covers English, Traditional Chinese and Japanese. For an English-only interface Consolas also works; MS Gothic lacks some Traditional Chinese characters. |
+| `fontsize` | `10` | Optional (default 10). Default font size in points. |
+| `charwidth` | `7` | Optional (default 7). Width of one character cell in pixels, used to convert WML widths given in characters. |
+| `charheight` | `13` | Optional (default 13). Height of one character cell in pixels, used for row heights and layout. |
+| `unicode` | `yes` | Keep it for utf8mb4 databases such as the sample: the presence of the line switches Unicode (UTF-8 / utf8mb4) on — the value is not checked; without it the connection is not Unicode. |
+| `language` | `en` | Optional (default `en`). Interface language of WapForm Toolkit / Runtime: `en`, `tw` (Traditional Chinese) or `jp` (Japanese). Built-in captions are translated automatically; other texts come from `language.txt`. |
+| `line_bot_id` | *(empty)* | LINE samples only. LINE Official Account ID (linebot, linepush). |
+| `line_channel_secret` | *(empty)* | LINE samples only. Messaging API channel secret; verifies the webhook signature (`X-Line-Signature`). |
+| `line_channel_access_token` | *(empty)* | LINE samples only. Channel access token for the push / reply API. |
+| `loginusr` / `loginpwd` | `admin` / `123` | Only in `shop\wapform.ini`: default sign-in of the store's management pages. |
+
+> **Security.** A real `wapform.ini` holds the database password and LINE keys: never publish it
+> on a website or commit it to a public repository (the copies here contain only simulated
+> values). IIS does not serve `.ini` files by default — do not move it to a downloadable
+> location. Get the LINE keys from the LINE Developers console and re-issue them at once if they
+> leak.
+
+The store's password-reset mail (`shop\forget.wml`) uses Gmail: replace
+`your-account@gmail.com` and `your-gmail-app-password` with your own account and an app password.
+
+## Interface languages: language.txt
+
+`language.txt` sits next to `wapform.ini` (UTF-8). One entry per line: the English text is the
+key, followed by the Traditional Chinese and Japanese translations separated by a comma:
+
+```
+; English=Traditional Chinese,Japanese
+Item No=料號,品番
+Item Name / Spec=品名規格,品名・仕様
+Search=查詢,検索
+```
+
+Write labels and titles in your WML in English; with `language=tw` or `jp` they are shown
+translated. A missing translation shows the English text. In WapForm Toolkit,
+*Languages › Interface Languages…* sets `language=` and edits `language.txt`; *Add texts from
+last run* lists every text met while running the WML, ready to translate.
+
+## Running the samples
+
+### Web: online store (shop)
+
+- IIS: `http://localhost/shop/`
+- WapForm Web Server (free): open *WapForm Web Server* › Start, then `http://localhost:8080/shop/`
+  (documents path defaults to `C:\Wapform`).
+- Member sign-in: `demo@example.com` / `123`.
+
+### Windows: back office
+
+Open the `.wml` pages in `C:\Wapform\flutter\lib` with WapForm Toolkit or Runtime, for example
+`app002.wml` (products) and `app006.wml` (shipping orders). Sign in: `admin` / `123` (all
+functions) or `demo` / `123` (sales menu only).
+
+### Flutter: back office (Web, Android)
+
+Complete [Setting up Flutter](#setting-up-flutter) first, then:
+
+```
+cd C:\Wapform\flutter\server
+npm install
+node server.js                     (or start_server.bat)
+
+cd C:\Wapform\flutter
+flutter pub get
+flutter run -d chrome              (Web)
+adb reverse tcp:3000 tcp:3000      (Android: forward the device's localhost:3000 to this PC)
+flutter run -d android             (Android)
+```
+
+`server.js` uses the same database settings as `wapform.ini` and listens on
+`http://localhost:3000`. On an Android phone or emulator `localhost` is the device itself, so run
+`adb reverse tcp:3000 tcp:3000` every time a device is connected.
+
+## Setting up Flutter
+
+Develop on Windows; targets: Web and Android.
+
+1. **Git for Windows**: git-scm.com/download/win.
+2. **Flutter SDK**: extract the Windows zip from docs.flutter.dev to a folder with no spaces,
+   for example `C:\src\flutter`, and add `C:\src\flutter\bin` to the user `Path`. Check with
+   `flutter --version`.
+3. **Web**: install Google Chrome.
+4. **Android**: install Android Studio; in SDK Manager select Android SDK, SDK Command-line Tools
+   and Platform-Tools; create an emulator or connect a phone with USB debugging. Run
+   `flutter doctor --android-licenses`.
+5. **Node.js LTS** for the REST back end.
+6. Run `flutter doctor`: Chrome and the Android toolchain should be checked.
+
+WapForm Toolkit generates the Flutter `.dart` pages from `.wml`. After changing a `.wml`, generate
+the `.dart` page again and `flutter run`. Release builds: `flutter build web` and
+`flutter build apk`; in production the REST back end must run on a server the device can reach
+(HTTPS recommended).
+
+## License and trial
+
+Each product starts a 30-day trial with all features on first use. After the trial, Toolkit and
+Runtime continue as the Free edition and WapForm for Web stops serving. Buy at
+[wapform.com/pricing](https://wapform.com/pricing); the license key is emailed to you.
+WapForm for Web: open `http://localhost/license.wml` on the server itself and enter the key.
+
+## Before going live
+
+- Replace every simulated value: the MySQL account (`wapform.ini`, `server.js`), the back-office
+  account `admin` / `123`, test members, `loginusr` / `loginpwd`.
+- Enter your own LINE and Gmail settings (never the sample values).
+- Delete or edit the sample products, customers and articles.
+- Serve the site over HTTPS.
 
 ---
 
-Documentation and support: [wapform.com](https://wapform.com) · [github.com/wapform](https://github.com/wapform)
+Documentation and support: [wapform.com](https://wapform.com) ·
+[github.com/wapform](https://github.com/wapform) · Flutter runtime:
+[wapform_flutter](https://github.com/wapform/wapform_flutter)
