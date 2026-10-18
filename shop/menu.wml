@@ -1,0 +1,84 @@
+﻿<?xml version="1.0"?>
+<wml>
+  <card id="P" title="Browse Menu">
+    <setvar name="B" value="0"/>
+    <dbquery id="ab">
+      <![CDATA[select * from menu order by az, id]]>
+      <field fieldname="az"/>
+      <field fieldname="id"/>
+      <field fieldname="sub"/>
+      <field fieldname="title" displaylabel="Title"/>
+      <field fieldname="href" displaylabel="Link"/>
+      <field fieldname="active" displaylabel="Active"/>
+      <field fieldname="typ" displaylabel="Mode"/>
+      <field fieldname="txt" displaylabel="Content"/>
+      <field fieldname="icon" displaylabel="icon"/>
+      <onevent type="onnewrecord">
+        <setvar name="abactive" value="1"/>
+      </onevent>
+      <onevent type="afterscroll">
+        <if cnd="B=1">
+          <if cnd="pa.state&lt;&gt;'BROWSE'">
+            <invoke instance="pa" method="post"/>
+          </if>
+          <dbquery id="pa">
+            <![CDATA[select pno, qno, sid, gid, des, topic, active from pa where gid='$ab.id' order by pno]]>
+          </dbquery>
+        </if>
+      </onevent>
+    </dbquery>
+    <dbquery id="pa">
+      <![CDATA[select pno, qno, sid, gid, des, topic, active from pa where gid='$ab.id' order by pno]]>
+      <field fieldname="Pno" displaylabel="Item No"/>
+      <field fieldname="Qno" displaylabel="SKU"/>
+      <field fieldname="sid" displaylabel="Category"/>
+      <field fieldname="gid" displaylabel="Subcategory"/>
+      <field fieldname="Des" displaylabel="Name / Spec"/>
+      <field fieldname="active" displaylabel="Active"/>
+      <field fieldname="topic" displaylabel="Image"/>
+    </dbquery>
+    <setvar name="B" value="1"/>
+    <table columns="3" align="LLL">
+      <tr>
+        <td>
+          <datasource dataset="ab">
+            <p>
+              <navigator/>
+            </p>
+            <dbgrid width="760" height="300">
+              <item field="id" size="6"/>
+              <item field="sub" size="6"/>
+              <item field="title" size="30"/>
+              <item field="icon" size="30"/>
+              <item field="az" size="6" align="center"/>
+              <item field="typ" size="6" align="center"/>
+              <item field="active" size="3" range="1;0"/>
+            </dbgrid>
+            <datasource dataset="pa">
+              <p>
+                <navigator/>
+              </p>
+              <dbgrid width="760" height="300">
+                <item field="Pno" size="14"/>
+                <item field="Qno" size="14"/>
+                <item field="sid" size="6"/>
+                <item field="gid" size="6"/>
+                <item field="Des" size="40"/>
+                <item field="active" size="6"/>
+              </dbgrid>
+            </datasource>
+          </datasource>
+        </td>
+        <td width="15"/>
+        <td>
+          <datasource dataset="pa">
+            <input field="topic" type="memo" width="600" height="688"/>
+          </datasource>
+        </td>
+      </tr>
+    </table>
+    <do type="prev" label="Close">
+      <prev/>
+    </do>
+  </card>
+</wml>

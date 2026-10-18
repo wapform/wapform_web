@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" device="wapform.html">
+    <setvar name="gp" value="'2902'"/>
+    <setvar name="gp" value="request.gp" cnd="define(request.gp)"/>
+    <setvar name="pg" value="1"/>
+    <setvar name="pg" value="val(request.pg)" cnd="define(request.pg)"/>
+    <setvar name="az" value="'az'"/>
+    <setvar name="az" value="request.sort" cnd="define(request.sort)"/>
+    <setvar name="i" value="0"/>
+    <setvar name="s" value="'Product Info'"/>
+    <setvar name="b" value="0"/>
+    <setvar name="gtitle" value="mid(gp,1,2)+'00'"/>
+    <setvar name="breadcrumb" value="'User Manual'"/>
+
+    <if cnd="DEFINE(session.usr)">
+      <setvar name="B" value="1" cnd="session.usr='admin'"/>
+    </if>
+
+    <dbquery id="sys">select * from sys</dbquery>
+
+    <block name="wapform.aa"/>
+    <block name="normal.aa"/>
+    <block name="content.aa"/>
+
+    <block name="content.zz"/>
+    <block name="normal.zz"/>
+    <block name="wapform.zz"/>
+  </card>
+</wml>

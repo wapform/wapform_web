@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="register" title="$(IF(DEFINE(session.usr),'Edit Membership','Member Registration'))">
+    <setvar name="op" value="'reg'"/>
+    <setvar name="op" value="request.op" cnd="DEFINE(request.op)"/>
+    <if cnd="op='upd'">
+      <dbquery id="cu">
+        <![CDATA[SELECT * FROM cu WHERE email='$session.usr']]>
+      </dbquery>
+      <setvar name="email" value="cu.email"/>
+      <setvar name="password1" value="cu.password1"/>
+      <setvar name="password2" value="cu.password2"/>
+      <setvar name="cname" value="cu.cname"/>
+      <setvar name="sex" value="cu.sex"/>
+      <setvar name="phone" value="cu.phone"/>
+      <setvar name="fax" value="cu.fax"/>
+      <setvar name="gsm" value="cu.gsm"/>
+      <setvar name="addr1" value="cu.addr1"/>
+      <setvar name="zip" value="cu.zip"/>
+      <setvar name="ac" value="cu.ac"/>
+      <setvar name="contact" value="cu.contact"/>
+      <setvar name="ship" value="ch.ship"/>
+      <setvar name="rem" value="cu.rem"/>
+    </if>
+    <operator>
+      <![CDATA[
+$op
+<input type="hidden" name="op" value="upd" />
+<table width="600" cellpadding="0" cellspacing="0" border="0" align="center" class="forumline">
+  <tr><td colspan="2"><hr/></td></tr>
+	<tr>
+		<td class="row1">E-mail<font color="red">*</font></td>
+		<td class="row2">$(IF(DEFINE(session.usr),email,'<input class="post" type="text" size="25" maxlength="100" name="email" value="'+email+'" />'))</td>
+	</tr>
+  <tr><td>Password<font color="red">*</font></td><td><input name="password1" value="1234567890" type="password" size="12"/></td></tr>
+  <tr><td>Confirm password<font color="red">*</font></td><td><input name="password2" value="1234567890" type="password" size="12"/></td></tr>
+  <tr><td colspan="2"><h3>Personal</h3></td></tr>
+	<tr>
+		<td class="row1">Name<font color="red">*</font></td>
+		<td class="row2"><input class="post" type="text" maxlength="255" name="cname" value="$cname" /></td>
+	</tr>
+	<tr>
+		<td class="row1">ID number<font color="red">*</font></td>
+		<td class="row2"><input class="post" type="text" maxlength="255" name="id" value="$id" /></td>
+	</tr>
+	<tr>
+		<td class="row1">Gender</td>
+		<td class="row2"><input type="radio" name="sex" value="1" $(IF(sex=1,'checked','')) /> Male&nbsp;&nbsp;<input type="radio" name="sex" value="0" $(IF(sex=0,'checked','')) /> Female</td>
+	</tr>
+	<tr>
+		<td class="row1">Phone<font color="red">*</font></td>
+		<td class="row2"><input class="post" type="text" size="20" maxlength="255" name="phone" value="$phone" />$(IF(phone='','#',''))</td>
+	</tr>
+	<tr>
+		<td class="row1">Fax</td>
+		<td class="row2"><input class="post" type="text" size="20" maxlength="255" name="fax" value="" /></td>
+	</tr>
+	<tr>
+		<td class="row1">Mobile</td>
+		<td class="row2"><input class="post" type="text" size="20" maxlength="255" name="gsm" value="$gsm" /></td>
+	</tr>
+	<tr>
+		<td class="row1">Delivery address<font color="red">*</font></td>
+		<td class="row2"><textarea name="addr1" rows="5" cols="30">$addr1</textarea></td>
+	</tr>
+	<tr>
+		<td class="row1">Postal code<font color="red">*</font></td>
+		<td class="row2"><input class="post" type="text" name="zip" size="5" maxlength="5" value="$zip" /></td>
+	</tr>
+  <tr><td colspan="2"><h3>Company</h3></td></tr>
+	<tr>
+		<td class="row1">Tax ID</td>
+		<td class="row2"><input class="post" type="text" maxlength="255" name="ac" value="$ac" /></td>
+	</tr>
+	<tr>
+		<td class="row1">Contact person</td>
+		<td class="row2"><input class="post" type="text" maxlength="255" name="contact" value="$contact" /></td>
+	</tr>
+	<tr>
+		<td class="row1">Preferred delivery time</td>
+		<td class="row2">
+    <input type="radio" name="ship" value="1" $(IF(ship=1,'checked','')) />Morning
+    <input type="radio" name="ship" value="2" $(IF(ship=2,'checked','')) />Afternoon
+    <input type="radio" name="ship" value="3" $(IF(ship=3,'checked','')) />Either</td>
+	</tr>
+	<tr>
+		<td class="row1">Notes</td>
+		<td class="row2"><input class="post" type="text" maxlength="255" name="rem" value="$rem" /></td>
+	</tr>
+  <tr><td colspan="2"><hr/></td></tr>
+	<tr>
+		<td class="catBottom" colspan="2">When you have finished, press <b>Submit</b>.</td>
+	</tr>
+	<tr>
+		<td class="catBottom" colspan="2" align="center"><input type="submit" name="submit" value="Submit" />&nbsp;&nbsp;<input type="reset" value="Reset" />
+		</td>
+	</tr>
+</table>
+]]>
+    </operator>
+  </card>
+  <card id="P1" title="Update" ontimer="product.wml">
+    <if cnd="DEFINE(session.usr)">
+      <setvar name="S" value="''"/>
+      <dbquery>
+        <![CDATA[update cu set cname='$cname',
+          addr1='$addr1', zip='$zip', phone='$phone', gsm='$gsm' where email='$session.usr']]>
+      </dbquery>
+      <if cnd="password1&lt;&gt;''">
+        <if cnd="password1=password2">
+          <dbquery>
+            <![CDATA[update cu set password='$(MD5(password1))' where email='$session.usr']]>
+          </dbquery>
+          <setvar name="S" value="'Password updated!'"/>
+          <else/>
+          <setvar name="S" value="'Confirmation password does not match; nothing changed!'"/>
+        </if>
+        <else/>
+        <setvar name="S" value="'Details updated!'"/>
+      </if>
+      <else/>
+      <dbquery>
+        <![CDATA[update sys set cno=cno+1]]>
+      </dbquery>
+      <dbquery id="sys">
+        <![CDATA[SELECT * FROM sys]]>
+      </dbquery>
+      <dbquery>
+        <![CDATA[insert into cu (cno,cname,email,addr1,zip,phone,gsm,password) 
+          values ('$('ZZ'+MID(STR(1000000+sys.cno),2,6))','$cname','$email','$addr1','$zip','$phone','$gsm','$(MD5(password1))')]]>
+      </dbquery>
+      <setsession name="usr" value="email"/>
+      <setsession name="pwd" value="password1"/>
+      <setvar name="S" value="'Record added!'"/>
+    </if>
+    <operator>
+      <![CDATA[
+<table cellpadding="6" border="0">
+<tr><td width="50" height="50" align="center"><img border="0" src="images/alert.png"/></td>
+<td>$S</td></tr>
+<tr><td colspan="2" align="center"><input type="button" value="OK" onclick="history.back()"></td></tr>
+</table>
+]]>
+    </operator>
+    <timer value="10"/>
+  </card>
+</wml>

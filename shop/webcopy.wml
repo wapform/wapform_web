@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="webcopy" title="File Transfer Test" width="960">
+
+    <setvar name="wc_result" value="''"/>
+    <setvar name="wc_err" value="''"/>
+
+    <setvar name="SRC_JPG"  value="'C:\Wapform\300x300.jpg'"/>
+    <setvar name="SRC_PDF"  value="'C:\Wapform\aaa.pdf'"/>
+    <setvar name="DST_DIR"  value="'C:\Wapform\temp\'"/>
+    <setvar name="DST_DIR2" value="'C:\Wapform\temp'"/>
+    <setvar name="UP_URL"   value="'http://localhost:8080/shop/upload.wml'"/>
+    <setvar name="DL_URL"   value="'http://localhost:8080/shop/upload/a02.jpg'"/>
+
+    <setvar name="FTP_HOST" value="''"/>
+    <setvar name="FTP_USER" value="''"/>
+    <setvar name="FTP_PWD"  value="''"/>
+    <setvar name="FTP_DIR"  value="''"/>
+
+    <table columns="4" align="LLLL">
+      <tr>
+        <td>protocol</td>
+        <td>host</td>
+        <td>url</td>
+        <td>dir</td>
+      </tr>
+      <tr>
+        <td>file</td>
+        <td>Target folder (ending with \)</td>
+        <td>Full source path</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>httpdownload</td>
+        <td>Source URL</td>
+        <td>—</td>
+        <td>Save folder</td>
+      </tr>
+      <tr>
+        <td>httpupload</td>
+        <td>Target URL</td>
+        <td>Local file path</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>ftpdownload</td>
+        <td>FTP host</td>
+        <td>File name on FTP</td>
+        <td>Local save folder</td>
+      </tr>
+      <tr>
+        <td>ftpupload</td>
+        <td>FTP host</td>
+        <td>Local file path</td>
+        <td>Folder on FTP</td>
+      </tr>
+    </table>
+    <br/>
+    <table columns="2" align="LL">
+      <tr>
+        <td width="60">result: </td>
+        <td width="900"><label name="R">(not run yet)</label></td>
+      </tr>
+      <tr>
+        <td>errmsg: </td>
+        <td><label name="E">(not run yet)</label></td>
+      </tr>
+    </table>
+
+    <do type="accept" label="file copy">
+      <webcopy protocol="file"
+               host="$(DST_DIR)"
+               url="$(SRC_JPG)"
+               unique="yes"
+               result="wc_result"
+               errmsg="wc_err"/>
+      <setprop name="R" prop="caption" value="wc_result"/>
+      <setprop name="E" prop="caption" value="wc_err"/>
+    </do>
+
+    <do type="accept" label="httpdownload">
+      <webcopy protocol="httpdownload"
+               host="$(DL_URL)"
+               dir="$(DST_DIR2)"
+               unique="yes"
+               result="wc_result"
+               errmsg="wc_err"/>
+      <setprop name="R" prop="caption" value="wc_result"/>
+      <setprop name="E" prop="caption" value="wc_err"/>
+    </do>
+
+    <do type="accept" label="httpupload JPG">
+      <webcopy protocol="httpupload"
+               host="$(UP_URL)"
+               url="$(SRC_JPG)"
+               result="wc_result"
+               errmsg="wc_err"/>
+      <setprop name="R" prop="caption" value="wc_result"/>
+      <setprop name="E" prop="caption" value="wc_err"/>
+    </do>
+
+    <do type="accept" label="httpupload PDF">
+      <webcopy protocol="httpupload"
+               host="$(UP_URL)"
+               url="$(SRC_PDF)"
+               result="wc_result"
+               errmsg="wc_err"/>
+      <setprop name="R" prop="caption" value="wc_result"/>
+      <setprop name="E" prop="caption" value="wc_err"/>
+    </do>
+
+    <do type="accept" label="ftpupload">
+      <webcopy protocol="ftpupload"
+               host="$(FTP_HOST)"
+               username="$(FTP_USER)"
+               password="$(FTP_PWD)"
+               url="$(SRC_JPG)"
+               dir="$(FTP_DIR)"
+               result="wc_result"
+               errmsg="wc_err"/>
+      <setprop name="R" prop="caption" value="wc_result"/>
+      <setprop name="E" prop="caption" value="wc_err"/>
+    </do>
+
+    <do type="accept" label="ftpdownload">
+      <webcopy protocol="ftpdownload"
+               host="$(FTP_HOST)"
+               username="$(FTP_USER)"
+               password="$(FTP_PWD)"
+               url="a02.jpg"
+               dir="$(DST_DIR2)"
+               result="wc_result"
+               errmsg="wc_err"/>
+      <setprop name="R" prop="caption" value="wc_result"/>
+      <setprop name="E" prop="caption" value="wc_err"/>
+    </do>
+
+    <do type="prev" label="Close">
+      <prev/>
+    </do>
+
+  </card>
+
+</wml>

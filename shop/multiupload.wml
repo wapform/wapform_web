@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="upload" title="File Upload">
+
+    <!--
+      WapForm for Web — multi-file upload example
+
+      The layout is in wapform.htm (.prefix / .suffix wrap the card content);
+      this file only handles flow and data, and all styling is applied through class.
+
+      Engine rules to note:
+        1. <form> / <div> are not engine tags; they are output as is, with their attributes (including class) kept.
+        2. A file field cannot use <input>, because _input does not output multiple.
+           Use <operator>, the raw HTML outlet, instead (its content is still $()-expanded).
+        3. _input does not output class, so wrap it in a <div class="field">
+           and style it with a descendant selector such as .field input.
+        4. The child nodes of <multiupload> run once for each file saved.
+        5. cnd= and value= take expressions, so string literals need their own single quotes.
+        6. Only fields sent in this request exist in the variable table; memo does not exist on the first GET,
+           so refer to it only in blocks where a POST has definitely happened.
+           n / err / fn / no / src are created by <multiupload> and can be used at any time.
+        9. Image preview: if the extension is an image type (jpg/jpeg/png/gif),
+           show the saved image directly with <img src="upload/$(fn)"> — because
+           destination is under the web root (see point 8), saved files can already
+           be reached by URL, with no download wml needed. ExtractFileExt/
+           LOWER are built-in expression functions, not add-ons.
+        7. An element with no child nodes is output as <div/>, which in HTML is an unclosed start
+           tag. Write empty containers as raw HTML with <operator>.
+        8. A relative destination such as upload\ is resolved against this .wml's folder (C:\Wapform\shop under WapServer, C:\inetpub\wwwroot\shop under IIS), which is under the web root;
+           uploaded files "can be reached directly by URL". .wml files are always blocked by the engine;
+           restrict other types with the accept whitelist. For full isolation, point destination
+           outside the web root and write a download wml to control access.
+    -->
+
+    <div class="narrow">
+
+    <div class="wf-head">
+      <div class="wf-badge">WapForm for Web · Example</div>
+      <div class="wf-title">File Upload</div>
+      <div class="wf-sub">Select several files at once; each file is saved under its original name and the results are listed.</div>
+    </div>
+
+    <div class="res">
+
+      <multiupload filefield="myfile"
+              destination="upload\"
+              filename="fn"
+              srcname="src"
+              index="no"
+              count="n"
+              result="err"
+              accept="jpg,jpeg,png,gif,pdf,txt,csv,xlsx,docx,pptx,xls,doc,ppt,zip">
+
+        <setvar name="isimg" value="0"/>
+        <if cnd="(LOWER(ExtractFileExt(fn))='.jpg') or (LOWER(ExtractFileExt(fn))='.jpeg') or (LOWER(ExtractFileExt(fn))='.png') or (LOWER(ExtractFileExt(fn))='.gif')">
+          <setvar name="isimg" value="1"/>
+        </if>
+
+        <div class="file">
+          <if cnd="isimg=1">
+            <img class="file-thumb" src="upload/$(fn)" alt="$(src)"/>
+          <else/>
+            <div class="file-ic">✓</div>
+          </if>
+          <div class="file-body">
+            <div class="file-name">$(src)</div>
+            <div class="file-meta">$(fn)</div>
+          </div>
+          <div class="file-no">#$(no)</div>
+        </div>
+
+        <!--
+          To write each file into the database, remove the comment on the line below and change it to your own dataset.
+
+        <dbquery id="q" sql="insert into upfile (fname, oname, utime) values ('$(fn)', '$(src)', now())"/>
+        -->
+
+      </multiupload>
+
+      <if cnd="n > 0">
+        <div class="res-bar">
+          <span>✓</span>
+          <span>Uploaded <b>$(n)</b> file(s)<if cnd="DEFINE(memo)"><if cnd="memo &lt;> ''">, note: $(memo)</if></if></span>
+        </div>
+      </if>
+
+      <if cnd="err &lt;> ''">
+        <div class="alert">
+          <span>!</span>
+          <span>$(err)</span>
+        </div>
+      </if>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-title">Choose files to upload</div>
+      <div class="card-note">Multiple selection is supported. Files are saved under their original names; uploading a file with the same name replaces the earlier one. Accepts jpg / png / gif / pdf / txt / csv / xlsx / docx / zip.</div>
+
+      <form action="multiupload.wml" method="post" enctype="multipart/form-data">
+
+        <input type="hidden" name="card" value="upload"/>
+
+        <div class="drop">
+          <div class="drop-ic">⬆</div>
+          <div class="drop-main">Click here to choose files</div>
+          <div class="drop-hint">Hold Ctrl or Shift to select several at once</div>
+          <operator><![CDATA[<input type="file" name="myfile" multiple="multiple"/>]]></operator>
+        </div>
+
+        <!--
+          Note: an empty element goes through ParseHTML as <div/>, which the browser treats as
+          an unclosed start tag that swallows everything after it. So every empty container "filled by
+          front-end JS" is written as raw HTML with <operator>.
+        -->
+        <operator><![CDATA[<div class="picked" id="picked"></div>]]></operator>
+
+        <div class="field" style="margin-top:1.25rem;">
+          <span class="field-label">Note (optional)</span>
+          <input type="text" name="memo" size="40"/>
+        </div>
+
+        <div class="actions">
+          <input type="submit" value="Upload"/>
+          <span class="actions-note">The saved name of each file is listed after uploading</span>
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="foot">
+      Layout comes from <code>wapform.htm</code>; the flow and data are defined in <code>multiupload.wml</code>.<br/>
+      Designers change the layout without touching the wml; engineers change the logic without touching the htm.<br/>
+      More examples: <a href="chart.wml">Chart Components</a>, <a href="crosstab.wml">Sales Cross Analysis</a>, <a href="report.wml">Grouped Sales Report</a>, <a href="linepush.wml?push_userid=&amp;push_text=">LINE Push</a>, <a href="function.wml">Function Self-Test</a>.
+    </div>
+
+    </div>
+
+  </card>
+
+</wml>

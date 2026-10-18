@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="example" title="WapForm for Web — Examples">
+
+    <!--
+      Home page (example.wml). The nav logo and "Back to home" both point here
+      (see wapform.htm); this page only lists the available examples and holds no real logic.
+
+      When you add an example page, update three places:
+        1. Add an <a class="ex-card"> here.
+        2. The "other examples" links in that page's own footer.
+        3. If the example needs its own CSS in wapform.htm (like .grid / .ex-grid),
+           add it to the shared stylesheet instead of writing it in an individual .wml.
+    -->
+
+    <div class="narrow">
+
+    <div class="wf-head">
+      <div class="wf-badge">WapForm for Web</div>
+      <div class="wf-title">Examples</div>
+      <div class="wf-sub">Layout and styles come from wapform.htm; each page only describes its flow and data.</div>
+    </div>
+
+    <div class="ex-grid">
+
+      <a class="ex-card" href="multiupload.wml">
+        <div class="ex-card-tag">multiupload.wml</div>
+        <div class="ex-card-title">File Upload</div>
+        <div class="ex-card-desc">
+          Multi-file upload, automatic renaming of duplicates, file-extension whitelist, per-file save results.
+        </div>
+        <div class="ex-card-cta">View example →</div>
+      </a>
+
+      <a class="ex-card" href="chart.wml">
+        <div class="ex-card-tag">chart.wml</div>
+        <div class="ex-card-title">Chart Components</div>
+        <div class="ex-card-desc">
+          All 12 built-in chart types, shown with random data — no tables needed.
+        </div>
+        <div class="ex-card-cta">View example →</div>
+      </a>
+
+      <a class="ex-card" href="crosstab.wml">
+        <div class="ex-card-tag">crosstab.wml</div>
+        <div class="ex-card-title">Sales Cross Analysis</div>
+        <div class="ex-card-desc">
+          A sales cross table of salesperson/customer x year/month, with subtotals and totals.
+        </div>
+        <div class="ex-card-cta">View example →</div>
+      </a>
+
+      <a class="ex-card" href="report.wml">
+        <div class="ex-card-tag">report.wml</div>
+        <div class="ex-card-title">Grouped Sales Report</div>
+        <div class="ex-card-desc">
+          A sales list grouped by salesperson and customer and summarized by month, using the same data as the cross analysis.
+        </div>
+        <div class="ex-card-cta">View example →</div>
+      </a>
+
+      <a class="ex-card" href="linepush.wml?push_userid=&amp;push_text=">
+        <div class="ex-card-tag">linepush.wml</div>
+        <div class="ex-card-title">LINE Push</div>
+        <div class="ex-card-desc">
+          The server pushes a message to a given LINE user, without waiting for the user to message first.
+        </div>
+        <div class="ex-card-cta">View example →</div>
+      </a>
+
+      <a class="ex-card" href="function.wml">
+        <div class="ex-card-tag">function.wml</div>
+        <div class="ex-card-title">Function Self-Test Report</div>
+        <div class="ex-card-desc">
+          Checks the actual results of 363 built-in functions one by one against the function reference.
+        </div>
+        <div class="ex-card-cta">View example →</div>
+      </a>
+
+    </div>
+
+    <div class="foot">
+      This is <code>example.wml</code>, the site's home page.<br/>
+      The layout shell <code>wapform.htm</code> is maintained by the designer; each example page's flow and data are independent.
+    </div>
+
+    </div>
+
+  </card>
+
+</wml>

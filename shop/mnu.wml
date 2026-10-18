@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="mnu" device="SUB">
+    <dbquery id="mnu">
+      <![CDATA[select substring(id,1,2) sub, id, sub, title from web where active=1 order by id]]>
+    </dbquery>
+    <setvar name="K" value="0"/>
+    <dbgroup dataset="mnu">
+      <![CDATA[
+<!-- aside -->
+<aside id="aside" class="app-aside hidden-xs bg-success dk b-b">
+   <div class="aside-wrap">
+      <div class="navi-wrap">
+         <!-- nav -->
+         <nav ui-nav class="navi clearfix">
+            <ul class="nav">
+]]>
+      <group change="mnu.sub">
+        <setvar name="K" value="0"/>
+        <setvar name="L" value="0"/>
+        <dbquery id="ctn">
+          <![CDATA[select count(*)-1 num from web where active=1 and substring(id,1,2)=$(mnu.sub)]]>
+        </dbquery>
+        <operator>
+          <![CDATA[<li><a href="product.wml?gp=$mnu.id">$(mnu.title)</a><ul class="nav nav-sub dk" style="width:$(ceil(ctn.num/8)*180)px;"><table border="0"><tr><td valign="top" width="180">]]>
+        </operator>
+        <group>
+          <if cnd="K&gt;0">
+            <setvar name="L" value="L+1"/>
+            <if cnd="L&gt;8">
+              <![CDATA[</td><td valign="top" width="180">]]>
+              <setvar name="L" value="1"/>
+            </if>
+            <operator>
+              <![CDATA[<li><a href="product.wml?gp=$mnu.id">$(mnu.title)</a></li>]]>
+            </operator>
+          </if>
+          <setvar name="K" value="K+1"/>
+        </group>
+        <![CDATA[</td></tr></table></ul></li>]]>
+      </group>
+      <![CDATA[
+            </ul>
+         </nav>
+         <!-- nav -->
+      </div>
+   </div>
+</aside>
+<!-- / aside -->
+]]>
+    </dbgroup>
+  </card>
+</wml>

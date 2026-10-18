@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="Member Login" device="wapform.html">
+    <setvar name="gp" value="'login'" />
+    <setvar name="gp" value="'logout'" cnd="define(request.logout)" />
+    <setvar name="gp" value="'set'" cnd="define(request.op)" />
+    <dbquery id="sys">select * from sys</dbquery>
+    <block name="wapform.aa"/>
+    <include name="header"/>
+    <block name="onpage"/>
+    <include name="footer"/>
+    <include name="asider" />
+    <block name="wapform.zz"/>
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+    <block name="breadcrumb" one="'My Account'" />
+  </card>
+  <card id="content" device="sub">
+    <if cnd="gp='logout'">
+      <session name="usr" value="''" />
+      <session name="pwd" value="''" />
+      <session name="ord" value="''" />
+      <redirect href="index.wml" />
+    </if>
+    <if cnd="gp='login'">
+      <block name="login"/>
+    </if>
+    <if cnd="gp='set'">
+      <dbquery id="usr">
+        <![CDATA[select * from cu where email='$A']]>
+      </dbquery>
+      <if cnd="usr.count=0">
+        <block name="alert" title="'Error'" message="'This user is not allowed to sign in.'" />
+        <elseif cnd="MD5(B)&lt;&gt;usr.password" />
+        <block name="alert" title="'Error'" message="'Incorrect password.'" />
+        <else />
+        <session name="usr" value="A" />
+        <session name="pwd" value="B" />
+        <redirect href="index.wml" />
+      </if>
+    </if>
+  </card>
+</wml>

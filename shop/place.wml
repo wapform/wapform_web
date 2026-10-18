@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="Your Order" device="wapform.html">
+    <if cnd="NOT(DEFINE(session.usr))">
+      <redirect href="login.wml" />
+    </if>
+    <setvar name="AA" value="'0000'" />
+    <if cnd="DEFINE(request.pno)">
+      <setvar name="AA" value="MID(request.pno,1,2)+'00'" />
+      <setvar name="BB" value="MID(request.pno,1,4)" />
+    </if>
+    <dbquery id="aa">select title, href, txt from web where id='$AA'</dbquery>
+    <setvar name="S" value="'Product Info'" />
+    <setvar name="S" value="aa.title" cnd="aa.title&lt;&gt;''" />
+    <dbquery id="sys">select * from sys</dbquery>
+    <dbquery id="pa">select * from pa where pno='$request.pno' order by pno</dbquery>
+    <dbquery id="grp">
+      <![CDATA[select pno, gid, des from pa where pno='$pa.gid' and active>0 order by pno]]>
+    </dbquery>
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="onpage" />
+    <include name="footer" />
+    <include name="asider" />
+    <block name="wapform.zz" />
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+    <block name="breadcrumb2" one="grp.des" one_href="'shop.wml?gp='+pa.gid" two="pa.des" />
+  </card>
+  <card id="content" device="sub">
+    <block name="place" />
+  </card>
+</wml>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="crosstab" title="Sales Cross Analysis">
+
+    <!--
+      WapForm for Web — sales cross-analysis example (salesperson/customer x year/month)
+
+      This version is rewritten from the carefully tuned version that is confirmed to work. Earlier versions
+      used AROW/ACOL/CELL (the crosstab's internal grid indexes, 0-based); this one uses
+      cellrow/cellcol/cell (counters that increase naturally while <tr>/<td> are rendered,
+      1-based, backed by Wap.RowNumber/Wap.ColNumber, not specific to crosstab).
+      They are two completely different sets of variables, not a case difference — cell matches CELL because
+      SetVar/GetVar both UpperCase(Name) before looking up, so identifiers are
+      case-insensitive; but cellrow/cellcol and AROW/ACOL are two independent sets of variables, and that was
+      the real cause of the earlier crosstab crashes, not the or keyword (that was a
+      misdiagnosis; compound conditions such as (cellrow<3) or (cellcol<3) are used as is here,
+      with no need to rewrite them as elseif).
+
+      The SQL sums the amounts with group by first, so each (month, salesperson, customer) has only
+      one row; the crosstab's Cell() accumulation then only handles "the first write to this cell",
+      without relying on it to accumulate duplicates, which is more predictable.
+
+      With data spanning two years, the two column groupings yy (outer column, year) →
+      ym (inner column, year-month) are correct across years; with a single year
+      the outer yy grouping always has one value, and the year boundary could not be tested.
+
+      rows="20" cols="15" control paging (Wap.LinesPerPage/CrossRow/CrossCol):
+      when the data has more rows/columns than this, the output pages automatically.
+
+      [Fixed] The dialog= attribute is only parsed, not used, by the current engine (Dlg is a local variable
+      that is only assigned and never read anywhere in the source), so writing it has no effect.
+
+      But autospan="yes" really does work — it was earlier mistaken for dead code like dialog=;
+      reading the source of _td showed that AutoSpan is a TCard field that _crosstab only sets,
+      and _td is what actually uses it — two separate pieces of logic. It works as a standard two-pass "measure, then merge":
+      Printable=0 (measure pass) compares adjacent cells, and when they are the same, adds the count of
+      identical consecutive cells to ColArray/RowArray; Printable=1 (render pass) reads that count back,
+      and when it is greater than 1 outputs colspan=/rowspan= to merge those cells into one. This applies only to
+      the header area (the salesperson/customer/year/month columns and rows); data cells are not affected. That is why
+      the salesperson code "10" appears only once, vertically centered — it is not a CSS illusion;
+      the browser really receives a rowspan cell, and centering the content is the browser's default for
+      rowspan cells.
+    -->
+
+    <div class="narrow">
+      <div class="wf-head">
+        <div class="wf-badge">WapForm for Web · Example</div>
+        <div class="wf-title">Sales Cross Analysis</div>
+        <div class="wf-sub">2026/01 ~ 2026/09, cross-tabulated by salesperson/customer (rows) and year/month (columns).</div>
+      </div>
+    </div>
+
+    <dbquery id="xy">
+      <![CDATA[
+select
+  year(s.sdate)                          yy,
+  date_format(s.sdate, '%Y%m')           ym,
+  s.Eno                                  eno,
+  s.Cno                                  cno,
+  sum(coalesce(s.Amount, 0))             amount
+from sh s
+left join cu c on c.Cno = s.Cno
+where s.sdate >= '2026-01-01' and s.sdate < '2026-10-01'
+group by 
+  date_format(s.sdate, '%Y%m'),
+  s.Eno,
+  s.Cno
+order by yy, ym, eno, cno
+    ]]>
+    </dbquery>
+    <div class="xtab-wrap">
+    <crosstab dataset="xy" dialog="cno;sdate" field="amount" autospan="yes">
+      <setvar name="I" value="0"/>
+      <setvar name="J" value="0"/>
+      <setvar name="K" value="0"/>
+      <setvar name="N" value="0"/>
+      <setvar name="T" value="0"/>
+      <setvar name="C" value="''"/>
+      <setvar name="R" value="''"/>
+      <setvar name="A" value="0"/>
+      <setvar name="B" value="0"/>
+      <setvar name="X" value="[1..999]"/>
+      <setvar name="Y" value="[1..999]"/>
+      <page>
+        <table class="xtab-table" rows="20" cols="15">
+          <row change="xy.eno">
+            <setvar name="I" value="1"/>
+            <while cnd="I&lt;=99">
+              <setvar name="X[I]" value="0"/>
+              <setvar name="I" value="I+1"/>
+            </while>
+            <row change="xy.cno">
+              <setvar name="K" value="0"/>
+              <setvar name="B" value="0"/>
+              <tr>
+                <col change="xy.YY">
+                  <setvar name="A" value="0"/>
+                  <col change="xy.YM">
+                    <log message="$cellrow $cellcol $cell"/>
+                    <setvar name="C" value="cell"/>
+                    <setvar name="R" value="cell" cnd="cellcol=1"/>
+                    <setvar name="N" value="0"/>
+                    <if cnd="(cellrow&lt;3) or (cellcol&lt;3)">
+                      <if cnd="(cellrow=2) and (cellcol&lt;3)">
+                      <td width="120" align="center"><i>$(IF(cell='',' ',cell))</i></td>
+                      <else/>
+                      <td align="center">$(IF(cell='',' ',cell))</td>
+                      </if>
+                      <else/>
+                      <setvar name="N" value="VAL(cell)"/>
+                      <td width="60" align="right">$(IF(N=0,' ',FORMAT('%d',N)))</td>
+                      <setvar name="A" value="A+N"/>
+                      <setvar name="B" value="B+N"/>
+                      <setvar name="K" value="K+1"/>
+                      <setvar name="X[K]" value="X[K]+N"/>
+                      <setvar name="Y[K]" value="Y[K]+N"/>
+                    </if>
+                  </col>
+                  <if cnd="cellcol&gt;3">
+                    <if cnd="cellrow=1">
+                      <th width="60" align="center">$C</th>
+                    </if>
+                    <if cnd="cellrow=2">
+                      <th width="60" align="center">TOTAL</th>
+                    </if>
+                    <if cnd="cellrow&gt;2">
+                      <td align="right">$(FORMAT('%d',A))</td>
+                    </if>
+                    <setvar name="K" value="K+1"/>
+                    <setvar name="X[K]" value="X[K]+A"/>
+                    <setvar name="Y[K]" value="Y[K]+A"/>
+                  </if>
+                </col>
+                <if cnd="cellrow=1">
+                  <th width="60" align="center"> </th>
+                </if>
+                <if cnd="cellrow=2">
+                  <th width="60" align="center">AMOUNT</th>
+                </if>
+                <if cnd="cellrow&gt;2">
+                  <td align="right">$(FORMAT('%d',B))</td>
+                </if>
+                <setvar name="K" value="K+1"/>
+                <setvar name="X[K]" value="X[K]+B"/>
+                <setvar name="Y[K]" value="Y[K]+B"/>
+              </tr>
+            </row>
+            <if cnd="cellrow&gt;3">
+              <tr class="xtab-total-row">
+                <th width="60">$R</th>
+                <th width="60">TOTAL</th>
+                <setvar name="I" value="1"/>
+                <while cnd="I&lt;=K">
+                  <td width="60" align="right">$(FORMAT('%d',X[I]))</td>
+                  <setvar name="I" value="I+1"/>
+                </while>
+              </tr>
+            </if>
+          </row>
+          <tr class="xtab-grand-row">
+            <th width="60"> </th>
+            <th width="60">AMOUNT</th>
+            <setvar name="I" value="1"/>
+            <while cnd="I&lt;=K">
+              <td width="60" align="right">$(FORMAT('%d',Y[I]))</td>
+              <setvar name="I" value="I+1"/>
+            </while>
+          </tr>
+        </table>
+      </page>
+    </crosstab>
+    </div>
+
+    <div class="narrow">
+      <div class="foot">
+        Layout comes from <code>wapform.htm</code>; the data and cross-tab logic are defined in <code>crosstab.wml</code>.<br/>
+        Data source <code>sh</code> (sales order headers), period 2026/01 ~ 2026/09; amounts are summed in SQL with
+        <code>group by</code> first, so the cross table only has to place each value in its cell.<br/>
+        It uses the same data as the <a href="report.wml">grouped report</a>, presented differently — one is
+        a row x column cross matrix, the other a grouped list report.<br/>
+        More examples: <a href="multiupload.wml">File Upload</a>, <a href="chart.wml">Chart Components</a>,
+        <a href="report.wml">Grouped Sales Report</a>, <a href="linepush.wml?push_userid=&amp;push_text=">LINE Push</a>, <a href="function.wml">Function Self-Test</a>.
+      </div>
+    </div>
+
+  </card>
+
+</wml>

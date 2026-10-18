@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="asider" device="sub">
+    <setvar name="i" value="0"/>
+    <setvar name="j" value="0"/>
+    <setvar name="k" value="0"/>
+    <setvar name="p" value="0"/>
+    <setvar name="headerSidebar" value="''"/>
+    <block name="asider.aa"/>
+    <while cnd="not(mnu_count[k]=999999)">
+      <setvar name="headerSidebar" value="FORMAT('%2.2d',k+1)"/>
+      <if cnd="1">
+        <setvar name="p" value="mnu_count[k]"/>
+        <setvar name="ic" value="'fa fa-th'"/>
+        <setvar name="ic" value="mnu_icon[k]" cnd="len(mnu_icon[k])&gt;0"/>
+        <setvar name="app" value="'grid'"/>
+        <setvar name="column_count" value="ceil(p/10)"/>
+        <switch exp="mnu_typ[k]">
+          <case value="b">
+            <setvar name="ic" value="ic+' text-danger'"/>
+            <setvar name="app" value="'book'"/>
+          </case>
+          <case value="n">
+            <setvar name="ic" value="ic+' text-info'"/>
+            <setvar name="app" value="'grid'"/>
+          </case>
+          <case value="p">
+            <setvar name="ic" value="ic+' text-blue'"/>
+            <setvar name="app" value="'grid'"/>
+          </case>
+          <default>
+            <setvar name="ic" value="ic+' text-success'"/>
+            <setvar name="app" value="'grid'"/>
+          </default>
+        </switch>
+      </if>
+      <block name="asider-list.aa"/>
+      <setvar name="i" value="0"/>
+      <setvar name="k" value="k+1"/>
+      <while cnd="i&lt;p">
+        <if cnd="1">
+          <setvar name="ic" value="''"/>
+          <setvar name="app" value="''"/>
+          <switch exp="mnu_typ[k]">
+            <case value="b">
+              <setvar name="app" value="'book'"/>
+            </case>
+            <case value="n">
+              <setvar name="app" value="'note'"/>
+            </case>
+            <case value="p">
+              <setvar name="app" value="'page'"/>
+            </case>
+            <case value="s">
+              <setvar name="app" value="'index'"/>
+            </case>
+            <default>
+              <setvar name="app" value="'grid'"/>
+            </default>
+          </switch>
+        </if>
+        <block name="asider-item"/>
+        <setvar name="i" value="i+1"/>
+        <setvar name="k" value="k+1"/>
+      </while>
+      <block name="asider-list.zz"/>
+      <setvar name="j" value="j+1"/>
+    </while>
+    <block name="asider.zz"/>
+  </card>
+</wml>

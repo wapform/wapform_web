@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="register" title="Terms of Service" device="wapform.html">
+    <dbquery id="sys">select * from sys</dbquery>
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="content.aa" />
+    <block name="member" />
+    <block name="content.zz" />
+    <include name="footer" />
+    <include name="asider" />
+    <block name="wapform.zz" />
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+    <block name="breadcrumb" one="'Terms of Service'" />
+  </card>
+</wml>

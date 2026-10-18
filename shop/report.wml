@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="report" title="Grouped Sales Report">
+
+    <!--
+      WapForm for Web — two-level grouped sales report example (salesperson → customer → month)
+
+      The query here is exactly the same as crosstab.wml (the same SQL, the same
+      group by totals, the same date range and eno/cno filters); only the presentation
+      changes from a "row x column matrix" to a "grouped list report". The customer column deliberately uses the raw Cno
+      code (not converted to the Cshort short name), so the numbers in the two examples can be
+      compared cell by cell: the cross-cell amount for a salesperson in a given month in crosstab.wml should match
+      the detail row in this report for the same salesperson, customer code and month.
+
+      <report> uses an engine completely different from, and much simpler than, <crosstab>: it relies on <group>
+      tags + a switch called MyEnable to decide whether it is now producing a "group header", a "detail" or
+      a "group subtotal", without computing any grid coordinates.
+
+      This file uses two levels of <group> (two group change="..."), following
+      the rules read from mywap.pas's CheckGroupHeaders/ParseGroupHeaders/ParseRecord/
+      CheckGroupFooters/ParseGroupFooters:
+
+        <report dataset="xy">
+          ... report prefix (ParsePrefix), runs once ...
+          <group change="first-level key, e.g. salesperson">
+            ... before the nested <group> = first-level header, printed once when the first-level key changes ...
+            <group change="second-level key, e.g. customer">
+              ... before the nested <group> = second-level header, printed once when the second-level key changes ...
+              <group change="innermost key, usually the detail's own unique key">
+                ... detail row, printed once per record ...
+              </group>
+              ... after the nested <group> = second-level subtotal, printed once before moving to the next
+                  second-level key ...
+            </group>
+            ... after the nested <group> = first-level subtotal, printed once before moving to the next
+                first-level key ...
+          </group>
+          ... report suffix (ParseSuffix), runs once ...
+        </report>
+
+      N levels of grouping (headers + subtotals) need N+1 nested <group>: the outer N
+      each handle one level's header/subtotal, and the innermost handles the detail rows. This file has two levels, so
+      there are three nested <group> in all: salesperson, customer, month (the detail row itself is the monthly total,
+      so no other unique key is needed).
+
+      Headers/subtotals are decided as a "chain": when an outer key changes, the inner level is treated as changed too and
+      its header is printed again (even if the customer code happens to repeat; this is standard control-break report
+      behavior, not a bug). Subtotals go the other way: the inner level prints first (customer subtotal first, then the salesperson
+      subtotal), matching how a nested report folds from the inside out.
+
+      ORDER BY must follow the grouping levels (salesperson, then customer, then month). This matters as much with two
+      levels as with one, but the risk doubles — if any level is not sorted, that level's
+      header is split into several repeated pieces.
+
+      [Fixed] All FORMAT('%d', ...) were changed to FORMAT('%.0f', ...). xy.amt comes
+      from the SQL sum() aggregate, and many database drivers return SUM(integer column) as
+      Double/Currency, no longer an integer; the FORMAT function does branch on the actual type,
+      but the format string is passed to Format() unchanged — '%d' is an integer-only
+      format code, and feeding it a floating-point value makes Format() itself throw (Numeric error).
+      '%.0f' accepts both integers and floats and still shows no decimals. This problem
+      did not show up in crosstab.wml because its values first go through CrossGrid's string
+      grid and back through VAL(), being implicitly converted to integers on the way; report.wml reads
+      xy.amt directly, without that conversion, so the problem shows up there.
+    -->
+
+    <dbquery id="xy">
+      <![CDATA[
+select
+  year(s.sdate)                          yy,
+  date_format(s.sdate, '%Y%m')           ym,
+  s.Eno                                  eno,
+  s.Cno                                  cust,
+  sum(coalesce(s.Amount, 0))             amt
+from sh s
+where s.sdate >= '2026-01-01' and s.sdate < '2026-10-01'
+group by
+  date_format(s.sdate, '%Y%m'),
+  s.Eno,
+  s.Cno
+order by yy, s.Eno, cust, ym
+      ]]>
+    </dbquery>
+
+    <div class="narrow">
+      <div class="wf-head">
+        <div class="wf-badge">WapForm for Web · Example</div>
+        <div class="wf-title">Grouped Sales Report</div>
+        <div class="wf-sub">2026/01 ~ 2026/09, grouped in two levels by salesperson/customer, with amounts by month and subtotals and totals at every level.</div>
+      </div>
+    </div>
+
+    <div class="narrow">
+      <report dataset="xy">
+
+        <setvar name="No" value="0"/>
+        <!-- EmpSubtotal: subtotal for the current salesperson, reset once for each new salesperson -->
+        <setvar name="EmpSubtotal" value="0.0"/>
+        <!-- CustSubtotal: subtotal for the current customer, reset once for each new customer -->
+        <setvar name="CustSubtotal" value="0.0"/>
+        <!-- Grand: total for all salespeople, reset only this once -->
+        <setvar name="Grand" value="0.0"/>
+
+        <table class="rpt-table">
+          <tr>
+            <th>#</th>
+            <th>Month</th>
+            <th>Amount</th>
+          </tr>
+
+          <group change="xy.eno">
+
+            <!-- first-level header: salesperson -->
+            <tr class="rpt-group-row">
+              <td colspan="3">Salesperson: $(xy.eno)</td>
+            </tr>
+            <setvar name="EmpSubtotal" value="0"/>
+
+            <group change="xy.cust">
+
+              <!-- second-level header: customer -->
+              <tr class="rpt-subgroup-row">
+                <td colspan="3">Customer: $(xy.cust)</td>
+              </tr>
+              <setvar name="CustSubtotal" value="0"/>
+
+              <group change="xy.ym">
+                <setvar name="No" value="No+1"/>
+                <tr>
+                  <td>$(No)</td>
+                  <td>$(xy.ym)</td>
+                  <td>$(FORMAT('%.0f',xy.amt))</td>
+                </tr>
+                <setvar name="CustSubtotal" value="CustSubtotal + xy.amt"/>
+                <setvar name="EmpSubtotal" value="EmpSubtotal + xy.amt"/>
+                <setvar name="Grand" value="Grand + xy.amt"/>
+              </group>
+
+              <!-- second-level subtotal: customer subtotal, printed once before the customer changes -->
+              <tr class="rpt-subtotal-row">
+                <td colspan="2">Customer subtotal</td>
+                <td>$(FORMAT('%.0f',CustSubtotal))</td>
+              </tr>
+
+            </group>
+
+            <!-- first-level subtotal: salesperson subtotal, printed once before the salesperson changes -->
+            <tr class="rpt-empsubtotal-row">
+              <td colspan="2">Salesperson subtotal</td>
+              <td>$(FORMAT('%.0f',EmpSubtotal))</td>
+            </tr>
+
+          </group>
+
+          <tr class="rpt-grand-row">
+            <td colspan="2">Total</td>
+            <td>$(FORMAT('%.0f',Grand))</td>
+          </tr>
+
+        </table>
+      </report>
+    </div>
+
+    <div class="narrow">
+      <div class="foot">
+        Layout comes from <code>wapform.htm</code>; the data and grouping logic are defined in <code>report.wml</code>.<br/>
+        Data source <code>sh</code> (sales order headers), grouped in two levels by salesperson → customer and summarized by month, period 2026/01 ~ 2026/09,
+        with exactly the same filters as the <a href="crosstab.wml">cross analysis</a>.<br/>
+        It uses <b>the same query</b> as the <a href="crosstab.wml">cross analysis</a>, presented differently — one is a grouped list report,
+        the other a row x column cross matrix; both use the raw customer code, so the amounts can be compared cell by cell.<br/>
+        More examples: <a href="multiupload.wml">File Upload</a>, <a href="chart.wml">Chart Components</a>,
+        <a href="crosstab.wml">Sales Cross Analysis</a>, <a href="linepush.wml?push_userid=&amp;push_text=">LINE Push</a>, <a href="function.wml">Function Self-Test</a>.
+      </div>
+    </div>
+
+  </card>
+
+</wml>

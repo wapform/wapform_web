@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="xyz">
+    <setvar name="A" value="['AAA','BBB','XYZ','AAA','BBB','XYZ']"/>
+    <setvar name="I" value="0"/>
+    <table column="3">
+      <tr>
+        <td>xyz</td>
+        <td>xyz</td>
+        <td>xyz</td>
+      </tr>
+      <while cnd="I&lt;=COUNT(productID)">
+        <tr>
+          <td>$(A[I])</td>
+          <td>$(productID[I])</td>
+          <td>$(quantity[I])</td>
+        </tr>
+        <setvar name="I" value="I+1"/>
+      </while>
+    </table>
+  </card>
+</wml>

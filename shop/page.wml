@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" device="wapform.html">
+    <setvar name="gp" value="'0000'" />
+    <setvar name="gp" value="request.gp" cnd="define(request.gp)" />
+    <setvar name="pg" value="1" />
+    <setvar name="pg" value="val(request.pg)" cnd="define(request.pg)" />
+    <setvar name="az" value="'az'" />
+    <setvar name="az" value="request.sort" cnd="define(request.sort)" />
+    <setvar name="i" value="0" />
+    <setvar name="s" value="'Product Info'" />
+    <setvar name="b" value="0" />
+    <setvar name="gtitle" value="mid(gp,1,2)+'00'" />
+    <setvar name="breadcrumb" value="'User Manual'" />
+    <if cnd="DEFINE(session.usr)">
+      <setvar name="B" value="1" cnd="session.usr='admin'" />
+    </if>
+    <dbquery id="sys">select * from sys</dbquery>
+    <dbquery id="grp">
+      <![CDATA[select pno, gid, des from pa where pno='$gp' and active>0 order by pno]]>
+    </dbquery>
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="onpage" />
+    <include name="footer" />
+    <block name="wapform.zz" />
+  </card>
+  <card id="slider" device="sub">
+    <block name="slider" />
+  </card>
+  <card id="breadcrumb" device="sub">
+  </card>
+  <card id="content" device="sub">
+    <dbquery id="pa">
+      <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, p.topic from pa p
+      where (p.gid='$gp') and (p.active>0) 
+      order by p.pno
+      limit $((pg-1)*20), 20
+]]>
+    </dbquery>
+    <dbgroup dataset="pa">
+      <setvar name="i" value="0" />
+      <group>
+        <if cnd="i=0">
+          <![CDATA[
+        <section class="section-two" style="background-color:$('#'+COLOR2HEX(color[inc('bot',1) mod 6]));">
+            <div class="container">
+                $pa.topic
+            </div><!--end container-->
+        </section><!--end section-->
+]]>
+          <else />
+          <![CDATA[
+        <section class="section-two border-top" style="background-color:$('#'+COLOR2HEX(color[inc('bot',1) mod 6]));">
+            <div class="container">
+                $pa.topic
+            </div><!--end container-->
+        </section><!--end section-->
+]]>
+        </if>
+        <setvar name="i" value="i+1" />
+      </group>
+    </dbgroup>
+  </card>
+</wml>

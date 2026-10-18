@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P1" device="wapform.html">
+    <setvar name="category" value="''" />
+    <dbquery id="sys">select * from sys</dbquery>
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="content.aa" one="'Cart'" />
+    <setvar name="PDATE" value="FORMAT('%2.2d',YEAR(DATE)-1911)+FORMAT('%2.2d',MONTH(DATE))+FORMAT('%2.2d',DAY(DATE))" />
+    <setvar name="pno" value="''" />
+    <setvar name="pno" value="request.pno" cnd="DEFINE(request.pno)" />
+    <setvar name="qty" value="1" />
+    <setvar name="qty" value="VAL(request.qty)" cnd="DEFINE(request.qty)" />
+    <setvar name="rem" value="''" />
+    <setvar name="rem" value="request.rem" cnd="DEFINE(request.rem)" />
+    <setvar name="rem" value="''" cnd="rem='Please note the product color and specification'" />
+    <dbquery id="cu">
+      select * from cu where email='$session.usr'
+    </dbquery>
+    <if cnd="NOT(DEFINE(session.ord))">
+      <dbquery id="maxno">
+        <![CDATA[select sno from num where date='$(PDATE+'A')']]>
+      </dbquery>
+      <if cnd="maxno.count=0">
+        <dbquery>
+          <![CDATA[insert into num values ('$(PDATE+'A')',0,0)]]>
+        </dbquery>
+      </if>
+      <dbquery>
+        <![CDATA[update num set sno=sno+1 where date='$(PDATE+'A')']]>
+      </dbquery>
+      <dbquery id="maxno">
+        <![CDATA[select sno from num where date='$(PDATE+'A')']]>
+      </dbquery>
+      <session name="ord" value="PDATE+'A'+FORMAT('%3.3d',maxno.sno)" />
+      <dbquery>
+        <![CDATA[insert into rh (sno, sdate, cno, TaxRate, dm)
+        VALUES ('$session.ord', '$(MYDATE(DATE))', '$cu.cno', 5, 'No flyers')]]>
+      </dbquery>
+      <else />
+      <dbquery id="sh">
+        select * from rh where sno='$session.ord'
+      </dbquery>
+      <if cnd="sh.a2010='xyz'">
+        <session name="ord" value="''" />
+        <dbquery id="maxno">
+          <![CDATA[select sno from num where date='$(PDATE+'A')']]>
+        </dbquery>
+        <if cnd="maxno.count=0">
+          <dbquery>
+            <![CDATA[insert into num values ('$(PDATE+'A')',0,0)]]>
+          </dbquery>
+        </if>
+        <dbquery>
+          <![CDATA[update num set sno=sno+1 where date='$(PDATE+'A')']]>
+        </dbquery>
+        <dbquery id="maxno">
+          <![CDATA[select sno from num where date='$(PDATE+'A')']]>
+        </dbquery>
+        <session name="ord" value="PDATE+'A'+FORMAT('%3.3d',maxno.sno)" />
+        <dbquery>
+          <![CDATA[insert into rh (sno, sdate, cno, TaxRate, dm)
+        VALUES ('$session.ord', '$(MYDATE(DATE))', '$cu.cno', 5, 'No flyers')]]>
+        </dbquery>
+      </if>
+    </if>
+    <dbquery id="pa">
+      <![CDATA[select * from pa where pno='$pno']]>
+    </dbquery>
+    <dbquery id="ss">
+      <![CDATA[select * from rn where sno='$session.ord' and pno='$pno']]>
+    </dbquery>
+    <if cnd="pa.price1&gt;pa.pricea">
+      <if cnd="1&gt;2">
+        <dbquery>
+          <![CDATA[update rn set qty=qty+$qty where sno='$session.ord' and pno='$pno']]>
+        </dbquery>
+        <else />
+        <dbquery id="maxitm">
+          <![CDATA[select max(itm) itm from rn where sno='$session.ord']]>
+        </dbquery>
+        <dbquery debug="yes">
+          <![CDATA[insert into rn (sno, itm, sdate, cno, pno, qty, price, Rem)
+      VALUES ('$session.ord', $(IF(isnull(maxitm.itm),0,maxitm.itm)+1), '$(MYDATE(DATE))', '$cu.cno', '$pno', $qty, $pa.price1, '$rem')]]>
+        </dbquery>
+      </if>
+    </if>
+    <block name="alert" title="'Message'" message="'The item has been added to your cart.'" />
+    <![CDATA[
+<script>
+    var timer = setTimeout(function() {
+        window.location='index.wml'
+    }, 3000);
+</script>
+]]>
+    <block name="content.zz" />
+    <include name="footer" />
+    <block name="wapform.zz" />
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+    <block name="breadcrumb" one="'Message'" />
+  </card>
+</wml>

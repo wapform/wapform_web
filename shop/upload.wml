@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="upload" title="Raw PUT Single-File Upload">
+
+    <!--
+      WapForm for Web — <upload> tag demo page
+
+      This page receives an upload request of a "completely different shape" from multiupload.wml; the two are not interchangeable:
+
+        multiupload.wml  <multiupload>  multipart/form-data
+                                  what a browser <form enctype="multipart/form-data">
+                                  sends: several files at once, each with a field name
+                                  and the original file name.
+
+        upload.wml       <upload>       raw PUT
+                                  the whole request body is the bytes of the file itself,
+                                  with no wrapper, no field name and no file name.
+
+      This tag was made to be compatible with the way upload.php receives files; the two behave the same:
+
+        upload.php:
+          $input = fopen('php://input', 'rb');   // read the whole body directly
+          fwrite($output, $buffer);              // write it to a file as is
+
+        upload.wml:
+          <upload destination="..." unique="yes" .../>
+
+      The sender (UploadFile in Unit2.pas) already has this shape, so it needs no change:
+
+        HttpCli.URL := 'http://localhost:8080/shop/upload.wml';
+        HttpCli.ContentTypePost := MimeOf(AFileName); // ← see "Always specify Content-Type" below
+        HttpCli.SendStream := Stream;
+        HttpCli.RequestVer := '1.1';
+        HttpCli.Put;                             // ← the key is Put, not Post
+
+      ★ Always specify Content-Type, and it must not be application/x-www-form-urlencoded.
+
+      This is a pitfall found in testing, with subtle symptoms: the server "receives something" and the length is exactly right,
+      but the bytes at the start of the file are altered and the saved image will not open. The reason: when Indy's HTTP
+      server sees application/x-www-form-urlencoded it decides the body is form text,
+      and processes it as a string once before handing it to anyone, applying Windows
+      best-fit character conversion on the way: bytes are treated as Latin-1 characters, and when converted to the ANSI code page,
+      anything without a mapping is replaced with the "closest-looking" ASCII letter —
+
+        FF (ÿ) → 79 ('y')      D8 (Ø) → 4F ('O')      E0 (à) → 61 ('a')
+
+      so the JPEG header FF D8 FF E0 becomes 79 4F 79 61, while bytes below $80
+      (the JFIF letters) are untouched, so it looks as if "only the first few bytes are broken".
+      This happens before the server reads the request, so neither the template nor <upload> can repair it;
+      only the sender can fix it by specifying the right Content-Type.
+
+      curl's data-binary option sends application/x-www-form-urlencoded by default,
+      and so does ICS's THttpCli; both must set it explicitly. image/jpeg, image/png and
+      application/octet-stream all work.
+
+      Note that the other procedure in Unit2.pas, UploadFile2, uses a multipart POST and must call
+      multiupload.wml, not this page — the two procedures map to two different tags, so don't mix them up.
+
+      How the file name is chosen: a raw PUT request carries no file name at all (only multipart does),
+      so the file name must be decided on the server. Three ways:
+
+        1. filename="a02.jpg"
+           A fixed file name. Like upload.php, uploading again overwrites the same file.
+
+        2. unique="yes" (same as nameconflict="unique"; both are recognized;
+           unique matches the spelling used by <webcopy>)
+           Avoids name clashes automatically: if filename is given, that name is kept, and only when a file
+           of the same name already exists in the folder is _01, _02 ... appended until an unused one is found.
+           Only when filename is not given is a name generated from a timestamp (yymmddhhnnsszzz).
+
+        ★ This page writes only unique="yes", with no filename.
+
+           Without filename, the tag first reads filename= from the Content-Disposition HTTP header,
+           the standard field for passing a file name over HTTP; <webcopy>'s httpupload
+           adds it automatically. So the caller needs to do nothing extra; the original file name is kept,
+           and there is no need to add ?name= to the URL.
+
+           Only when the header has no file name either (for example, curl used by hand without that header) does it fall back
+           to generating one from a timestamp.
+
+           unique="yes" handles name clashes: when a file of the same name already exists in the folder,
+           _01, _02 ... is appended until the name is unique, so nothing is overwritten.
+
+        3. Neither
+           Same as unique; the extension is inferred from the request's Content-Type:
+             image/jpeg .jpg    image/png .png    image/gif .gif
+             image/bmp  .bmp    application/pdf .pdf
+             application/zip .zip   text/plain .txt   text/csv .csv
+             application/msword .doc
+             application/vnd.ms-excel .xls
+             application/vnd.ms-powerpoint .ppt
+             ...officedocument.wordprocessingml.document .docx
+             ...officedocument.spreadsheetml.sheet .xlsx
+             ...officedocument.presentationml.presentation .pptx
+           Any unrecognized type is treated as .jpg. So the Content-Type sent must match
+           the actual file type — for example, sending a PDF labeled image/jpeg makes it .jpg,
+           and then header validation finds the content is a PDF that does not match .jpg, and refuses to save it.
+           If you don't want to rely on inference, setting the extension with the filename attribute is the most reliable.
+
+      Get the actual saved file name from the variable named by the savedname attribute (up_name on this page),
+      because only the tag knows a generated file name, and the template needs it to show the preview.
+
+      The file name can also come from outside, for example filename="$(name)" with ?name=... in the URL;
+      the tag strips any path, blocks .. and drive letters, then checks the extension whitelist.
+
+      Allowed types: the accept attribute lists the allowed extensions (comma-separated); empty means no restriction.
+      Whatever the setting, .wml is always forbidden — if the upload folder is under the web root, a .wml would be
+      "executed" by the engine, so anyone who could upload could run any template.
+
+      In addition, "recognized formats" are checked again by the magic bytes in the file header:
+        jpg/jpeg, png, gif, bmp, pdf
+        zip (docx/xlsx/pptx are zip files inside, all with the PK header)
+        doc/xls/ppt (Office 97-2003 OLE2 compound documents, all with the D0 CF 11 E0 header)
+      This blocks "something else with a changed extension"; for example, a PDF renamed to .jpg
+      is refused. Formats without a fixed header (txt, csv and so on) skip this check and are accepted.
+
+      Opening this page directly in a browser (GET) does not cause an error; since there is no body,
+      result gets 'empty body', and the page shows the usage notes below.
+    -->
+
+    <div class="narrow">
+      <div class="wf-head">
+        <div class="wf-badge">WapForm for Web · Example</div>
+        <div class="wf-title">Raw PUT Single-File Upload</div>
+        <div class="wf-sub">The whole request body is one file, with no multipart wrapper — compatible with the way upload.php receives files.</div>
+      </div>
+    </div>
+
+    <div class="narrow">
+
+      <upload destination="upload\"
+                 accept="jpg,jpeg,png,gif,bmp,pdf,txt,csv,xlsx,docx,pptx,xls,doc,ppt,zip"
+                 result="up_err"
+                 size="up_size"
+                 savedname="up_name"/>
+
+      <if cnd="up_size &gt; 0">
+        <div class="res-bar">
+          <span>✓</span>
+          <span>Saved <b>$(up_name)</b>, $(up_size) bytes.</span>
+        </div>
+        <div class="card">
+          <div class="card-title">Save result</div>
+          <img class="up-preview" src="upload/$(up_name)" alt="$(up_name)"/>
+        </div>
+      </if>
+
+      <if cnd="up_err &lt;> ''">
+        <div class="alert">
+          <span>!</span>
+          <span>Nothing was saved this time: $(up_err)</span>
+        </div>
+      </if>
+
+      <div class="card">
+        <div class="card-title">How to test</div>
+        <div class="card-note">
+          This is not a form page and has no file button — a raw PUT cannot be sent from an ordinary browser form;
+          a program (or curl) must send the file content directly as the request body.
+        </div>
+
+        <div class="alert">
+          <span>!</span>
+          <span>
+            <b>Always specify Content-Type</b> when sending (for example <code>image/jpeg</code>);
+            do not use the default <code>application/x-www-form-urlencoded</code> —
+            it makes the server treat the file as form text: the file length looks right, but a few
+            bytes are silently altered and the saved image will not open. curl's <code>--data-binary</code>
+            and ICS's <code>THttpCli</code> both send that type by default, so both must set it explicitly.
+          </span>
+        </div>
+
+        <div class="card-note">
+          <b>With Unit2.pas:</b> change the URL in UploadFile to this page and press the button.
+        </div>
+        <div class="code-block">
+          HttpCli.URL := 'http://localhost:8080/shop/upload.wml';<br/>
+          HttpCli.ContentTypePost := 'image/jpeg';<br/>
+          HttpCli.SendStream := Stream;<br/>
+          HttpCli.RequestVer := '1.1';<br/>
+          HttpCli.Put;
+        </div>
+
+        <div class="card-note">
+          <b>With curl:</b>
+        </div>
+        <div class="code-block">
+          curl -X PUT --data-binary "@C:\Wapform\a02.jpg" -H "Content-Type: image/jpeg" http://localhost:8080/shop/upload.wml<br/>
+          <br/>
+          For a PDF, switch to the matching type instead of reusing image/jpeg:<br/>
+          curl -X PUT --data-binary "@C:\Wapform\aaa.pdf" -H "Content-Type: application/pdf" http://localhost:8080/shop/upload.wml<br/>
+          <br/>
+          To set the saved file name, add a Content-Disposition header:<br/>
+          curl -X PUT --data-binary "@C:\Wapform\a02.jpg" -H "Content-Type: image/jpeg" -H "Content-Disposition: attachment; filename=\"a02.jpg\"" http://localhost:8080/shop/upload.wml
+        </div>
+      </div>
+
+    </div>
+
+    <div class="narrow">
+      <div class="foot">
+        Layout comes from <code>wapform.htm</code>; the receiving logic comes from the <code>&lt;upload&gt;</code> tag (mywap.pas).<br/>
+        It is a different upload shape from <a href="multiupload.wml">File Upload</a> — that page uses a browser form's
+        multipart, this one a raw PUT, and the two tags are not interchangeable.<br/>
+        More examples: <a href="chart.wml">Chart Components</a>, <a href="crosstab.wml">Sales Cross Analysis</a>,
+        <a href="report.wml">Grouped Sales Report</a>, <a href="function.wml">Function Self-Test</a>.
+      </div>
+    </div>
+
+  </card>
+
+</wml>

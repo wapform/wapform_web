@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="mainmenu" device="MDI">
+    <dbquery id="usr">select pwd from users where userid='$username'</dbquery>
+    <if cnd="usr.count=0">
+      <alert message="Account does not exist"/>
+      <prev/>
+    </if>
+    <if cnd="upper(usr.pwd)&lt;&gt;upper(password)">
+      <alert message="Password error"/>
+      <prev/>
+    </if>
+    <function id="wap">
+      <alert message="wap"/>
+    </function>
+    <setvar name="K" value="0"/>
+    <setvar name="N" value="0"/>
+    <setvar name="S" value="''"/>
+    <dbquery id="sub">
+      <![CDATA[select id, title, href from mnu where active=1 and sub=-1 order by id]]>
+    </dbquery>
+    <mainmenu images="imagelist1">
+      <while cnd="NOT(sub.EOF)">
+        <menuitem caption="$sub.title" hint="sub">
+          <dbquery id="itm">
+            <![CDATA[
+            SELECT mnu.id, mnu.title, mnu.href, login.uid, login.w FROM mnu LEFT JOIN login ON mnu.id=login.id
+                and login.uid='$username' where mnu.active=1 and mnu.sub=$sub.id order by mnu.id]]>
+          </dbquery>
+          <while cnd="NOT(itm.EOF)">
+            <setvar name="I" value="-1"/>
+            <setvar name="I" value="itm.w" cnd="itm.w&gt;0"/>
+            <setvar name="N" value="N+1"/>
+            <setvar name="S" value="str(itm.w)"/>
+            <setvar name="K" value="K+1"/>
+            <setvar name="ID" value="'A'+Format('%3.3d',K)"/>
+            <menuitem name="$ID" caption="$(itm.title)" hint="$itm.href" imageindex="$I" onclick="$itm.href"/>
+            <setprop name="$ID" prop="enabled" value="0" cnd="I=-1"/>
+            <invoke instance="itm" method="Next"/>
+          </while>
+        </menuitem>
+        <invoke instance="sub" method="Next"/>
+      </while>
+    </mainmenu>
+  </card>
+</wml>

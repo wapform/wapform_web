@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="linepush" title="LINE Push Test">
+
+    <!--
+      WapForm for Web — <linepush> tag demo page
+
+      This page is meant to be opened in a browser (unlike linebot.wml, which is for the webhook);
+      it lets you test the new "server push" feature without waiting for a user
+      to send a message first.
+
+      <linepush to="..." text="..." result="varname"/> is a tag newly added to
+      mywap.pas and works in any .wml page, not just this one — for example, when an order's
+      status changes, add one <linepush> line to the wml that handles orders to notify the customer,
+      without waiting for them to message the bot first.
+
+      channelAccessToken is read from Config.Values['line_channel_access_token'],
+      the same setting WebHookAction uses; set it once in Config
+      and both can use it.
+
+      userId must be the LINE user's userId (a long alphanumeric string), not the display name
+      and not a phone number — to test, send a message from your own account to linebot.wml first;
+      the value recorded from events_source_userId is the one.
+    -->
+
+    <div class="narrow">
+      <div class="wf-head">
+        <div class="wf-badge">WapForm for Web · Example</div>
+        <div class="wf-title">LINE Push Test</div>
+        <div class="wf-sub">The server can push a text message to a given user at any time, without the user messaging first.</div>
+      </div>
+    </div>
+
+    <div class="narrow">
+
+      <!-- push_userid/push_text exist in the variable table only when this request actually carries these two fields (whether
+           in a GET query string or a POST form); this is
+           TWap.Run's own mechanism (it SetVars only while reading Request.ContentFields/QueryFields,
+           and creates nothing when both are empty). Giving defaults here with
+           <setvar> does not work — when the form really is being submitted, the fields are
+           put into the variable table "before" this card starts running,
+           and <setvar> would overwrite the submitted values with empty strings. The right way is to make
+           the "first visit" path itself carry these two empty query-string values (see
+           the links from nav/example.wml to this page, which all include
+           ?push_userid=&push_text=), so that whether it is the first visit or a form
+           submission, both variables are guaranteed to exist. -->
+
+      <if cnd="push_userid &lt;> ''">
+
+        <linepush to="$(push_userid)" text="$(push_text)" result="push_result"/>
+
+        <if cnd="push_result = 'ok'">
+          <div class="res-bar">
+            <span>✓</span>
+            <span>Push request sent.</span>
+          </div>
+        <else/>
+          <div class="alert">
+            <span>!</span>
+            <span>Push failed: $(push_result)</span>
+          </div>
+        </if>
+
+      </if>
+
+      <div class="card">
+
+        <div class="card-title">Send a test message</div>
+        <div class="card-note">userId must be the LINE user ID, not the display name.</div>
+
+        <form action="linepush.wml" method="post">
+
+          <input type="hidden" name="card" value="linepush"/>
+
+          <div class="field">
+            <span class="field-label">LINE User ID</span>
+            <input type="text" name="push_userid" size="40"/>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Message</span>
+            <input type="text" name="push_text" size="40"/>
+          </div>
+
+          <div class="actions">
+            <input type="submit" value="Send push"/>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+    <div class="narrow">
+      <div class="foot">
+        Layout comes from <code>wapform.htm</code>; the push logic comes from the <code>&lt;linepush&gt;</code> tag (mywap.pas).<br/>
+        It is the other direction of the same LINE integration as <a href="linebot.wml">linebot.wml</a> — one is the user messaging and the bot replying,
+        the other is the server pushing without waiting for the user.<br/>
+        More examples: <a href="multiupload.wml">File Upload</a>, <a href="chart.wml">Chart Components</a>,
+        <a href="crosstab.wml">Sales Cross Analysis</a>, <a href="report.wml">Grouped Sales Report</a>,
+        <a href="function.wml">Function Self-Test</a>.
+      </div>
+    </div>
+
+  </card>
+
+</wml>

@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" device="wapform.html">
+    <setvar name="category" value="'Message'" />
+    <if cnd="NOT(DEFINE(session.usr))">
+      <redirect href="login.wml" />
+      <exit />
+    </if>
+    <dbquery id="sys">
+      select * from sys
+    </dbquery>
+    <if cnd="DEFINE(request.del)">
+      <dbquery>
+        <![CDATA[DELETE FROM rn WHERE sno='$session.ord']]>
+      </dbquery>
+      <session name="ord" value="''" />
+      <redirect href="cart.wml" />
+      <elseif cnd="DEFINE(request.chk)" />
+      <go href="#confirm" />
+      <elseif cnd="DEFINE(request.ok)" />
+      <dbquery id="aa">
+        <![CDATA[SELECT * FROM rn WHERE sno='$session.ord']]>
+      </dbquery>
+      <invoke instance="aa" method="first" />
+      <setvar name="TempTotal" value="0" />
+      <while cnd="NOT(aa.EOF)">
+        <setvar name="TempTotal" value="TempTotal+aa.qty*aa.price" />
+        <dbquery>
+          <![CDATA[INSERT INTO sn (sno, itm, sdate, cno, eno, pno, qty, price, rem) 
+          VALUES ('$session.ord', $aa.itm, '$(FormatDateTime('yyyy-mm-dd',DATE))', '$aa.cno', '99', '$aa.pno', $aa.qty, $aa.price, '$aa.rem')]]>
+        </dbquery>
+        <invoke instance="aa" method="next" />
+      </while>
+      <if cnd="TempTotal&lt;1200">
+        <dbquery>
+          <![CDATA[INSERT INTO sn (sno, itm, sdate, cno, eno, pno, qty, price, rem) 
+          VALUES ('$session.ord', 999, '$(FormatDateTime('yyyy-mm-dd',DATE))', '$aa.cno', '99', '999', 1, 100, NULL)]]>
+        </dbquery>
+        <setvar name="TempTotal" value="TempTotal+100" />
+      </if>
+      <setvar name="Tax" value="ROUND(TempTotal*5/100,0)" />
+      <dbquery id="cu">
+        <![CDATA[select * from cu where email='$session.usr']]>
+      </dbquery>
+      <dbquery>
+        <![CDATA[INSERT INTO sh (sno, cno, cshort, ac, pay, eno, sdate, amount, taxrate, tax, atype)                                        
+        VALUES ('$session.ord', '$cu.cno', '$cu.cshort', '$cu.ac', '$cu.pay', '99', '$(MYDATE(DATE))', $TempTotal, 5, $Tax, 3)]]>
+      </dbquery>
+      <dbquery>
+        <![CDATA[DELETE FROM rn WHERE sno='$session.ord']]>
+      </dbquery>
+      <session name="ord" value="''" />
+      <block name="wapform.aa" />
+      <include name="header" />
+      <block name="content.aa" one="'Cart'" />
+      <block name="alert" title="'Message'" message="'Your order has been submitted!&lt;br&gt;Our customer service team will call you shortly.&lt;br&gt;If you do not hear from us, please give us a call.'" />
+      <block name="content.zz" />
+      <include name="footer" />
+      <include name="asider" />
+      <block name="wapform.zz" />
+      <else />
+      <if cnd="DEFINE(request.act)">
+        <dbquery>
+          <![CDATA[DELETE FROM rn WHERE sno = '$session.ord' AND itm = $itemno]]>
+        </dbquery>
+      </if>
+      <if cnd="DEFINE(request.upd)">
+        <setvar name="I" value="0" />
+        <while cnd="I&lt;COUNT(quantity)">
+          <if cnd="quantity[I]&gt;0">
+            <dbquery>
+              <![CDATA[UPDATE rn SET qty=$(quantity[I]), rem='$(rem[I])' WHERE sno = '$session.ord' AND itm = $(xyz[I]) ]]>
+            </dbquery>
+            <else />
+            <dbquery>
+              <![CDATA[DELETE FROM rn WHERE sno='$session.ord' AND itm=$(xyz[I]) ]]>
+            </dbquery>
+          </if>
+          <setvar name="I" value="I+1" />
+        </while>
+      </if>
+      <if cnd="NOT(DEFINE(session.ord))">
+        <block name="wapform.aa" />
+        <include name="header" />
+        <block name="content.aa" one="'Cart'" />
+        <block name="alert" title="'Reminder'" message="'Your cart is empty. Have a look around first.'" />
+        <block name="content.zz" />
+        <include name="footer" />
+        <include name="asider" />
+        <block name="wapform.zz" />
+        <else />
+        <go href="#detail" />
+      </if>
+    </if>
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+    <block name="breadcrumb" one="category" />
+  </card>
+  <card id="confirm" device="SUB">
+    <setvar name="category" value="'Order Form'" />
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="content.aa" />
+    <setvar name="total" value="0" />
+    <setvar name="tax" value="0" />
+    <dbquery id="sys">
+      select * from sys
+    </dbquery>
+    <dbquery id="od">
+      <![CDATA[
+SELECT ss.sno, ss.itm, ss.sdate, ss.cno, cu.cname, cu.addr1, cu.phone, cu.fax, cu.contact, cu.email, cu.ac, cu.rem curem, 
+  ss.pno, pa.Sub, pa.des, pa.unit, ss.qty, ss.price, pa.price1, ss.qty*ss.price total, ss.rem
+FROM rn ss, cu, pa
+WHERE
+ (ss.sno = '$session.ord')
+ AND (cu.cno = ss.cno)
+ AND (pa.pno = ss.pno)
+ORDER BY pa.Sub, ss.sno, ss.itm
+    ]]>
+    </dbquery>
+    <if cnd="od.count=0">
+      <session name="ord" value="''" />
+      <redirect href="cart.wml" />
+    </if>
+    <if cnd="session.usr='test'">
+      <p class="test-note">
+        This test account is for trying out the system only; it does not place real orders.
+        <br />
+        To order, click [Print Order] and fax it to 04-25264501, or register your own member account.
+      </p>
+    </if>
+    <output dataset="od">
+      <setvar name="I" value="0" />
+      <setvar name="TempTotal" value="0" />
+      <block name="invoice.aa" />
+      <block name="invoice-list.aa" />
+      <group change="od.sub">
+        <setvar name="I" value="0" />
+        <group>
+          <block name="invoice-item" />
+          <setvar name="I" value="I+1" />
+          <setvar name="TempTotal" value="TempTotal+od.qty*od.price" />
+        </group>
+      </group>
+      <if cnd="TempTotal&lt;1200">
+        <setvar name="TempTotal" value="TempTotal+100" />
+        <block name="invoice-1000" />
+      </if>
+      <setvar name="Tax" value="TempTotal*5/100" />
+      <block name="invoice-list.zz" />
+      <block name="invoice-proceed" />
+      <block name="invoice.zz" />
+    </output>
+    <block name="content.zz" />
+    <include name="footer" />
+    <include name="asider" />
+    <block name="wapform.zz" />
+  </card>
+  <card id="detail" device="SUB">
+    <setvar name="category" value="'Cart'" />
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="content.aa" />
+    <dbquery id="od">
+      <![CDATA[
+SELECT ss.sno, ss.itm, ss.cno, cu.cname, cu.addr1, cu.phone, cu.contact, cu.email, cu.ac, 
+  ss.pno, pa.qno, pa.des, pa.unit, ss.qty, ss.price, ss.rem
+FROM rn ss, cu, pa
+WHERE
+ (ss.sno = '$session.ord')
+ AND (cu.cno = ss.cno)
+ AND (pa.pno = ss.pno)
+ORDER BY ss.sno, ss.itm
+    ]]>
+    </dbquery>
+    <if cnd="od.count=0">
+      <session name="ord" value="''" />
+      <redirect href="cart.wml" />
+    </if>
+    <if cnd="session.usr='test'">
+      <p class="test-note">
+        This test account is for trying out the system only; it does not place real orders.
+        <br />
+        To order, click [Print Order] and fax it to 04-25264501, or register your own member account.
+      </p>
+    </if>
+    <output dataset="od">
+      <setvar name="TempTotal" value="0" />
+      <block name="cart.aa" />
+      <block name="cart-list.aa" />
+      <group>
+        <block name="cart-item" />
+        <setvar name="TempTotal" value="TempTotal+od.qty*od.price" />
+      </group>
+      <block name="cart-list.zz" />
+      <block name="cart-calc.aa" />
+      <if cnd="TempTotal&lt;1200">
+        <setvar name="TempTotal" value="TempTotal+100" />
+        <block name="cart-1000" />
+      </if>
+      <setvar name="Tax" value="TempTotal*5/100" />
+      <block name="cart-calc.zz" />
+      <block name="cart.zz" />
+    </output>
+    <block name="content.zz" />
+    <include name="footer" />
+    <include name="asider" />
+    <block name="wapform.zz" />
+  </card>
+</wml>

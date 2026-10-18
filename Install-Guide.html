@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WapForm Installation Guide</title>
+<style>
+  :root { --fg:#1f2328; --muted:#5b636e; --line:#d8dee4; --bg:#fff; --code:#f4f6f8; --accent:#1f6feb; --warn:#fff4e5; --warnline:#f0b35a; }
+  @media (prefers-color-scheme: dark) { :root { --fg:#e6edf3; --muted:#9aa4af; --line:#30363d; --bg:#0d1117; --code:#161b22; --accent:#58a6ff; --warn:#2a2112; --warnline:#9e6a03; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.65 "Segoe UI", "Microsoft JhengHei", system-ui, sans-serif; }
+  main { max-width: 920px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 26px; margin: 0 0 4px; } h2 { font-size: 20px; margin: 36px 0 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+  h3 { font-size: 16px; margin: 22px 0 6px; } p.lead { color: var(--muted); margin-top: 0; }
+  nav { display:flex; gap:12px; flex-wrap:wrap; margin: 16px 0 8px; } nav a { color: var(--accent); text-decoration: none; }
+  table { width:100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 14px; display:block; overflow-x:auto; }
+  th, td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+  th { background: var(--code); white-space: nowrap; }
+  code, pre { font-family: Consolas, "Cascadia Mono", monospace; font-size: 13px; background: var(--code); border-radius: 4px; }
+  code { padding: 1px 5px; } pre { padding: 10px 12px; overflow-x: auto; border:1px solid var(--line); }
+  .warn { background: var(--warn); border-left: 4px solid var(--warnline); padding: 10px 14px; border-radius: 4px; margin: 12px 0; }
+  .en { color: var(--muted); }
+  [lang="ja"] { font-family: "Segoe UI", "Yu Gothic UI", Meiryo, system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<main id="top">
+<h1>WapForm Installation Guide</h1>
+<p class="lead">WapForm 2.0 &middot; full environment: Windows, Web and Flutter on one sample platform &middot; <a href="#zh">中文說明</a> &middot; <a href="#ja">日本語</a></p>
+<nav><a href="#layout">1. What is installed</a><a href="#req">2. Requirements</a><a href="#setup">3. Setup</a><a href="#db">4. Database</a><a href="#ini">5. wapform.ini</a><a href="#run">6. Running the samples</a><a href="#flutter">6-1. WapForm for Flutter</a><a href="#license">7. License</a><a href="#security">8. Before going live</a></nav>
+
+<div class="warn">All accounts and passwords in this guide and in the sample configuration files are <strong>simulated</strong> (for example <code>xyz / 123</code>) and meant for local testing only. Replace them with your own before going live.</div>
+
+<h2 id="layout">1. What is installed (C:\Wapform)</h2>
+<table>
+<tr><th>Location</th><th>Contents</th><th>Component</th></tr>
+<tr><td>WapForm Toolkit</td><td>The development tool (WML forms, reports, Flutter page generator) — <strong>installed from the Microsoft Store</strong>, not by this setup</td><td>Microsoft Store</td></tr>
+<tr><td>WapForm Runtime</td><td>Runs WapForm applications — <strong>installed from the Microsoft Store</strong>, not by this setup</td><td>Microsoft Store</td></tr>
+<tr><td><code>WapServ.dll</code></td><td>WapForm for Web: the IIS ISAPI module for <code>*.wml</code> (licensed, 30-day trial)</td><td>Web &gt; IIS module</td></tr>
+<tr><td><code>WapServer.exe</code></td><td>WapForm Web Server, free edition: serves <code>localhost:8080</code> only</td><td>Web &gt; Web Server</td></tr>
+<tr><td><code>wapform.ini</code></td><td>Shared settings: database connection, fonts, LINE (see section 5)</td><td>Samples</td></tr>
+<tr><td><code>shop\</code></td><td>Sample online store (English): catalog, products, cart, members, orders</td><td>Samples</td></tr>
+<tr><td><code>flutter\</code></td><td>WapForm for Flutter project (Web and Android; platform folders included), using <code>wapform_flutter ^1.6.8</code> from pub.dev</td><td>Flutter</td></tr>
+<tr><td><code>flutter\lib\</code></td><td>The back office: the same <code>.wml</code> pages run on Windows, the generated <code>.dart</code> pages run on Flutter</td><td>Flutter</td></tr>
+<tr><td><code>flutter\server\</code></td><td>REST back end of the Flutter back office (Node.js <code>server.js</code>, started with <code>start_server.bat</code>, port 3000)</td><td>Flutter</td></tr>
+<tr><td><code>database\sales.sql</code></td><td>Sample database <code>sales</code> (fictitious English data)</td><td>Samples</td></tr>
+<tr><td><code>setup\</code></td><td>PowerShell scripts to configure / remove IIS and replace the DLL, plus logs</td><td>Web &gt; IIS module</td></tr>
+</table>
+<p>The store and the back office share <strong>one database</strong>: orders and members from the store are managed directly in the back office (Windows or Flutter).</p>
+
+<h2 id="req">2. Requirements</h2>
+<table>
+<tr><th>Item</th><th>Used for</th><th>Needed</th></tr>
+<tr><td>Windows 10 / 11 or Windows Server</td><td>All components</td><td>Always</td></tr>
+<tr><td>MySQL or MariaDB (e.g. XAMPP)</td><td>The sample database <code>sales</code></td><td>To run the samples</td></tr>
+<tr><td>IIS with <em>ISAPI Extensions</em></td><td>Serving sites with WapServ.dll</td><td>IIS module only</td></tr>
+<tr><td>Node.js</td><td><code>flutter\server\server.js</code> (REST back end)</td><td>WapForm for Flutter only</td></tr>
+<tr><td>Flutter SDK, Chrome, Android Studio</td><td>Building and running the Flutter back office on Web and Android (see 6-1)</td><td>WapForm for Flutter only</td></tr>
+</table>
+<p>Turning on IIS: Control Panel &gt; Programs &gt; Turn Windows features on or off &gt; Internet Information Services &gt; World Wide Web Services &gt; Application Development Features &gt; check <em>ISAPI Extensions</em>.</p>
+
+<h2 id="setup">3. Setup</h2>
+<ol>
+<li>Run <code>wapsetup.exe</code> as administrator.</li>
+<li>Choose the setup type:
+  <ul>
+  <li><strong>Full environment</strong>: Web, samples and Flutter (recommended)</li>
+  <li><strong>Custom</strong>: pick the components yourself</li>
+  </ul></li>
+<li>With the IIS module, confirm the <strong>IIS site</strong> (default <code>Default Web Site</code>) and <strong>application pool</strong> (default <code>DefaultAppPool</code>). Setup then enables 32-bit applications, allows the ISAPI extension, maps <code>*.wml</code> to <code>C:\Wapform\WapServ.dll</code>, adds <code>index.wml</code> as default document, grants write access to the license and upload folders, and restarts the pool. Log: <code>C:\Wapform\setup\iis-setup.log</code>.</li>
+<li>The sample store is placed both in <code>C:\Wapform\shop</code> (for WapForm Web Server) and in the <code>shop</code> folder of the IIS site (for IIS).</li>
+</ol>
+<p>Running setup again (upgrade) never overwrites samples or <code>wapform.ini</code> you have changed; uninstalling keeps them too, unless you answer <strong>Yes</strong> to <em>Remove everything as well?</em>: then <code>C:\Wapform</code> (samples, <code>wapform.ini</code>, your own files in it), the IIS copy of <code>shop</code> and the WapForm Web Server settings are deleted as well. The license data (<code>C:\ProgramData\WapForm\License</code>, shared with WapForm Toolkit / Runtime) and the <code>sales</code> database are always kept.</p>
+
+<h2 id="db">4. Sample database</h2>
+<pre>cd C:\Wapform\database
+mysql -u root -p &lt; sales.sql</pre>
+<p>With XAMPP the client is <code>C:\xampp\mysql\bin\mysql.exe</code>; you can also use phpMyAdmin &gt; Import and choose <code>sales.sql</code>.</p>
+<p><code>sales.sql</code>:</p>
+<ul>
+<li>creates the database <code>sales</code> (if it exists, its sample tables are <strong>re-created</strong> &mdash; back up a database with that name first)</li>
+<li>creates the MySQL account <code>xyz</code> / <code>123</code> (simulated values) with access to <code>sales</code> only</li>
+<li>loads fictitious English data: a stationery catalog with 271 categories, 5,390 products (22 per category, 4 of them recommended), 30 customers, 10 vendors, 6 staff, 3 carriers, 120 orders and 8 articles</li>
+</ul>
+<table>
+<tr><th>Table</th><th>Contents</th></tr>
+<tr><td><code>pa</code></td><td>Catalog (<code>mnu='m'</code>: <code>gid='0000'</code> = top level, others = sub-categories) and products (<code>mnu='n'</code>, <code>gid</code> = sub-category code). <code>active</code>: 0 hidden, 1 listed, 2 and up recommended (sorted by the number)</td></tr>
+<tr><td><code>menu</code>, <code>web</code></td><td>The store's category menu and category list</td></tr>
+<tr><td><code>cu</code> / <code>ve</code> / <code>em</code> / <code>fm</code></td><td>Customers (including store members) / vendors / staff / carriers</td></tr>
+<tr><td><code>sh</code> / <code>sn</code></td><td>Shipping orders (header / lines); also the source of the store's best sellers</td></tr>
+<tr><td><code>rh</code> / <code>rn</code></td><td>Store carts and web orders</td></tr>
+<tr><td><code>sys</code></td><td>Company profile, tax rate, accounting period</td></tr>
+<tr><td><code>mnu</code> / <code>users</code> / <code>login</code></td><td>Back-office menu / accounts / permissions</td></tr>
+<tr><td><code>topic</code>, <code>counter</code>, <code>num</code></td><td>Articles, visit counter, document number sequence</td></tr>
+</table>
+
+<h2 id="ini">5. wapform.ini</h2>
+<p>Files: <code>C:\Wapform\wapform.ini</code> (shared), <code>shop\wapform.ini</code> (store site), <code>flutter\lib\wapform.ini</code> (back office). Each site folder reads its own <code>wapform.ini</code>. Format <code>name=value</code>; names are case-insensitive; save the file as UTF-8.</p>
+<pre>; ============================================================
+; WapForm settings (wapform.ini)
+; Required: the database settings. Everything else is optional -
+; delete a line (or leave it out) to use the default shown.
+; Lines starting with ; are comments.
+; ============================================================
+
+; ---- Database (required) ------------------------------------
+Driver=mysql
+Server=localhost
+Database=sales
+Username=xyz
+Password=123
+
+; ---- Optional ------------------------------------------------
+; Date format on screens and reports (default: Windows regional settings)
+DateFormat=yyyy/mm/dd
+; Font of Windows forms and reports (default: system font, size 10).
+; MingLiU covers English, Traditional Chinese and Japanese.
+FontName=MingLiU
+FontSize=10
+; Character cell in pixels (default 7 x 13)
+CharWidth=7
+CharHeight=13
+; Unicode (UTF-8 / utf8mb4) database connection: keep this line for
+; utf8mb4 databases such as the sample; the line itself switches it on.
+unicode=yes
+; Interface language: en, tw or jp (default en); translations in language.txt
+language=en
+; LINE Messaging API - only for the LINE samples (linebot, linepush)
+line_bot_id=
+line_channel_secret=
+line_channel_access_token=</pre>
+<table>
+<tr><th>Key</th><th>Sample (simulated)</th><th>Meaning</th></tr>
+<tr><td><code>driver</code></td><td><code>mysql</code></td><td><strong>Required.</strong> Database type: <code>mysql</code> (MySQL / MariaDB); the Professional edition also supports <code>mssql</code> (SQL Server)</td></tr>
+<tr><td><code>server</code></td><td><code>localhost</code></td><td><strong>Required.</strong> Database host name or IP; use <code>host:port</code> for a non-default port</td></tr>
+<tr><td><code>database</code></td><td><code>sales</code></td><td><strong>Required.</strong> Database name</td></tr>
+<tr><td><code>username</code></td><td><code>xyz</code></td><td><strong>Required.</strong> Database account (use one limited to this database, not root)</td></tr>
+<tr><td><code>password</code></td><td><code>123</code></td><td><strong>Required.</strong> Database password (simulated &mdash; always change it for a real installation)</td></tr>
+<tr><td><code>dateformat</code></td><td><code>yyyy/mm/dd</code></td><td><em>Optional</em> (default: Windows regional settings). Date format on screens and reports</td></tr>
+<tr><td><code>fontname</code></td><td><code>MingLiU</code></td><td><em>Optional</em> (default: system font). Default font of Windows forms and reports. Use a <strong>monospaced</strong> font, because layouts are measured in character cells (<code>charwidth</code> / <code>charheight</code>). <code>MingLiU</code> is built into Windows and covers English, Traditional Chinese and Japanese, so it fits every <code>language</code> (English letters are half-width, Chinese/Japanese characters full-width). For an English-only interface <code>Consolas</code> also works, but it has no Chinese/Japanese characters; <code>MS Gothic</code> (Japanese) lacks some Traditional Chinese characters.</td></tr>
+<tr><td><code>fontsize</code></td><td><code>10</code></td><td><em>Optional</em> (default 10). Default font size (points)</td></tr>
+<tr><td><code>charwidth</code></td><td><code>7</code></td><td><em>Optional</em> (default 7). Width of one character cell in pixels, used to convert WML widths given in characters</td></tr>
+<tr><td><code>charheight</code></td><td><code>13</code></td><td><em>Optional</em> (default 13). Height of one character cell in pixels, used for row heights and layout</td></tr>
+<tr><td><code>unicode</code></td><td><code>yes</code></td><td><em>Optional</em>, but keep it for utf8mb4 databases such as the sample: the presence of the line switches Unicode on (the value is not checked); without it the connection is not Unicode. Connect and store data as Unicode (UTF-8 / utf8mb4); keep <code>yes</code> for new databases</td></tr>
+<tr><td><code>language</code></td><td><code>en</code></td><td><em>Optional</em> (default en). Interface language of WapForm Toolkit / Runtime: <code>en</code> (English, default), <code>tw</code> (Traditional Chinese) or <code>jp</code> (Japanese). Built-in captions (navigator bar, search bar) are translated automatically; other texts come from <code>language.txt</code> (below)</td></tr>
+<tr><td><code>line_bot_id</code></td><td>(empty)</td><td><em>Optional</em> (LINE samples only). LINE Official Account ID (used by the linebot and linepush samples)</td></tr>
+<tr><td><code>line_channel_secret</code></td><td>(empty)</td><td><em>Optional</em> (LINE samples only). LINE Messaging API channel secret, verifies the webhook signature (<code>X-Line-Signature</code>)</td></tr>
+<tr><td><code>line_channel_access_token</code></td><td>(empty)</td><td><em>Optional</em> (LINE samples only). LINE channel access token for the push / reply API</td></tr>
+<tr><td><code>loginusr</code> / <code>loginpwd</code></td><td><code>admin</code> / <code>123</code></td><td>Only in <code>shop\wapform.ini</code>: default sign-in of the store's management pages</td></tr>
+</table>
+<div class="warn"><code>wapform.ini</code> holds the database password and LINE keys: never publish it on a website or commit it to GitHub. IIS does not serve <code>.ini</code> files by default &mdash; do not move it to a downloadable location. Get the LINE keys from the LINE Developers console and re-issue them at once if they leak.</div>
+<h3>Interface languages: language.txt</h3>
+<p><code>language.txt</code> sits next to <code>wapform.ini</code> (UTF-8). One entry per line, <strong>English is the key</strong>, followed by the Traditional Chinese and Japanese translations separated by a comma; lines starting with <code>;</code> are comments:</p>
+<pre>; English=Traditional Chinese,Japanese
+Item No=料號,品番
+Item Name / Spec=品名規格,品名・仕様
+Search=查詢,検索</pre>
+<p>Write the labels and titles in your WML in English; with <code>language=tw</code> or <code>jp</code> they are shown translated. A missing or empty translation shows the English text. In WapForm Toolkit, <strong>Languages &gt; Interface Languages…</strong> sets <code>language=</code> and edits <code>language.txt</code>; <em>Add texts from last run</em> lists every text met while running the WML, ready to translate.</p>
+<p>The store's password-reset mail (<code>shop\forget.wml</code>) uses Gmail: replace <code>your-account@gmail.com</code> and <code>your-gmail-app-password</code> with your Gmail account and an app password.</p>
+
+<h2 id="run">6. Running the samples</h2>
+<h3>Web: online store (shop)</h3>
+<ul>
+<li>IIS: <code>http://localhost/shop/</code></li>
+<li>WapForm Web Server (free): open WapForm Web Server from the desktop &gt; Start, then <code>http://localhost:8080/shop/</code> (documents path defaults to <code>C:\Wapform</code>)</li>
+<li>Member sign-in: <code>demo@example.com</code> / <code>123</code>. Category pages show 20 products per page; the recommended section lists products with <code>active</code> 2 or higher.</li>
+</ul>
+<h3>Windows: back office</h3>
+<ul>
+<li>Open the <code>.wml</code> pages in <code>C:\Wapform\flutter\lib</code> with WapForm Toolkit or Runtime, e.g. <code>app002.wml</code> (products) and <code>app006.wml</code> (shipping orders).</li>
+<li>Sign in: <code>admin</code> / <code>123</code> (all functions) or <code>demo</code> / <code>123</code> (sales menu only).</li>
+</ul>
+<h3>Flutter: back office (Web, Android)</h3>
+<p>The project is <code>C:\Wapform\flutter</code> (back office in <code>lib</code>), the REST back end is <code>C:\Wapform\flutter\server</code>. The WapForm Flutter runtime is <a href="https://pub.dev/packages/wapform_flutter"><code>wapform_flutter</code></a> on pub.dev, downloaded by <code>flutter pub get</code>. Complete <a href="#flutter">6-1</a> first, then:</p>
+<pre>cd C:\Wapform\flutter\server
+npm install
+node server.js                     (or run start_server.bat)
+
+cd C:\Wapform\flutter
+flutter pub get
+flutter run -d chrome              (Web)
+
+adb reverse tcp:3000 tcp:3000      (Android: forwards the phone's / emulator's localhost:3000 to this computer)
+flutter run -d android             (Android)</pre>
+<p><code>server.js</code> uses the same database settings as <code>wapform.ini</code> (<code>sales</code> / <code>xyz</code> / <code>123</code>) and listens on <code>http://localhost:3000</code>. The Web and Android platform folders are included; there is no need to run <code>flutter create</code>.</p>
+<p>WapForm for Flutter supports <strong>Web</strong> and <strong>Android</strong>. The app reaches the REST back end at <code>http://localhost:3000</code>; on an Android phone or emulator, localhost is the device itself, so run <code>adb reverse tcp:3000 tcp:3000</code> every time a device is connected (adb comes with Android Studio, usually in <code>%LOCALAPPDATA%\Android\Sdk\platform-tools</code>). The sample's AndroidManifest already has the Internet permission and allows HTTP to the local back end.</p>
+
+<h3 id="flutter">6-1. Installing WapForm for Flutter (develop on Windows; targets: Web, Android)</h3>
+<ol>
+<li><strong>Git for Windows</strong>: <a href="https://git-scm.com/download/win">git-scm.com/download/win</a> (keep the default options).</li>
+<li><strong>Flutter SDK</strong>: download the Windows zip from <a href="https://docs.flutter.dev/get-started/install/windows">docs.flutter.dev/get-started/install/windows</a> and extract it to a folder with <strong>no spaces or non-ASCII characters</strong> that needs no admin rights, e.g. <code>C:\src\flutter</code> (not <code>C:\Program Files</code>).</li>
+<li><strong>PATH</strong>: Settings &gt; System &gt; About &gt; Advanced system settings &gt; Environment Variables &gt; user variable <code>Path</code> &gt; New &gt; <code>C:\src\flutter\bin</code>. Open a new command prompt and check with <code>flutter --version</code>.</li>
+<li><strong>Web</strong> (<code>-d chrome</code>): install Google Chrome.</li>
+<li><strong>Android</strong>: install <a href="https://developer.android.com/studio">Android Studio</a>; in SDK Manager select Android SDK, SDK Command-line Tools and Platform-Tools; create an emulator (Device Manager) or connect a phone with USB debugging enabled. Then run <code>flutter doctor --android-licenses</code> and accept the licenses.</li>
+<li><strong>Node.js LTS</strong>: <a href="https://nodejs.org">nodejs.org</a> (for the REST back end).</li>
+<li><strong>Check</strong>: run <code>flutter doctor</code>; Chrome and the Android toolchain should be checked (the Windows / Visual Studio items can be ignored).</li>
+<li><strong>Editor</strong> (recommended): VS Code with the Flutter extension, or Android Studio with the Flutter plugin.</li>
+</ol>
+<p>WapForm Toolkit generates Flutter <code>.dart</code> pages from <code>.wml</code>. The generated pages use the WapForm Flutter runtime <code>wapform_flutter</code> from pub.dev (source: <a href="https://github.com/wapform/wapform_flutter">github.com/wapform/wapform_flutter</a>). After changing a <code>.wml</code>, generate the <code>.dart</code> page again and <code>flutter run</code>.</p>
+<p>Release builds: <code>flutter build web</code> (output in <code>build\web</code>, can be served by IIS) and <code>flutter build apk</code> (output <code>build\app\outputs\flutter-apk\app-release.apk</code>). In production the REST back end must run on a server the phone can reach (HTTPS recommended), and the runtime's address must point to it.</p>
+
+<h2 id="license">7. License and trial</h2>
+<ul>
+<li>Each product starts a <strong>30-day trial</strong> with all features on first use. After the trial, Toolkit and Runtime continue as the Free edition and WapForm for Web stops serving.</li>
+<li>Buy at <a href="https://wapform.com/pricing">wapform.com/pricing</a>; the license key is emailed to you.</li>
+<li>Toolkit / Runtime: enter the key in the program's License window. WapForm for Web: open <code>http://localhost/license.wml</code> on the server itself and enter the key (the page opens only on the server).</li>
+<li>Moving to another computer: click <strong>Deactivate</strong> on the old computer to release the seat, then activate on the new one.</li>
+</ul>
+
+<h2 id="security">8. Before going live</h2>
+<ul>
+<li>Replace every simulated value: the MySQL account (<code>wapform.ini</code>, <code>server.js</code>), the back-office account <code>admin/123</code>, test members, <code>loginusr/loginpwd</code></li>
+<li>Enter your own LINE and Gmail settings (never the sample values)</li>
+<li>Delete or edit the sample products, customers and articles</li>
+<li>Serve the site over HTTPS</li>
+</ul>
+<p>Documentation and support: <a href="https://wapform.com">wapform.com</a> &middot; <a href="https://github.com/wapform">github.com/wapform</a></p>
+
+<!-- ================================ 中文說明 ================================ -->
+<h1 id="zh" style="margin-top:56px">WapForm 全環境安裝說明（中文）</h1>
+<p class="lead">WapForm 2.0 &middot; Windows、Web、Flutter 共用範例平台 &middot; <a href="#top">English</a> &middot; <a href="#ja">日本語</a></p>
+<nav><a href="#zh-layout">1. 安裝內容</a><a href="#zh-req">2. 需求</a><a href="#zh-setup">3. 安裝步驟</a><a href="#zh-db">4. 資料庫</a><a href="#zh-ini">5. wapform.ini</a><a href="#zh-run">6. 執行範例</a><a href="#zh-flutter">6-1. WapForm for Flutter</a><a href="#zh-license">7. 授權</a><a href="#zh-security">8. 上線前</a></nav>
+
+<div class="warn">本說明與範例設定檔中的帳號、密碼都是<strong>模擬值</strong>（例如 <code>xyz / 123</code>），只供本機測試。正式上線前請全部換成你自己的設定。</div>
+
+<h2 id="zh-layout">1. 安裝內容（C:\Wapform）</h2>
+<table>
+<tr><th>位置</th><th>內容</th><th>元件</th></tr>
+<tr><td>WapForm Toolkit</td><td>開發工具（WML 表單、報表、Flutter 產生）——<strong>請從 Microsoft Store 安裝</strong>，不在這個安裝檔裡</td><td>Microsoft Store</td></tr>
+<tr><td>WapForm Runtime</td><td>執行 WapForm 應用程式——<strong>請從 Microsoft Store 安裝</strong>，不在這個安裝檔裡</td><td>Microsoft Store</td></tr>
+<tr><td><code>WapServ.dll</code></td><td>WapForm for Web：IIS 的 ISAPI 模組，對應 <code>*.wml</code>（需授權，30 天試用）</td><td>Web &gt; IIS module</td></tr>
+<tr><td><code>WapServer.exe</code></td><td>WapForm Web Server 免費版：只服務本機 <code>localhost:8080</code></td><td>Web &gt; Web Server</td></tr>
+<tr><td><code>wapform.ini</code></td><td>共用設定：資料庫連線、字型、LINE（見第 5 節）</td><td>Samples</td></tr>
+<tr><td><code>shop\</code></td><td>線上交易平台範例（英文商店）：目錄、商品、購物車、會員、訂單</td><td>Samples</td></tr>
+<tr><td><code>C:\Wapform\flutter\lib\</code></td><td>WapForm for Flutter 專案的後台程式：同一份 <code>.wml</code> 在 Windows 執行，產生的 <code>.dart</code> 在 Flutter 執行；Flutter runtime 是 pub.dev 的 <code>wapform_flutter</code> 套件</td><td>Flutter</td></tr>
+<tr><td><code>C:\Wapform\flutter\</code></td><td>WapForm for Flutter 專案（支援 Web、Android，平台資料夾已建好），相依 pub.dev 的 <code>wapform_flutter ^1.6.8</code></td><td>Flutter</td></tr>
+<tr><td><code>C:\Wapform\flutter\server\</code></td><td>Flutter 版的 REST 後端（Node.js <code>server.js</code>，<code>start_server.bat</code> 啟動，port 3000）</td><td>Flutter</td></tr>
+<tr><td><code>database\sales.sql</code></td><td>範例資料庫 <code>sales</code>（英文模擬資料）</td><td>Samples</td></tr>
+<tr><td><code>setup\</code></td><td>IIS 設定／移除／更新 DLL 的 PowerShell 腳本與記錄</td><td>Web &gt; IIS module</td></tr>
+</table>
+<p>商店與後台使用<strong>同一個資料庫</strong>：前台下的訂單、會員，後台（Windows 或 Flutter）可以直接管理。</p>
+
+<h2 id="zh-req">2. 需求</h2>
+<table>
+<tr><th>項目</th><th>用途</th><th>必要</th></tr>
+<tr><td>Windows 10 / 11（或 Windows Server）</td><td>所有元件</td><td>必要</td></tr>
+<tr><td>MySQL 或 MariaDB（例如 XAMPP）</td><td>範例資料庫 <code>sales</code></td><td>執行範例時必要</td></tr>
+<tr><td>IIS ＋「ISAPI 擴充程式」</td><td>WapServ.dll 對外服務網站</td><td>只有 IIS 模組需要</td></tr>
+<tr><td>Node.js</td><td><code>C:\Wapform\flutter\server\server.js</code>（Flutter 後台的 REST 後端）</td><td>只有 WapForm for Flutter 需要</td></tr>
+<tr><td>Flutter SDK、Chrome、Android Studio</td><td>建置與執行 Flutter 後台：Web、Android（見 6-1）</td><td>只有 WapForm for Flutter 需要</td></tr>
+</table>
+<p>開啟 IIS：控制台 &gt; 程式集 &gt; 開啟或關閉 Windows 功能 &gt; Internet Information Services &gt; World Wide Web 服務 &gt; 應用程式開發功能 &gt; 勾選「ISAPI 擴充程式」。</p>
+
+<h2 id="zh-setup">3. 安裝步驟</h2>
+<ol>
+<li>以系統管理員身分執行 <code>wapsetup.exe</code>。</li>
+<li>選擇安裝類型：
+  <ul>
+  <li><strong>Full environment</strong>：Web＋範例＋Flutter（建議）</li>
+  <li><strong>Custom</strong>：自行勾選</li>
+  </ul></li>
+<li>有勾 IIS 模組時，確認 <strong>IIS 網站</strong>（預設 <code>Default Web Site</code>）與 <strong>應用程式集區</strong>（預設 <code>DefaultAppPool</code>）。安裝程式會自動：開啟 32 位元應用程式、允許 ISAPI、對應 <code>*.wml</code> → <code>C:\Wapform\WapServ.dll</code>、設定預設文件 <code>index.wml</code>、給授權與上傳資料夾寫入權限、重新啟動集區。記錄在 <code>C:\Wapform\setup\iis-setup.log</code>。</li>
+<li>範例商店同時放在 <code>C:\Wapform\shop</code>（給 WapServer）與 IIS 網站資料夾下的 <code>shop</code>（給 IIS）。</li>
+</ol>
+<p>再次安裝（升級）不會覆蓋你修改過的範例與 <code>wapform.ini</code>；解除安裝時預設也會保留它們；若在「<em>Remove everything as well?</em>」回答 <strong>Yes</strong>，會一併刪除 <code>C:\Wapform</code>（範例、<code>wapform.ini</code>、你放在裡面的檔案）、IIS 下的 <code>shop</code> 與 WapForm Web Server 的設定。授權資料（<code>C:\ProgramData\WapForm\License</code>，WapForm Toolkit／Runtime 也會用到）與 <code>sales</code> 資料庫一律保留。</p>
+
+<h2 id="zh-db">4. 建立範例資料庫</h2>
+<pre>cd C:\Wapform\database
+mysql -u root -p &lt; sales.sql</pre>
+<p>XAMPP 的 mysql 在 <code>C:\xampp\mysql\bin\mysql.exe</code>；也可以在 phpMyAdmin 用「匯入」選 <code>sales.sql</code>。</p>
+<p><code>sales.sql</code> 會：</p>
+<ul>
+<li>建立資料庫 <code>sales</code>（已存在時<strong>重建其中的範例資料表</strong>，請先備份同名資料庫）</li>
+<li>建立 MySQL 帳號 <code>xyz</code> / <code>123</code>（模擬值），只授權 <code>sales</code></li>
+<li>匯入英文模擬資料：文具目錄 271 筆分類、5,390 項商品（每個分類 22 項，其中 4 項推薦）、客戶 30、廠商 10、員工 6、貨運 3、訂單 120、文章 8</li>
+</ul>
+<table>
+<tr><th>資料表</th><th>內容</th></tr>
+<tr><td><code>pa</code></td><td>目錄（<code>mnu='m'</code>：<code>gid='0000'</code> 為大類，其餘為子類）與商品（<code>mnu='n'</code>，<code>gid</code> = 子類代碼）。<code>active</code>：0 下架、1 上架、2 以上為推薦（依數字排序）</td></tr>
+<tr><td><code>menu</code>、<code>web</code></td><td>商店的分類選單與分類清單</td></tr>
+<tr><td><code>cu</code> / <code>ve</code> / <code>em</code> / <code>fm</code></td><td>客戶（含商店會員）／廠商／員工／貨運公司</td></tr>
+<tr><td><code>sh</code> / <code>sn</code></td><td>出貨單（表頭／明細），也是商店「熱銷排行」的來源</td></tr>
+<tr><td><code>rh</code> / <code>rn</code></td><td>商店購物車與網路訂單</td></tr>
+<tr><td><code>sys</code></td><td>公司資料、稅率、帳期</td></tr>
+<tr><td><code>mnu</code> / <code>users</code> / <code>login</code></td><td>後台選單／帳號／權限</td></tr>
+<tr><td><code>topic</code>、<code>counter</code>、<code>num</code></td><td>文章、瀏覽計數、單號流水號</td></tr>
+</table>
+
+<h2 id="zh-ini">5. wapform.ini 參數說明</h2>
+<p>位置：<code>C:\Wapform\wapform.ini</code>（共用）、<code>shop\wapform.ini</code>（商店網站）、<code>C:\Wapform\flutter\lib\wapform.ini</code>（後台）。每個網站資料夾讀取自己資料夾內的 <code>wapform.ini</code>。格式為 <code>名稱=值</code>，名稱不分大小寫，檔案請存成 UTF-8。</p>
+<pre>; ============================================================
+; WapForm settings (wapform.ini)
+; Required: the database settings. Everything else is optional -
+; delete a line (or leave it out) to use the default shown.
+; Lines starting with ; are comments.
+; ============================================================
+
+; ---- Database (required) ------------------------------------
+Driver=mysql
+Server=localhost
+Database=sales
+Username=xyz
+Password=123
+
+; ---- Optional ------------------------------------------------
+; Date format on screens and reports (default: Windows regional settings)
+DateFormat=yyyy/mm/dd
+; Font of Windows forms and reports (default: system font, size 10).
+; MingLiU covers English, Traditional Chinese and Japanese.
+FontName=MingLiU
+FontSize=10
+; Character cell in pixels (default 7 x 13)
+CharWidth=7
+CharHeight=13
+; Unicode (UTF-8 / utf8mb4) database connection: keep this line for
+; utf8mb4 databases such as the sample; the line itself switches it on.
+unicode=yes
+; Interface language: en, tw or jp (default en); translations in language.txt
+language=en
+; LINE Messaging API - only for the LINE samples (linebot, linepush)
+line_bot_id=
+line_channel_secret=
+line_channel_access_token=</pre>
+<table>
+<tr><th>參數</th><th>範例（模擬值）</th><th>說明</th></tr>
+<tr><td><code>driver</code></td><td><code>mysql</code></td><td><strong>必填。</strong>資料庫種類。<code>mysql</code>（MySQL / MariaDB）；Professional 版另支援 <code>mssql</code>（SQL Server）</td></tr>
+<tr><td><code>server</code></td><td><code>localhost</code></td><td><strong>必填。</strong>資料庫主機名稱或 IP；非預設連接埠時寫成 <code>主機:埠</code></td></tr>
+<tr><td><code>database</code></td><td><code>sales</code></td><td><strong>必填。</strong>資料庫名稱</td></tr>
+<tr><td><code>username</code></td><td><code>xyz</code></td><td><strong>必填。</strong>資料庫帳號（建議只授權這個資料庫，不要用 root）</td></tr>
+<tr><td><code>password</code></td><td><code>123</code></td><td><strong>必填。</strong>資料庫密碼（範例為模擬值，正式環境務必更換）</td></tr>
+<tr><td><code>dateformat</code></td><td><code>yyyy/mm/dd</code></td><td><em>可省略</em>（預設：Windows 地區設定）。畫面與報表的日期顯示格式</td></tr>
+<tr><td><code>fontname</code></td><td><code>MingLiU</code></td><td><em>可省略</em>（預設：系統字型）。Windows 表單與報表的預設字型。請用<strong>等寬字型</strong>，因為版面以字元格（<code>charwidth</code> / <code>charheight</code>）換算。<code>MingLiU</code>（細明體的英文名稱，兩種寫法都可以）是 Windows 內建字型，同時涵蓋英文、繁體中文與日文，任何 <code>language</code> 都適用（英文半形、中日文全形）。純英文介面也可以用 <code>Consolas</code>，但它沒有中日文字形；<code>MS Gothic</code>（日文）缺部分繁體字。</td></tr>
+<tr><td><code>fontsize</code></td><td><code>10</code></td><td><em>可省略</em>（預設 10）。預設字型大小（點）</td></tr>
+<tr><td><code>charwidth</code></td><td><code>7</code></td><td><em>可省略</em>（預設 7）。一個字元格的寬度（像素），WML 以「字元數」指定欄寬時換算用</td></tr>
+<tr><td><code>charheight</code></td><td><code>13</code></td><td><em>可省略</em>（預設 13）。一個字元格的高度（像素），用於換算列高與版面</td></tr>
+<tr><td><code>unicode</code></td><td><code>yes</code></td><td><em>可省略</em>，但 utf8mb4 資料庫（例如範例）請保留：只要有這一行就開啟 Unicode（不看值），沒有這一行就不是 Unicode 連線。以 Unicode（UTF-8 / utf8mb4）連線與存取資料；新資料庫請保持 <code>yes</code></td></tr>
+<tr><td><code>language</code></td><td><code>en</code></td><td><em>可省略</em>（預設 en）。WapForm Toolkit／Runtime 的介面語言：<code>en</code>（英文，預設）、<code>tw</code>（繁體中文）、<code>jp</code>（日文）。引擎內建文字（資料導覽列、查詢列）自動翻譯，其他文字由 <code>language.txt</code> 提供（見下方）</td></tr>
+<tr><td><code>line_bot_id</code></td><td>（空白）</td><td><em>可省略</em>（僅 LINE 範例使用）。LINE 官方帳號 ID（linebot、linepush 範例使用）</td></tr>
+<tr><td><code>line_channel_secret</code></td><td>（空白）</td><td><em>可省略</em>（僅 LINE 範例使用）。LINE Messaging API 的 Channel secret，用來驗證 webhook 簽章（<code>X-Line-Signature</code>）</td></tr>
+<tr><td><code>line_channel_access_token</code></td><td>（空白）</td><td><em>可省略</em>（僅 LINE 範例使用）。LINE 的 Channel access token，用來呼叫推播／回覆 API</td></tr>
+<tr><td><code>loginusr</code> / <code>loginpwd</code></td><td><code>admin</code> / <code>123</code></td><td>只在 <code>shop\wapform.ini</code>：商店後台功能使用的預設登入</td></tr>
+</table>
+<div class="warn"><code>wapform.ini</code> 含有資料庫密碼與 LINE 金鑰：不要放到公開網站、不要上傳到 GitHub。IIS 預設不會提供 <code>.ini</code> 下載，但請勿把它改放到可直接下載的位置。LINE 金鑰到 LINE Developers 主控台取得；外流時請立即「重新發行」。</div>
+<h3>多國語言介面：language.txt</h3>
+<p><code>language.txt</code> 與 <code>wapform.ini</code> 放在同一個資料夾（UTF-8）。一行一筆，<strong>以英文為主要索引</strong>，等號後依序是繁體中文、日文的翻譯，以逗號分隔；<code>;</code> 開頭為註解：</p>
+<pre>; English=繁體中文,日本語
+Item No=料號,品番
+Item Name / Spec=品名規格,品名・仕様
+Search=查詢,検索</pre>
+<p>WML 裡的標籤與標題用英文撰寫，<code>language=tw</code> 或 <code>jp</code> 時就會顯示翻譯；沒有翻譯或留空則顯示英文。WapForm Toolkit 的 <strong>Languages &gt; Interface Languages…</strong> 可以設定 <code>language=</code> 並編輯 <code>language.txt</code>；<em>Add texts from last run</em> 會列出執行 WML 時遇到的所有文字，直接填入翻譯即可。</p>
+<p>商店的「忘記密碼」信件（<code>shop\forget.wml</code>）使用 Gmail：把 <code>your-account@gmail.com</code> 與 <code>your-gmail-app-password</code> 換成你的帳號與「應用程式密碼」。</p>
+
+<h2 id="zh-run">6. 執行範例</h2>
+<h3>Web：線上交易平台（shop）</h3>
+<ul>
+<li>IIS：<code>http://localhost/shop/</code></li>
+<li>WapForm Web Server（免費版）：開啟桌面的 WapForm Web Server &gt; Start，再開 <code>http://localhost:8080/shop/</code>（文件路徑預設為 <code>C:\Wapform</code>）</li>
+<li>會員登入：<code>demo@example.com</code> / <code>123</code>；分類頁一頁 20 項，「推薦」區顯示 <code>active</code> 2 以上的商品</li>
+</ul>
+<h3>Windows：後台管理</h3>
+<ul>
+<li>用 WapForm Toolkit（或 Runtime）開啟 <code>C:\Wapform\flutter\lib</code> 中的 <code>.wml</code>，例如 <code>app002.wml</code>（商品資料）、<code>app006.wml</code>（出貨單）</li>
+<li>登入：<code>admin</code> / <code>123</code>（全部功能）或 <code>demo</code> / <code>123</code>（只有銷售選單）</li>
+</ul>
+<h3>Flutter：後台管理（Web、Android）</h3>
+<p>專案安裝在 <code>C:\Wapform\flutter</code>（後台程式在 <code>lib</code>），REST 後端在 <code>C:\Wapform\flutter\server</code>。WapForm Flutter runtime 是 pub.dev 上的 <a href="https://pub.dev/packages/wapform_flutter"><code>wapform_flutter</code></a>，<code>flutter pub get</code> 時自動下載。先完成下面「6-1 WapForm for Flutter 安裝」，再執行：</p>
+<pre>cd C:\Wapform\flutter\server
+npm install
+node server.js            （或執行 start_server.bat）
+
+cd C:\Wapform\flutter
+flutter pub get
+flutter run -d chrome              （Web）
+
+adb reverse tcp:3000 tcp:3000      （Android：手機／模擬器的 localhost:3000 轉到這台電腦）
+flutter run -d android             （Android）</pre>
+<p><code>server.js</code> 的資料庫設定與 <code>wapform.ini</code> 相同（<code>sales</code> / <code>xyz</code> / <code>123</code>），預設在 <code>http://localhost:3000</code>。Web、Android 的平台資料夾已經建好，不需要再執行 <code>flutter create</code>。</p>
+<p>WapForm for Flutter 支援 <strong>Web</strong> 與 <strong>Android</strong>。App 透過 <code>http://localhost:3000</code> 連 REST 後端；Android 裝置或模擬器上的 localhost 是手機本身，所以每次接上裝置後先執行 <code>adb reverse tcp:3000 tcp:3000</code>（Android Studio 內建 adb，路徑通常是 <code>%LOCALAPPDATA%\Android\Sdk\platform-tools</code>）。範例的 AndroidManifest 已加入網路權限，並允許連到本機的 http。</p>
+
+<h3 id="zh-flutter">6-1 WapForm for Flutter 安裝（開發環境：Windows；目標平台：Web、Android）</h3>
+<ol>
+<li><strong>Git for Windows</strong>：<a href="https://git-scm.com/download/win">git-scm.com/download/win</a>，安裝時保留預設值。</li>
+<li><strong>Flutter SDK</strong>：到 <a href="https://docs.flutter.dev/get-started/install/windows">docs.flutter.dev/get-started/install/windows</a> 下載 Windows 版 zip，解壓縮到<strong>沒有空白與中文</strong>、不需要管理員權限的資料夾，例如 <code>C:\src\flutter</code>（不要放在 <code>C:\Program Files</code>）。</li>
+<li><strong>加入 PATH</strong>：設定 &gt; 系統 &gt; 關於 &gt; 進階系統設定 &gt; 環境變數 &gt; 使用者變數 <code>Path</code> &gt; 新增 <code>C:\src\flutter\bin</code>。重新開啟命令提示字元後執行 <code>flutter --version</code> 確認。</li>
+<li><strong>Web</strong>（<code>-d chrome</code>）：安裝 Google Chrome。</li>
+<li><strong>Android</strong>：安裝 <a href="https://developer.android.com/studio">Android Studio</a>，在 SDK Manager 勾選 Android SDK、SDK Command-line Tools、Platform-Tools；建立一個模擬器（Device Manager），或用 USB 連接已開啟「USB 偵錯」的手機。最後執行 <code>flutter doctor --android-licenses</code> 同意授權。</li>
+<li><strong>Node.js LTS</strong>：<a href="https://nodejs.org">nodejs.org</a>（Flutter 後台的 REST API 需要）。</li>
+<li><strong>檢查</strong>：執行 <code>flutter doctor</code>，Chrome 與 Android toolchain 打勾即可（Windows／Visual Studio 項目可忽略）。</li>
+<li><strong>編輯器</strong>（建議）：VS Code ＋ Flutter 擴充套件，或 Android Studio ＋ Flutter 外掛。</li>
+</ol>
+<p>WapForm Toolkit 可以把 <code>.wml</code> 產生成 Flutter 的 <code>.dart</code> 頁面；產生的頁面使用 pub.dev 的 WapForm Flutter runtime（<code>wapform_flutter</code>，原始碼在 <a href="https://github.com/wapform/wapform_flutter">github.com/wapform/wapform_flutter</a>）。修改 <code>.wml</code> 後重新產生 <code>.dart</code>，再 <code>flutter run</code> 即可。</p>
+<p>發行版本：<code>flutter build web</code>（輸出在 <code>build\web</code>，可放到 IIS 網站）、<code>flutter build apk</code>（輸出在 <code>build\app\outputs\flutter-apk\app-release.apk</code>）。正式上線時，REST 後端要放在手機連得到的伺服器（建議 https），並把 runtime 中的位址改成該伺服器。</p>
+
+<h2 id="zh-license">7. 授權與試用</h2>
+<ul>
+<li>每個產品第一次使用時自動開始 <strong>30 天試用</strong>（全部功能）。試用結束後 Toolkit／Runtime 變成 Free 版，WapForm for Web 停止服務。</li>
+<li>購買：<a href="https://wapform.com/pricing">wapform.com/pricing</a>。序號會寄到你的 Email。</li>
+<li>Toolkit／Runtime：程式內的 License 視窗輸入序號。WapForm for Web：在伺服器本機開 <code>http://localhost/license.wml</code> 輸入序號（這一頁只能從伺服器本機開啟）。</li>
+<li>換電腦：先在舊電腦按 <strong>Deactivate</strong> 釋放席位，再到新電腦啟用。</li>
+</ul>
+
+<h2 id="zh-security">8. 上線前檢查</h2>
+<ul>
+<li>更換所有模擬值：MySQL 帳密（<code>wapform.ini</code>、<code>server.js</code>）、後台帳號 <code>admin/123</code>、會員測試帳號、<code>loginusr/loginpwd</code></li>
+<li>填入你自己的 LINE 與 Gmail 設定（不要使用範例值）</li>
+<li>刪除或修改範例商品、客戶與文章</li>
+<li>網站改用 HTTPS</li>
+</ul>
+<p>說明文件與支援：<a href="https://wapform.com">wapform.com</a> &middot; <a href="https://github.com/wapform">github.com/wapform</a></p>
+
+<!-- ================================ 日本語 ================================ -->
+<div lang="ja">
+<h1 id="ja" style="margin-top:56px">WapForm インストールガイド（日本語）</h1>
+<p class="lead">WapForm 2.0 &middot; Windows・Web・Flutter 共通のサンプル環境 &middot; <a href="#top">English</a> &middot; <a href="#zh">中文說明</a></p>
+<nav><a href="#ja-layout">1. インストール内容</a><a href="#ja-req">2. 必要環境</a><a href="#ja-setup">3. セットアップ</a><a href="#ja-db">4. データベース</a><a href="#ja-ini">5. wapform.ini</a><a href="#ja-run">6. サンプルの実行</a><a href="#ja-flutter">6-1. WapForm for Flutter</a><a href="#ja-license">7. ライセンス</a><a href="#ja-security">8. 公開前の確認</a></nav>
+
+<div class="warn">このガイドとサンプル設定ファイルのアカウント・パスワードはすべて<strong>仮の値</strong>（例：<code>xyz / 123</code>）で、ローカルでのテスト専用です。本番公開の前に、すべてご自身の設定に置き換えてください。</div>
+
+<h2 id="ja-layout">1. インストール内容（C:\Wapform）</h2>
+<table>
+<tr><th>場所</th><th>内容</th><th>コンポーネント</th></tr>
+<tr><td>WapForm Toolkit</td><td>開発ツール（WML のフォーム・帳票、Flutter 生成）――<strong>Microsoft Store からインストール</strong>してください。このセットアップには含まれません</td><td>Microsoft Store</td></tr>
+<tr><td>WapForm Runtime</td><td>WapForm アプリケーションの実行環境――<strong>Microsoft Store からインストール</strong>してください。このセットアップには含まれません</td><td>Microsoft Store</td></tr>
+<tr><td><code>WapServ.dll</code></td><td>WapForm for Web：IIS の ISAPI モジュール。<code>*.wml</code> に割り当てます（ライセンス制、30 日間試用）</td><td>Web &gt; IIS module</td></tr>
+<tr><td><code>WapServer.exe</code></td><td>WapForm Web Server 無料版：ローカル <code>localhost:8080</code> のみ提供</td><td>Web &gt; Web Server</td></tr>
+<tr><td><code>wapform.ini</code></td><td>共通設定：データベース接続、フォント、LINE（5 章参照）</td><td>Samples</td></tr>
+<tr><td><code>shop\</code></td><td>オンラインショップのサンプル（英語のストア）：カタログ、商品、カート、会員、注文</td><td>Samples</td></tr>
+<tr><td><code>C:\Wapform\flutter\lib\</code></td><td>WapForm for Flutter プロジェクトのバックオフィス：同じ <code>.wml</code> が Windows で動き、生成された <code>.dart</code> が Flutter で動きます。Flutter のランタイムは pub.dev の <code>wapform_flutter</code> パッケージです</td><td>Flutter</td></tr>
+<tr><td><code>C:\Wapform\flutter\</code></td><td>WapForm for Flutter プロジェクト（Web・Android 対応、プラットフォームフォルダー作成済み）。pub.dev の <code>wapform_flutter ^1.6.8</code> に依存</td><td>Flutter</td></tr>
+<tr><td><code>C:\Wapform\flutter\server\</code></td><td>Flutter 版の REST バックエンド（Node.js の <code>server.js</code>、<code>start_server.bat</code> で起動、ポート 3000）</td><td>Flutter</td></tr>
+<tr><td><code>database\sales.sql</code></td><td>サンプルデータベース <code>sales</code>（英語の架空データ）</td><td>Samples</td></tr>
+<tr><td><code>setup\</code></td><td>IIS の設定・削除・DLL 更新用 PowerShell スクリプトとログ</td><td>Web &gt; IIS module</td></tr>
+</table>
+<p>ショップとバックオフィスは<strong>同じデータベース</strong>を使います。ショップで受けた注文や会員を、バックオフィス（Windows または Flutter）でそのまま管理できます。</p>
+
+<h2 id="ja-req">2. 必要環境</h2>
+<table>
+<tr><th>項目</th><th>用途</th><th>必須</th></tr>
+<tr><td>Windows 10 / 11（または Windows Server）</td><td>すべてのコンポーネント</td><td>必須</td></tr>
+<tr><td>MySQL または MariaDB（例：XAMPP）</td><td>サンプルデータベース <code>sales</code></td><td>サンプル実行時に必須</td></tr>
+<tr><td>IIS ＋「ISAPI 拡張」</td><td>WapServ.dll による Web サイト公開</td><td>IIS モジュールのみ</td></tr>
+<tr><td>Node.js</td><td><code>C:\Wapform\flutter\server\server.js</code>（Flutter バックオフィスの REST バックエンド）</td><td>WapForm for Flutter のみ</td></tr>
+<tr><td>Flutter SDK、Chrome、Android Studio</td><td>Flutter バックオフィスのビルドと実行：Web、Android（6-1 参照）</td><td>WapForm for Flutter のみ</td></tr>
+</table>
+<p>IIS の有効化：コントロールパネル &gt; プログラム &gt; Windows の機能の有効化または無効化 &gt; インターネット インフォメーション サービス &gt; World Wide Web サービス &gt; アプリケーション開発機能 &gt;「ISAPI 拡張」にチェック。</p>
+
+<h2 id="ja-setup">3. セットアップ</h2>
+<ol>
+<li><code>wapsetup.exe</code> を管理者として実行します。</li>
+<li>インストールの種類を選びます：
+  <ul>
+  <li><strong>Full environment</strong>：Web＋サンプル＋Flutter（推奨）</li>
+  <li><strong>Custom</strong>：個別に選択</li>
+  </ul></li>
+<li>IIS モジュールを選んだ場合は、<strong>IIS サイト</strong>（既定 <code>Default Web Site</code>）と<strong>アプリケーションプール</strong>（既定 <code>DefaultAppPool</code>）を確認します。セットアップは自動的に、32 ビットアプリケーションの有効化、ISAPI の許可、<code>*.wml</code> → <code>C:\Wapform\WapServ.dll</code> の割り当て、既定のドキュメント <code>index.wml</code> の設定、ライセンスフォルダーとアップロードフォルダーへの書き込み権限の付与（<code>shop\upload</code> を含む）、プールの再起動を行います。ログは <code>C:\Wapform\setup\iis-setup.log</code> です。</li>
+<li>サンプルショップは <code>C:\Wapform\shop</code>（WapServer 用）と IIS サイトフォルダーの <code>shop</code>（IIS 用）の両方に配置されます。</li>
+</ol>
+<p>再インストール（アップグレード）しても、変更したサンプルと <code>wapform.ini</code> は上書きされません。アンインストール時も既定では残ります。「<em>Remove everything as well?</em>」で <strong>Yes</strong> を選ぶと、<code>C:\Wapform</code>（サンプル、<code>wapform.ini</code>、そこに置いたご自身のファイル）、IIS 側の <code>shop</code>、WapForm Web Server の設定もまとめて削除されます。ライセンスデータ（<code>C:\ProgramData\WapForm\License</code>、WapForm Toolkit／Runtime と共用）と <code>sales</code> データベースは常に残ります。</p>
+
+<h2 id="ja-db">4. サンプルデータベースの作成</h2>
+<pre>cd C:\Wapform\database
+mysql -u root -p &lt; sales.sql</pre>
+<p>XAMPP の mysql は <code>C:\xampp\mysql\bin\mysql.exe</code> にあります。phpMyAdmin の「インポート」で <code>sales.sql</code> を選んでもかまいません。</p>
+<p><code>sales.sql</code> は次の処理を行います：</p>
+<ul>
+<li>データベース <code>sales</code> を作成（既にある場合は<strong>サンプルのテーブルを作り直す</strong>ため、同名のデータベースは先にバックアップしてください）</li>
+<li>MySQL アカウント <code>xyz</code> / <code>123</code>（仮の値）を作成し、<code>sales</code> のみに権限を付与</li>
+<li>英語の架空データを取り込み：文具カタログ 271 カテゴリ、5,390 商品（各カテゴリ 22 品、うち 4 品がおすすめ）、顧客 30、仕入先 10、社員 6、運送会社 3、注文 120、記事 8</li>
+</ul>
+<table>
+<tr><th>テーブル</th><th>内容</th></tr>
+<tr><td><code>pa</code></td><td>カタログ（<code>mnu='m'</code>：<code>gid='0000'</code> が大分類、それ以外が小分類）と商品（<code>mnu='n'</code>、<code>gid</code> = 小分類コード）。<code>active</code>：0 非公開、1 公開、2 以上はおすすめ（数字順）</td></tr>
+<tr><td><code>menu</code>、<code>web</code></td><td>ショップのカテゴリメニューとカテゴリ一覧</td></tr>
+<tr><td><code>cu</code> / <code>ve</code> / <code>em</code> / <code>fm</code></td><td>顧客（ショップ会員を含む）／仕入先／社員／運送会社</td></tr>
+<tr><td><code>sh</code> / <code>sn</code></td><td>出荷伝票（ヘッダー／明細）。ショップの「売れ筋ランキング」の元データでもあります</td></tr>
+<tr><td><code>rh</code> / <code>rn</code></td><td>ショップのカートとネット注文</td></tr>
+<tr><td><code>sys</code></td><td>会社情報、税率、支払条件</td></tr>
+<tr><td><code>mnu</code> / <code>users</code> / <code>login</code></td><td>バックオフィスのメニュー／アカウント／権限</td></tr>
+<tr><td><code>topic</code>、<code>counter</code>、<code>num</code></td><td>記事、閲覧カウンター、伝票番号の連番</td></tr>
+</table>
+
+<h2 id="ja-ini">5. wapform.ini の設定項目</h2>
+<p>場所：<code>C:\Wapform\wapform.ini</code>（共通）、<code>shop\wapform.ini</code>（ショップサイト）、<code>C:\Wapform\flutter\lib\wapform.ini</code>（バックオフィス）。各サイトのフォルダーは自分のフォルダー内の <code>wapform.ini</code> を読み込みます。形式は <code>名前=値</code>、名前の大文字・小文字は区別しません。ファイルは UTF-8 で保存してください。</p>
+<pre>; ============================================================
+; WapForm settings (wapform.ini)
+; Required: the database settings. Everything else is optional -
+; delete a line (or leave it out) to use the default shown.
+; Lines starting with ; are comments.
+; ============================================================
+
+; ---- Database (required) ------------------------------------
+Driver=mysql
+Server=localhost
+Database=sales
+Username=xyz
+Password=123
+
+; ---- Optional ------------------------------------------------
+; Date format on screens and reports (default: Windows regional settings)
+DateFormat=yyyy/mm/dd
+; Font of Windows forms and reports (default: system font, size 10).
+; MingLiU covers English, Traditional Chinese and Japanese.
+FontName=MingLiU
+FontSize=10
+; Character cell in pixels (default 7 x 13)
+CharWidth=7
+CharHeight=13
+; Unicode (UTF-8 / utf8mb4) database connection: keep this line for
+; utf8mb4 databases such as the sample; the line itself switches it on.
+unicode=yes
+; Interface language: en, tw or jp (default en); translations in language.txt
+language=en
+; LINE Messaging API - only for the LINE samples (linebot, linepush)
+line_bot_id=
+line_channel_secret=
+line_channel_access_token=</pre>
+<table>
+<tr><th>項目</th><th>例（仮の値）</th><th>説明</th></tr>
+<tr><td><code>driver</code></td><td><code>mysql</code></td><td><strong>必須。</strong>データベースの種類。<code>mysql</code>（MySQL / MariaDB）。Professional 版は <code>mssql</code>（SQL Server）にも対応</td></tr>
+<tr><td><code>server</code></td><td><code>localhost</code></td><td><strong>必須。</strong>データベースのホスト名または IP。既定以外のポートは <code>ホスト:ポート</code></td></tr>
+<tr><td><code>database</code></td><td><code>sales</code></td><td><strong>必須。</strong>データベース名</td></tr>
+<tr><td><code>username</code></td><td><code>xyz</code></td><td><strong>必須。</strong>データベースのアカウント（このデータベースだけに権限を与え、root は使わないことを推奨）</td></tr>
+<tr><td><code>password</code></td><td><code>123</code></td><td><strong>必須。</strong>データベースのパスワード（サンプルは仮の値。本番では必ず変更）</td></tr>
+<tr><td><code>dateformat</code></td><td><code>yyyy/mm/dd</code></td><td><em>省略可</em>（既定：Windows の地域設定）。画面と帳票の日付表示形式</td></tr>
+<tr><td><code>fontname</code></td><td><code>MingLiU</code></td><td><em>省略可</em>（既定：システムフォント）。Windows のフォームと帳票の既定フォント。レイアウトは文字セル（<code>charwidth</code> / <code>charheight</code>）で計算するため、<strong>等幅フォント</strong>を使ってください。<code>MingLiU</code>（細明體）は Windows 標準のフォントで、英語・繁体字中国語・日本語をすべて含み、どの <code>language</code> でも使えます（英字は半角、中日文字は全角）。英語だけの画面なら <code>Consolas</code> も使えますが中日文字はありません。<code>MS Gothic</code>（日本語）は一部の繁体字がありません。</td></tr>
+<tr><td><code>fontsize</code></td><td><code>10</code></td><td><em>省略可</em>（既定 10）。既定のフォントサイズ（ポイント）</td></tr>
+<tr><td><code>charwidth</code></td><td><code>7</code></td><td><em>省略可</em>（既定 7）。文字セル 1 つの幅（ピクセル）。WML で列幅を「文字数」で指定したときの換算に使います</td></tr>
+<tr><td><code>charheight</code></td><td><code>13</code></td><td><em>省略可</em>（既定 13）。文字セル 1 つの高さ（ピクセル）。行の高さとレイアウトの換算に使います</td></tr>
+<tr><td><code>unicode</code></td><td><code>yes</code></td><td><em>省略可</em>。ただし utf8mb4 のデータベース（サンプルなど）では残してください：この行があるだけで Unicode が有効になり（値は見ません）、行がなければ Unicode 接続になりません。Unicode（UTF-8 / utf8mb4）で接続・入出力します。新しいデータベースでは <code>yes</code> のままにしてください</td></tr>
+<tr><td><code>language</code></td><td><code>en</code></td><td><em>省略可</em>（既定 en）。WapForm Toolkit／Runtime の画面の言語：<code>en</code>（英語、既定）、<code>tw</code>（繁体字中国語）、<code>jp</code>（日本語）。エンジン内蔵の文字（データナビゲーター、検索バー）は自動で翻訳され、それ以外は <code>language.txt</code> で指定します（下記参照）</td></tr>
+<tr><td><code>line_bot_id</code></td><td>（空欄）</td><td><em>省略可</em>（LINE サンプルのみ）。LINE 公式アカウントの ID（linebot、linepush サンプルで使用）</td></tr>
+<tr><td><code>line_channel_secret</code></td><td>（空欄）</td><td><em>省略可</em>（LINE サンプルのみ）。LINE Messaging API の Channel secret。webhook の署名（<code>X-Line-Signature</code>）の検証に使います</td></tr>
+<tr><td><code>line_channel_access_token</code></td><td>（空欄）</td><td><em>省略可</em>（LINE サンプルのみ）。LINE の Channel access token。プッシュ／応答 API の呼び出しに使います</td></tr>
+<tr><td><code>loginusr</code> / <code>loginpwd</code></td><td><code>admin</code> / <code>123</code></td><td><code>shop\wapform.ini</code> のみ：ショップの管理機能で使う既定のログイン</td></tr>
+</table>
+<div class="warn"><code>wapform.ini</code> にはデータベースのパスワードと LINE のキーが含まれます。公開サイトに置いたり GitHub にアップロードしたりしないでください。IIS は既定で <code>.ini</code> をダウンロードさせませんが、直接ダウンロードできる場所に移さないでください。LINE のキーは LINE Developers コンソールで取得し、漏れた場合はすぐに「再発行」してください。</div>
+<h3>画面の多言語化：language.txt</h3>
+<p><code>language.txt</code> は <code>wapform.ini</code> と同じフォルダーに置きます（UTF-8）。1 行に 1 項目、<strong>英語がキー</strong>で、等号の後に繁体字中国語、日本語の順にカンマで区切って翻訳を書きます。<code>;</code> で始まる行はコメントです：</p>
+<pre>; English=繁體中文,日本語
+Item No=料號,品番
+Item Name / Spec=品名規格,品名・仕様
+Search=查詢,検索</pre>
+<p>WML のラベルとタイトルは英語で書いておけば、<code>language=tw</code> または <code>jp</code> のときに翻訳して表示されます。翻訳がない・空欄のときは英語のまま表示されます。WapForm Toolkit の <strong>Languages &gt; Interface Languages…</strong> で <code>language=</code> の設定と <code>language.txt</code> の編集ができます。<em>Add texts from last run</em> で WML の実行中に出てきた文字が一覧になるので、そのまま翻訳を入力できます。</p>
+<p>ショップの「パスワードを忘れた場合」のメール（<code>shop\forget.wml</code>）は Gmail を使います。<code>your-account@gmail.com</code> と <code>your-gmail-app-password</code> をご自身のアカウントと「アプリ パスワード」に置き換えてください。</p>
+
+<h2 id="ja-run">6. サンプルの実行</h2>
+<h3>Web：オンラインショップ（shop）</h3>
+<ul>
+<li>IIS：<code>http://localhost/shop/</code></li>
+<li>WapForm Web Server（無料版）：デスクトップの WapForm Web Server を開いて Start を押し、<code>http://localhost:8080/shop/</code> を開きます（ドキュメントのパスは既定で <code>C:\Wapform</code>）</li>
+<li>会員ログイン：<code>demo@example.com</code> / <code>123</code>。カテゴリページは 1 ページ 20 品、「おすすめ」には <code>active</code> が 2 以上の商品が表示されます</li>
+</ul>
+<h3>Windows：バックオフィス</h3>
+<ul>
+<li>WapForm Toolkit（または Runtime）で <code>C:\Wapform\flutter\lib</code> の <code>.wml</code> を開きます。例：<code>app002.wml</code>（商品マスター）、<code>app006.wml</code>（出荷伝票）</li>
+<li>ログイン：<code>admin</code> / <code>123</code>（全機能）または <code>demo</code> / <code>123</code>（販売メニューのみ）</li>
+</ul>
+<h3>Flutter：バックオフィス（Web、Android）</h3>
+<p>プロジェクトは <code>C:\Wapform\flutter</code>（バックオフィスは <code>lib</code>）、REST バックエンドは <code>C:\Wapform\flutter\server</code> にあります。WapForm の Flutter ランタイムは pub.dev の <a href="https://pub.dev/packages/wapform_flutter"><code>wapform_flutter</code></a> で、<code>flutter pub get</code> のときに自動でダウンロードされます。先に下の「6-1 WapForm for Flutter のインストール」を済ませてから実行します：</p>
+<pre>cd C:\Wapform\flutter\server
+npm install
+node server.js            （または start_server.bat を実行）
+
+cd C:\Wapform\flutter
+flutter pub get
+flutter run -d chrome              （Web）
+
+adb reverse tcp:3000 tcp:3000      （Android：端末／エミュレーターの localhost:3000 をこの PC に転送）
+flutter run -d android             （Android）</pre>
+<p><code>server.js</code> のデータベース設定は <code>wapform.ini</code> と同じ（<code>sales</code> / <code>xyz</code> / <code>123</code>）で、既定は <code>http://localhost:3000</code> です。Web と Android のプラットフォームフォルダーは作成済みなので、<code>flutter create</code> は不要です。</p>
+<p>WapForm for Flutter は <strong>Web</strong> と <strong>Android</strong> に対応しています。アプリは <code>http://localhost:3000</code> で REST バックエンドに接続します。Android の端末やエミュレーターでは localhost が端末自身を指すため、端末をつなぐたびに <code>adb reverse tcp:3000 tcp:3000</code> を実行してください（adb は Android Studio に含まれ、通常は <code>%LOCALAPPDATA%\Android\Sdk\platform-tools</code> にあります）。サンプルの AndroidManifest にはネットワーク権限と、ローカルへの http 接続の許可が設定済みです。</p>
+
+<h3 id="ja-flutter">6-1 WapForm for Flutter のインストール（開発環境：Windows、対象：Web・Android）</h3>
+<ol>
+<li><strong>Git for Windows</strong>：<a href="https://git-scm.com/download/win">git-scm.com/download/win</a>。既定のままインストールします。</li>
+<li><strong>Flutter SDK</strong>：<a href="https://docs.flutter.dev/get-started/install/windows">docs.flutter.dev/get-started/install/windows</a> から Windows 版の zip をダウンロードし、<strong>空白や日本語を含まない</strong>、管理者権限の不要なフォルダーに展開します。例：<code>C:\src\flutter</code>（<code>C:\Program Files</code> には置かないでください）。</li>
+<li><strong>PATH に追加</strong>：設定 &gt; システム &gt; バージョン情報 &gt; システムの詳細設定 &gt; 環境変数 &gt; ユーザー環境変数 <code>Path</code> &gt; 新規 <code>C:\src\flutter\bin</code>。コマンドプロンプトを開き直して <code>flutter --version</code> で確認します。</li>
+<li><strong>Web</strong>（<code>-d chrome</code>）：Google Chrome をインストールします。</li>
+<li><strong>Android</strong>：<a href="https://developer.android.com/studio">Android Studio</a> をインストールし、SDK Manager で Android SDK、SDK Command-line Tools、Platform-Tools にチェックします。エミュレーターを 1 つ作成する（Device Manager）か、「USB デバッグ」を有効にした端末を USB で接続します。最後に <code>flutter doctor --android-licenses</code> でライセンスに同意します。</li>
+<li><strong>Node.js LTS</strong>：<a href="https://nodejs.org">nodejs.org</a>（Flutter バックオフィスの REST API に必要）。</li>
+<li><strong>確認</strong>：<code>flutter doctor</code> を実行し、Chrome と Android toolchain にチェックが付けば OK です（Windows／Visual Studio の項目は無視してかまいません）。</li>
+<li><strong>エディター</strong>（推奨）：VS Code＋Flutter 拡張機能、または Android Studio＋Flutter プラグイン。</li>
+</ol>
+<p>WapForm Toolkit は <code>.wml</code> から Flutter の <code>.dart</code> ページを生成できます。生成されたページは pub.dev の WapForm Flutter ランタイム（<code>wapform_flutter</code>、ソースは <a href="https://github.com/wapform/wapform_flutter">github.com/wapform/wapform_flutter</a>）を使います。<code>.wml</code> を変更したら <code>.dart</code> を生成し直し、<code>flutter run</code> を実行してください。</p>
+<p>リリース版：<code>flutter build web</code>（出力は <code>build\web</code>、IIS のサイトに配置可能）、<code>flutter build apk</code>（出力は <code>build\app\outputs\flutter-apk\app-release.apk</code>）。本番では、REST バックエンドを端末から接続できるサーバー（https 推奨）に置き、ランタイム内のアドレスをそのサーバーに変更してください。</p>
+
+<h2 id="ja-license">7. ライセンスと試用</h2>
+<ul>
+<li>各製品は初回使用時に自動で <strong>30 日間の試用</strong>（全機能）が始まります。試用終了後、Toolkit／Runtime は Free 版になり、WapForm for Web はサービスを停止します。</li>
+<li>購入：<a href="https://wapform.com/pricing">wapform.com/pricing</a>。シリアル番号はメールで届きます。</li>
+<li>Toolkit／Runtime：プログラム内の License ウィンドウでシリアル番号を入力します。WapForm for Web：サーバー上で <code>http://localhost/license.wml</code> を開いて入力します（このページはサーバー本体からのみ開けます）。</li>
+<li>PC の移行：先に旧 PC で <strong>Deactivate</strong> を押してライセンスを解放し、新しい PC でアクティベートします。</li>
+</ul>
+
+<h2 id="ja-security">8. 公開前の確認</h2>
+<ul>
+<li>仮の値をすべて変更：MySQL のアカウント（<code>wapform.ini</code>、<code>server.js</code>）、バックオフィスのアカウント <code>admin/123</code>、会員のテストアカウント、<code>loginusr/loginpwd</code></li>
+<li>LINE と Gmail はご自身の設定を入力（サンプルの値は使わない）</li>
+<li>サンプルの商品・顧客・記事を削除または変更</li>
+<li>サイトを HTTPS に切り替え</li>
+</ul>
+<p>ドキュメントとサポート：<a href="https://wapform.com">wapform.com</a> &middot; <a href="https://github.com/wapform">github.com/wapform</a></p>
+</div>
+
+</main>
+</body>
+</html>

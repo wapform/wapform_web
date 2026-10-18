@@ -1,0 +1,225 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="WapForm Stationery" device="wapform.html">
+    <setvar name="category" value="'Message'" />
+    <dbquery id="sys">select * from sys</dbquery>
+    <setvar name="op" value="'reg'" />
+    <setvar name="op" value="request.op" cnd="DEFINE(request.op)" />
+    <go href="#register" cnd="op='reg'" />
+    <go href="#update" cnd="op='upd'" />
+    <go href="#order" cnd="op='ord'" />
+    <go href="#item" cnd="op='itm'" />
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+    <block name="breadcrumb" one="category" />
+  </card>
+  <card id="register" device="SUB">
+    <block name="wapform.aa" />
+    <include name="header" />
+    <setvar name="S" value="'2aixijxu'" />
+    <setvar name="category" value="'New Member'" />
+    <setvar name="email" value="''" />
+    <setvar name="password1" value="''" />
+    <setvar name="password2" value="''" />
+    <setvar name="cname" value="''" />
+    <setvar name="sex" value="''" />
+    <setvar name="phone" value="''" />
+    <setvar name="fax" value="''" />
+    <setvar name="gsm" value="''" />
+    <setvar name="addr1" value="''" />
+    <setvar name="zip" value="''" />
+    <setvar name="ac" value="''" />
+    <setvar name="contact" value="''" />
+    <setvar name="ship" value="''" />
+    <setvar name="rem" value="''" />
+    <if cnd="DEFINE(session.usr)">
+      <setvar name="S" value="session.usr" />
+      <setvar name="category" value="'Edit Member Details'" />
+    </if>
+    <dbquery id="cu">
+      <![CDATA[SELECT * FROM cu WHERE email='$S']]>
+    </dbquery>
+    <block name="content.aa" />
+    <block name="profile" />
+    <block name="content.zz" />
+    <include name="footer" />
+    <include name="asider"/>
+    <block name="wapform.zz" />
+  </card>
+  <card id="update" device="SUB">
+    <setvar name="S" value="''" />
+    <bug />
+    <if cnd="NOT(DEFINE(session.usr))">
+      <setvar name="S" value="S+'password, '" cnd="password1=''" />
+      <setvar name="S" value="S+'confirm password, '" cnd="password2=''" />
+    </if>
+    <setvar name="S" value="S+'name, '" cnd="cname=''" />
+    <setvar name="S" value="S+'phone number, '" cnd="phone=''" />
+    <setvar name="S" value="S+'delivery address, '" cnd="addr1=''" />
+    <setvar name="S" value="S+'postal code, '" cnd="zip=''" />
+    <setvar name="S" value="'Please fill in: '+S+'&lt;br&gt;&lt;br&gt;Go back to the previous page to continue.'" cnd="S&lt;&gt;''" />
+    <if cnd="S&lt;&gt;''">
+      <elseif cnd="DEFINE(session.usr)" />
+      <dbquery>
+        <![CDATA[update cu set cname='$cname', cshort='$cname',
+          addr1='$addr1', zip='$zip', phone='$phone', fax='$fax', gsm='$gsm', sex='$sex', ship='$ship', ac='$ac', contact='$contact', rem='$rem' where email='$session.usr']]>
+      </dbquery>
+      <if cnd="(password1&lt;&gt;'') or (password2&lt;&gt;'')">
+        <if cnd="password1=password2">
+          <dbquery>
+            <![CDATA[update cu set password='$(MD5(password1))' where email='$session.usr']]>
+          </dbquery>
+          <setvar name="S" value="'Your password has been updated.'" />
+          <else />
+          <setvar name="S" value="'Incorrect password; nothing was changed.'" />
+        </if>
+        <else />
+        <setvar name="S" value="'Your details have been updated.'" />
+      </if>
+      <else />
+      <dbquery id="cu">
+        <![CDATA[select * from cu where email='$email']]>
+      </dbquery>
+      <if cnd="cu.count&gt;0">
+        <setvar name="S" value="'This account already exists; nothing was saved. Please register again.'" />
+        <elseif cnd="password1&lt;&gt;password2" />
+        <setvar name="S" value="'The confirmation password does not match; nothing was added. Go back to the previous page to correct it.'" />
+        <else />
+        <if cnd="1&gt;2">
+          <dbquery id="cu">
+            <![CDATA[select * from cu where ac='$ac']]>
+          </dbquery>
+          <if cnd="cu.count&gt;0">
+            <dbquery>
+              <![CDATA[update cu set email='$email', password='$(MD5(password1))' where ac='$cu.ac']]>
+            </dbquery>
+            <else />
+            <dbquery>
+              <![CDATA[update sys set cno=cno+1]]>
+            </dbquery>
+            <dbquery id="sys">
+              <![CDATA[select * from sys]]>
+            </dbquery>
+            <dbquery>
+              <![CDATA[insert into cu (cno,cname,cshort,email,addr1,zip,phone,fax,gsm,sex,ship,ac,contact,rem,password) 
+              values ('$('CA'+MID(STR(1000000+sys.cno),2,6))','$cname','$cname','$email','$addr1','$zip',
+              '$phone','$fax','$gsm','$sex','$ship','$ac','$contact','$rem','$(MD5(password1))')]]>
+            </dbquery>
+          </if>
+          <else />
+          <dbquery>
+            <![CDATA[update sys set cno=cno+1]]>
+          </dbquery>
+          <dbquery id="sys">
+            <![CDATA[select * from sys]]>
+          </dbquery>
+          <dbquery>
+            <![CDATA[insert into cu (cno,cname,cshort,email,addr1,zip,phone,fax,gsm,sex,ship,ac,contact,rem,password) 
+              values ('$('CA'+MID(STR(1000000+sys.cno),2,6))','$cname','$cname','$email','$addr1','$zip',
+              '$phone','$fax','$gsm','$sex','$ship','$ac','$contact','$rem','$(MD5(password1))')]]>
+          </dbquery>
+        </if>
+        <setsession name="usr" value="email" />
+        <setsession name="pwd" value="password1" />
+        <setvar name="S" value="'Registration complete!&lt;br&gt;Happy shopping!'" />
+      </if>
+    </if>
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="content.aa" one="'Cart'" />
+    <block name="alert" title="'Message'" message="S" />
+    <block name="content.zz" />
+    <include name="footer" />
+    <include name="asider"/>
+    <block name="wapform.zz" />
+    <!--
+        <include name="header" />
+        <setvar name="category" value="'Message'" />
+        <block name="content.aa" one="'Member Management'" />
+        <block name="alert" msg="S" />
+        <block name="content.zz" />
+        <include name="footer" />
+-->
+  </card>
+  <card id="order" device="SUB">
+    <block name="wapform.aa" />
+    <include name="header" />
+    <setvar name="category" value="'Order History'" />
+    <block name="content.aa" />
+    <if cnd="NOT(DEFINE(session.usr))">
+      <redirect href="login.wml" />
+    </if>
+    <setvar name="A" value="FORMAT('%4.4d',YEAR(DATE))+'0101'" />
+    <setvar name="A" value="request.a" cnd="DEFINE(request.a)" />
+    <setvar name="B" value="FORMAT('%4.4d',YEAR(DATE))+FORMAT('%2.2d',MONTH(DATE))+FORMAT('%2.2d',DAY(DATE))" />
+    <setvar name="B" value="request.b" cnd="DEFINE(request.b)" />
+    <setvar name="P" value="1" />
+    <setvar name="P" value="request.pg" cnd="DEFINE(request.pg)" />
+    <dbquery id="od">
+      <![CDATA[
+SELECT sh.sno, sh.amount, sh.tax, 
+ sh.sdate, sh.paid, sh.pc, sh.cno, 
+ cu.cname, cu.contact, cu.addr1, cu.phone, cu.email
+FROM sh, cu
+WHERE (cu.cno = sh.cno)
+  AND (cu.email='$session.usr')
+  AND sh.sdate between date_sub(now(),interval 9 month) and now()
+ORDER BY sh.sno desc
+    ]]>
+    </dbquery>
+    <output dataset="od">
+      <block name="order.aa" />
+      <setvar name="S" value="''" />
+      <setvar name="I" value="1" />
+      <group>
+        <block name="order-item" />
+        <setvar name="I" value="I+1" />
+      </group>
+      <block name="order.zz" />
+    </output>
+    <block name="content.zz" />
+    <include name="footer" />
+    <include name="asider"/>
+    <block name="wapform.zz" />
+  </card>
+  <card id="item" device="SUB">
+    <block name="wapform.aa" />
+    <include name="header" />
+    <setvar name="category" value="'Order Form'" />
+    <block name="content.aa" />
+    <dbquery id="sys">
+      <![CDATA[select * from sys]]>
+    </dbquery>
+    <dbquery id="od">
+      <![CDATA[
+SELECT o.sno, o.amount, o.sdate, o.cno, o.topic, o.sales, o.dm,
+ o1.itm, o1.pno, o1.qty, o1.price, o1.rem,
+ c.cname, c.gsm, c.phone, c.addr1, c.email, c.ac,
+ p.des, p.unit
+FROM sh o, sn o1, cu c, pa p
+WHERE
+ (o1.sno = '$request.od')
+ AND (o1.sno = o.sno)
+ AND (c.cno = o.cno)
+ AND (p.pno = o1.pno)
+ORDER BY o.sno, o1.itm
+    ]]>
+    </dbquery>
+    <output dataset="od">
+      <block name="detail.aa" />
+      <setvar name="TempTotal" value="0" />
+      <group>
+        <block name="detail-item" />
+        <setvar name="TempTotal" value="TempTotal+od.qty*od.price" />
+      </group>
+      <setvar name="Tax" value="TempTotal*5/100" />
+      <block name="detail.zz" />
+    </output>
+    <block name="content.zz" />
+    <include name="footer" />
+    <include name="asider"/>
+    <block name="wapform.zz" />
+  </card>
+</wml>

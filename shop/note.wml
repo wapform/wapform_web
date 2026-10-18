@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" device="wapform.html">
+    <setvar name="gp" value="'note'" />
+    <setvar name="gp" value="request.gp" cnd="define(request.gp)" />
+    <setvar name="pg" value="'note'" />
+    <setvar name="pg" value="request.pg" cnd="DEFINE(request.pg)" />
+    <setvar name="sr" value="'az'" />
+    <setvar name="sr" value="request.sort" cnd="define(request.sort)" />
+    <setvar name="id" value="''" />
+    <setvar name="i" value="0" />
+    <setvar name="s" value="'Product Info'" />
+    <setvar name="b" value="0" />
+    <setvar name="gtitle" value="mid(gp,1,2)+'00'" />
+    <if cnd="DEFINE(session.usr)">
+      <setvar name="B" value="1" cnd="session.usr='admin'" />
+    </if>
+    <dbquery id="sys">select * from sys</dbquery>
+    <dbquery id="grp">
+      <![CDATA[select pno, gid, des from pa where pno='$gp' and active>0 order by pno]]>
+    </dbquery>
+    <setvar name="category" value="'Shopping Guide'" />
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="onnote" />
+    <include name="footer" />
+    <include name="asider" />
+    <block name="wapform.zz" />
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+    <block name="breadcrumb" one="'Shopping Guide'" />
+  </card>
+  <card id="sidebar" device="sub">
+    <dbquery id="mnu">
+      <![CDATA[select pno, gid, des, typ from pa where gid='$gp' and active>0 order by pno]]>
+    </dbquery>
+    <setvar name="id" value="mnu.pno" />
+    <setvar name="id" value="request.pg" cnd="DEFINE(request.pg)" />
+    <dbgroup dataset="mnu">
+      <setvar name="row" value="0" />
+      <setvar name="col" value="0" />
+      <block name="sidebar.aa" />
+      <group>
+        <setvar name="ic" value="''" />
+        <setvar name="app" value="'note'" />
+        <block name="sidebar-note" />
+      </group>
+      <block name="sidebar.zz" />
+    </dbgroup>
+  </card>
+  <card id="content" device="sub">
+    <![CDATA[
+    <div class="info-head">
+      <h1>$category</h1>
+    </div>
+    <div class="article" id="xyz"></div>
+    <script>loadDoc('note-js.wml?pg=$id');</script>
+]]>
+  </card>
+</wml>

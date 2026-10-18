@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="custlist">
+
+    <!--
+      Customer lookup — a subroutine of linebot.wml (a fragment, not a standalone entry point)
+
+      Loaded by linebot.wml with <include name="custlist"/>. mywap.pas's
+      _include copies this <card> over and runs it with ParseBlock, sharing the same
+      Evaluator, so variables set here are visible in linebot.wml.
+
+      [Why the file is not called cust.wml]
+      WebHookAction uses the first word of the message as a file name and looks for <op>.wml. If this file were
+      cust.wml, a user sending "cust" would load it directly as a full entry point —
+      and since this file has no CDATA output section, the whole site layout would be sent to LINE.
+      Giving it a name that cannot be taken as a command removes that path.
+
+      [What this file does]
+      It only sets reply_text and msg_json. quickReply and the outer JSON template
+      are produced by linebot.wml; a subroutine should not produce its own, or there will be two sets.
+
+      [Variables you can use directly] (already set by linebot.wml)
+        user_text  — the full message the user sent (including the command word)
+        cmd        — user_text in lower case, trimmed
+        uid        — the sender's LINE userId
+      plus the whole events_* series set by WebHookAction with SetVar.
+    -->
+
+    <!--
+      Getting the keyword: find the first space; everything after it is the keyword.
+
+      Why not $(p1): if the user sends only "cust", p1 is never created,
+      and referring to it gives Unknown identifier instead of an empty string. Splitting it yourself has another benefit:
+      the keyword of "cust north office" becomes "north office" (including the space),
+      while p1 would only give "north".
+
+      [Why the if condition also checks sp < LENGTH]
+      Only MID can be used — the string functions registered in myexp.pas are just CHR/LENGTH/LOWER/UPPER/
+      MID/POS/TRIM/INSTR, with no COPY and no LEFT (_COPY exists in the source
+      but is not registered with AddFunctionParam, so calling it gives Unknown function identifier).
+      And _MID is the DBCS version: when the start is past the end of the string, its internal j is never assigned,
+      and it returns undefined content (_AnsiMid fixed this bug in V1.6; _MID did not).
+      So we guard it ourselves: when the space is the last character, sp+1 is already out of range,
+      which is the same as having no keyword.
+
+      Note: a less-than sign in cnd must be written as &amp;lt;; XML attribute values do not accept a literal <.
+    -->
+    <setvar name="sp" value="INSTR(user_text, ' ')"/>
+    <setvar name="kw" value="''"/>
+    <if cnd="(sp > 0) and (sp &lt; LENGTH(user_text))">
+      <setvar name="kw" value="TRIM(MID(user_text, sp + 1, 200))"/>
+    </if>
+
+    <!--
+      kw is user input and goes straight into the SQL. Without filtering, a single quote could
+      rewrite the query. AsSqlStr() doubles each single quote (the SQL literal escape);
+      it does not add the outer quotes, so the SQL has to write '$kwsql' itself.
+    -->
+    <setvar name="kwsql" value="AsSqlStr(kw)"/>
+
+    <!--
+      ★ Table and column names: cu / cno / cname follow the naming convention of pa (the product table)
+        and are an assumption; if your names differ, just change these three.
+
+      [Why the whole list is built by SQL]
+      <dbquery> only opens a dataset; it is not a loop — mywap.pas's _dbquery
+      has no ParseBlock and no DataSet.Next, and its child nodes are field definitions (onevent
+      and so on), not content run per record. After opening, $(id.field) returns "the current
+      record", i.e. the first one.
+      Walking records needs <report> or <crosstab>, but both are designed for producing tables,
+      which is roundabout for building a piece of plain text.
+      Instead MySQL joins the 10 rows into one string with group_concat; the result
+      has a single row, so $(cu.txt) gets it directly, with no loop at all.
+
+      [Why char(10) instead of separator '\n']
+      The SQL string goes through the engine's preprocessing and $ variable substitution first, and it is not certain
+      whether backslash escapes survive. char(10) is a plain function call and cannot be mangled.
+      So each row appends char(10) itself, and the separator is an empty string.
+
+      [limit 10]
+      Not just for display: a single LINE message is limited to 5000 characters, and with many customers, sending them all
+      at once is rejected with 400. Also, group_concat defaults to 1024 bytes
+      (group_concat_max_len), plenty for 10 customer names; to raise it
+      you have to change the MySQL settings.
+
+      [When there is no data] count(*) returns 0 and group_concat returns NULL,
+      so every value below goes through AsStringValue.
+    -->
+    <dbquery id="cu"><![CDATA[
+      select count(*) as cnt,
+             group_concat(concat(cname, '[', cno, ']', char(10))
+                          order by cno separator '') as txt
+      from (select cno, cname from cu
+            where ('$kwsql' = '')
+               or (cname like '%$kwsql%')
+               or (cno like '%$kwsql%')
+            order by cno
+            limit 10) t
+    ]]></dbquery>
+
+    <setvar name="n" value="AsInt(cu.cnt)"/>
+    <setvar name="lst" value="TRIM(AsStringValue(cu.txt))"/>
+
+    <if cnd="n = 0">
+      <if cnd="kw = ''">
+        <setvar name="reply_text" value="'There are no customers in the customer table yet.'"/>
+      <else/>
+        <setvar name="reply_text" value="'No customers match: ' + kw + CHR(10) + CHR(10) + 'Send just cust to see the first 10.'"/>
+      </if>
+    <else/>
+      <if cnd="kw = ''">
+        <setvar name="reply_text" value="'Customers (first ' + AsStringValue(n) + ')' + CHR(10) + TRIM(lst) + CHR(10) + CHR(10) + 'To find a customer: cust keyword'"/>
+      <else/>
+        <setvar name="reply_text" value="'Search for &quot;' + kw + '&quot; found ' + AsStringValue(n) + CHR(10) + TRIM(lst)"/>
+      </if>
+    </if>
+
+    <setvar name="msg_json" value="'&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:' + AsJson(reply_text)"/>
+
+  </card>
+
+</wml>

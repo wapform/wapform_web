@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="WapForm Stationery" device="wapform-js.html">
+    <setvar name="pg" value="'note'"/>
+    <setvar name="pg" value="request.pg" cnd="DEFINE(request.pg)"/>
+    <dbquery id="pa">select topic from pa where pno='$pg'</dbquery>
+    <![CDATA[
+$pa.topic
+]]>
+  </card>
+</wml>

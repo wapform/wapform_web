@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="linebot">
+
+    <!--
+      Complete LINE Bot example — handles three message types (text/sticker/image); every
+      reply carries a set of Quick Reply buttons, so the user can tap instead of typing.
+
+      This is not a page for people to open in a browser; after WebModule1WebHookAction receives
+      a LINE webhook, it loads this file as the "reply generator". The flow:
+
+        LINE sends a webhook (JSON)
+          → WebHookAction verifies the signature and parses the events_* fields
+          → each field is SetVar'ed in
+          → this .wml renders normally (Wap.Run)
+          → the output goes through wrapper(), which strips HTML tags, line breaks and whitespace outside quotes
+          → the remaining string is sent as the request body of the LINE reply API
+
+      ★ The channel secret / channel access token are not written in this .wml;
+        WebHookAction (on the Delphi side) reads them from the configuration file:
+          Channel secret       → verifies X-Line-Signature
+          Channel access token → the Authorization: Bearer header for the reply API
+
+      Variables you can use directly (already SetVar'ed by WebHookAction):
+        events_replyToken      — the token for this reply
+        events_source_userId   — the sender's LINE user ID (reported by the id command)
+        events_message_text    — the message the user sent (may be Null for non-text messages)
+        host                    — the Host of this request (used to build full URLs for image messages)
+
+      [Syntax note] To put a literal double quote in an XML attribute value, use the entity &quot;;
+      expression strings use Pascal-style single quotes '...', with a single quote itself escaped as ''.
+
+      [Function notes] (as of myexp.pas V1.7)
+        - The tt_ prefixes have all been renamed; tt_AsDQuoted no longer exists and calling it gives
+          "Unknown function identifier".
+        - Strings going into JSON always use AsJson(): it escapes \ " CR LF TAB
+          and returns the string already wrapped in double quotes.
+          Do not use AsDQuoted() — it only escapes double quotes, not backslashes or line breaks,
+          so a CHR(10) in the help text becomes a raw line break and the JSON is invalid.
+        - Zero-argument functions (NOW, DATE, TODAY…) must not have parentheses: write NOW,
+          not NOW(), or the parser reports "Right parenthesis expected" at
+          the FormatDateTime argument.
+        - User input first goes through AsStringValue() to turn Null into '', so that non-text messages
+          such as stickers or images do not make TRIM(Null) throw a Numeric error.
+
+      [Message types] Each branch builds only the fields "inside the message object" (msg_json, without
+      the outer {}); at the end the CDATA template puts them into the messages array and adds
+      quickReply.
+        text    — {"type":"text","text":"..."}
+        sticker — {"type":"sticker","packageId":"446","stickerId":"1988"}
+        image   — {"type":"image","originalContentUrl":"https://...",
+                    "previewImageUrl":"https://..."}
+                  ★ Image URLs must be HTTPS and reachable by the LINE servers;
+                  testing with a local http://localhost fails.
+
+      [Open issue] Signature verification has to reject requests "before" WebHookAction loads this .wml;
+      it cannot be done inside the wml.
+    -->
+
+    <setvar name="user_text" value="AsStringValue(events_message_text)"/>
+    <setvar name="cmd" value="LOWER(TRIM(user_text))"/>
+    <setvar name="uid" value="AsStringValue(events_source_userId)"/>
+
+    <!--
+      op1 = the first word of the message (the command itself). cmd is "the whole message" in lower case,
+      so when the user sends "cust wapform", cmd is "cust wapform",
+      and cmd='cust' does not match; commands with parameters must use op1.
+
+      There is no LEFT — the string functions registered in myexp.pas are only CHR/LENGTH/LOWER/
+      UPPER/MID/POS/TRIM/INSTR. Be careful with _MID's boundary bug: when the start
+      is past the end of the string, its internal j is never assigned and it returns undefined content. Here
+      sp > 1 guarantees that start 1 is always valid, so it is safe.
+    -->
+    <setvar name="sp" value="INSTR(cmd, ' ')"/>
+    <setvar name="op1" value="cmd"/>
+    <if cnd="sp > 1">
+      <setvar name="op1" value="MID(cmd, 1, sp - 1)"/>
+    </if>
+
+    <!-- Quick Reply buttons attached to every reply; tapping one is the same as typing and sending that command -->
+    <setvar name="quick_reply" value="',&quot;quickReply&quot;:{&quot;items&quot;:[' +
+      '{&quot;type&quot;:&quot;action&quot;,&quot;action&quot;:{&quot;type&quot;:&quot;message&quot;,&quot;label&quot;:&quot;Help&quot;,&quot;text&quot;:&quot;help&quot;}},' +
+      '{&quot;type&quot;:&quot;action&quot;,&quot;action&quot;:{&quot;type&quot;:&quot;message&quot;,&quot;label&quot;:&quot;Time&quot;,&quot;text&quot;:&quot;time&quot;}},' +
+      '{&quot;type&quot;:&quot;action&quot;,&quot;action&quot;:{&quot;type&quot;:&quot;message&quot;,&quot;label&quot;:&quot;Sticker&quot;,&quot;text&quot;:&quot;sticker&quot;}},' +
+      '{&quot;type&quot;:&quot;action&quot;,&quot;action&quot;:{&quot;type&quot;:&quot;message&quot;,&quot;label&quot;:&quot;Image&quot;,&quot;text&quot;:&quot;image&quot;}},' +
+      '{&quot;type&quot;:&quot;action&quot;,&quot;action&quot;:{&quot;type&quot;:&quot;message&quot;,&quot;label&quot;:&quot;My ID&quot;,&quot;text&quot;:&quot;id&quot;}},' +
+      '{&quot;type&quot;:&quot;action&quot;,&quot;action&quot;:{&quot;type&quot;:&quot;message&quot;,&quot;label&quot;:&quot;Customers&quot;,&quot;text&quot;:&quot;cust&quot;}}' +
+      ']}'"/>
+
+    <if cnd="(cmd='help') or (cmd='?')">
+
+      <setvar name="reply_text" value="'Commands:' + CHR(10) + 'help — show this help' + CHR(10) + 'time — show the server time' + CHR(10) + 'sticker — reply with a sticker' + CHR(10) + 'image — reply with an image' + CHR(10) + 'id — show your LINE userId' + CHR(10) + 'cust — list the first 10 customers' + CHR(10) + 'cust keyword — search by name or code' + CHR(10) + 'anything else — echoed back to you'"/>
+      <setvar name="msg_json" value="'&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:' + AsJson(reply_text)"/>
+
+    <elseif cnd="(cmd='time') or (cmd='now')">
+
+      <setvar name="reply_text" value="'Current time: ' + FormatDateTime('yyyy-mm-dd hh:nn:ss', NOW)"/>
+      <setvar name="msg_json" value="'&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:' + AsJson(reply_text)"/>
+
+    </elseif>
+    <elseif cnd="(cmd='id') or (cmd='myid') or (cmd='userid')">
+
+      <!--
+        Reports the user's own LINE userId.
+
+        The userId is the value for the to parameter of <linepush> — a 33-character string starting with U,
+        not the display name, not a Bot basic ID such as @538nlluf, and not the destination
+        in the webhook body (that is the bot's own ID).
+
+        Getting this value used to mean digging through linebot_error.log or opening a test page; now users
+        can simply ask the bot: on a phone, long-press the message to copy it, so customers can get it themselves.
+
+        The userId is on a line of its own, with no punctuation around it, so it is easy to long-press and select.
+      -->
+      <setvar name="reply_text" value="'Your LINE userId:' + CHR(10) + uid + CHR(10) + CHR(10) + 'You can enter this value in the User ID field of linepush.wml.'"/>
+      <setvar name="msg_json" value="'&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:' + AsJson(reply_text)"/>
+
+    </elseif>
+    <elseif cnd="(op1='cust') or (op1='customer')">
+
+      <!--
+        Customer lookup — the logic is in custlist.wml; this branch only hands over to it.
+
+        <include name="custlist"/> loads custlist.wml from the same folder and copies its
+        <card> in to run (mywap.pas's _include). It shares the same
+        Evaluator, so reply_text / msg_json set there take effect here directly.
+
+        The condition checks op1 (the first word), not cmd (the whole message) — when the user sends
+        "cust wapform", cmd is the whole string and cmd='cust' does not match.
+        The keyword is split off in custlist.wml.
+
+        [Why the subroutine is not called cust.wml]
+        WebHookAction uses the first word of the message as a file name to find <op>.wml. If it were named cust.wml,
+        a user sending "cust" would load it directly as a full entry point, and since it has no CDATA
+        output section, the whole site layout would be sent to LINE. Renaming it removes that path.
+
+        To add another subroutine, follow this pattern: add an elseif + include here,
+        put the logic in its own file, and let the CDATA below produce the output.
+      -->
+      <include name="custlist"/>
+
+    </elseif>
+    <elseif cnd="(cmd='sticker')">
+
+      <setvar name="msg_json" value="'&quot;type&quot;:&quot;sticker&quot;,&quot;packageId&quot;:&quot;446&quot;,&quot;stickerId&quot;:&quot;1988&quot;'"/>
+
+    </elseif>
+    <elseif cnd="(cmd='image') or (cmd='picture')">
+
+      <setvar name="img_url" value="'https://' + AsStringValue(host) + '/upload/example.jpg'"/>
+      <setvar name="msg_json" value="'&quot;type&quot;:&quot;image&quot;,&quot;originalContentUrl&quot;:' + AsJson(img_url) + ',&quot;previewImageUrl&quot;:' + AsJson(img_url)"/>
+
+    </elseif>
+    <else/>
+
+      <setvar name="reply_text" value="'You said: ' + user_text"/>
+      <setvar name="msg_json" value="'&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:' + AsJson(reply_text)"/>
+
+    </if>
+
+    <!--
+      ★ Keep both markers @@LINEJSON@@ and @@ENDJSON@@.
+
+      The output of this .wml is wrapped in the site's shared layout — the nav bar, the CSS in <style>,
+      and the JavaScript in the footer <script> are all in the output. WebHookAction's
+      wrapper() strips only <...> tags and keeps the text "between" tags, so the CSS and JS
+      remain untouched; in testing the whole output was 10692 bytes, and the real JSON was just a small piece
+      in the middle. Sending all of that to LINE is always rejected with 400, and the bot never replies.
+
+      There is footer JS after the JSON too, so "from {"replyToken to the end" does not work either.
+      WebHookAction was changed to cut out the part between these two markers before sending.
+
+      The markers must not contain spaces, line breaks or angle brackets, which wrapper() would strip.
+    -->
+    <![CDATA[
+    @@LINEJSON@@{"replyToken":$(AsJson(events_replyToken)),"messages":[{$(msg_json)$(quick_reply)}]}@@ENDJSON@@
+    ]]>
+
+  </card>
+
+</wml>

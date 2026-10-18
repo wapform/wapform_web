@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="how" device="wapform.html">
+    <include name="mnu.wml"/>
+    <section name="wrapper.prefix"/>
+    <![CDATA[
+<div class="bg-light lter b-b wrapper-md">
+  <h1 class="m-n font-thin h3">Payment Methods</h1>
+</div>
+<div class="wrapper-md" style="height:500px;">
+  <div class="row">
+    <div class="col-lg-3">
+      <div class="panel panel-default">
+        <div class="panel-body">
+<ul class="folder-list" style="padding:0">
+<li><a href="process.wml">Ordering Process</a></li>
+<li><a href="manual.wml">How to Order Online</a></li>
+<li><a href="faq.wml">Terms of Sale</a></li>
+<li><a href="payment.wml">Payment Methods</a></li>
+<li><a href="freight.wml">Shipping</a></li>
+<li><a href="return.wml">Returns &amp; Exchanges</a></li>
+</ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-9">
+      <div class="panel panel-default">
+        <div class="panel-body art-main">
+
+<div id="faq">
+
+<p><a name="3"></a><font color="#FF0000">Payment methods:</font></p>
+<ol class="decimal">
+  <li>Orders are delivered by courier, normally with cash on delivery.</li>
+  <li>You can also pay by bank transfer.<br>If you choose this, please call our customer service after placing the order to get the account details.</li>
+  <li>Customers who have ordered regularly for more than a year can call to ask about monthly billing.</li>
+</ol>
+
+</div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+]]>
+    <section name="wrapper.suffix"/>
+  </card>
+  <card id="mnu" device="SUB">
+    <dbquery id="mnu">
+      <![CDATA[select substring(id,1,2) sub, id, sub, title from web where active=1 order by id]]>
+    </dbquery>
+    <output dataset="mnu">
+      <![CDATA[
+  <!-- aside -->
+  <aside id="aside" class="app-aside hidden-xs bg-success dk">
+          <div class="aside-wrap">
+        <div class="navi-wrap">
+          <!-- nav -->
+          <nav ui-nav class="navi clearfix">
+            <ul class="nav">
+]]>
+      <group change="mnu.sub">
+        <setvar name="K" value="0"/>
+        <operator>
+          <![CDATA[<li><a href="product.wml?gp=$mnu.id">$mnu.title</a><ul class="nav nav-sub dk">]]>
+        </operator>
+      <group>
+        <if cnd="K&gt;0">
+          <operator>
+            <![CDATA[<li><a href="product.wml?gp=$mnu.id">$mnu.title</a></li>]]>
+          </operator>
+        </if>
+        <setvar name="K" value="K+1"/>
+      </group>
+      <![CDATA[</ul></li>]]>
+      </group>
+      <![CDATA[
+            </ul>
+          </nav>
+          <!-- nav -->
+        </div>
+      </div>
+  </aside>
+  <!-- / aside -->
+]]>
+    </output>
+  </card>
+</wml>

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="Member Login" device="wapform.html">
+    <setvar name="category" value="'Message'" />
+    <dbquery id="sys">select * from sys</dbquery>
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="content.aa" />
+    <if cnd="DEFINE(request.op)">
+      <if cnd="email=''">
+        <block name="result" msg="'Account is empty!'" />
+        <else />
+        <dbquery id="cu">
+          <![CDATA[select * from cu where email='$email']]>
+        </dbquery>
+        <if cnd="cu.count=0">
+          <block name="alert" title="'Error'" message="'No such account: '+email" />
+          <else />
+          <setvar name="I" value="0" />
+          <setvar name="S" value="MD5(NOW)" />
+          <dbquery>
+            <![CDATA[update cu set password='$(S)' where email='$email']]>
+          </dbquery>
+<mail
+  host="smtp.gmail.com"
+  port="587"
+  username="your-account@gmail.com"
+  password="your-gmail-app-password"
+  from="your-account@gmail.com"
+  to="$email"
+  subject="WapForm Stationery password reset"
+  result="I">
+            <![CDATA[
+Please click the link below to reset your password on our website.<br/><br/>
+<a href="http://127.0.0.1:8080/wapserv/password.wml?id=$(S)">Reset your password</a>
+]]>
+          </mail>
+          <if cnd="I=0">
+            <block name="alert" title="'Message'" message="'A password reset link has been sent to your registered e-mail&lt;br&gt;'+email" />
+            <else />
+            <block name="alert" title="'Error'" message="'E-mail error: '+email" />
+          </if>
+        </if>
+      </if>
+      <else />
+      <block name="forget" />
+    </if>
+    <block name="content.zz" />
+    <include name="footer" />
+    <include name="asider"/>
+    <block name="wapform.zz" />
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+    <block name="breadcrumb" one="'Forgot Password'" />
+  </card>
+</wml>

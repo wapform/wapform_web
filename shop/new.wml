@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="WapForm Stationery" device="wapform.html">
+    <setvar name="GP" value="'wap'" />
+    <setvar name="GP" value="request.p" cnd="DEFINE(request.p)" />
+    <dbquery id="sys">select * from sys</dbquery>
+    <block name="wapform.aa" />
+    <include name="header" />
+    <block name="content.aa" />
+
+    <nowap>
+    <![CDATA[
+<h1 class="news-title">Latest News</h1>
+
+<div class="news" id="xyz">
+  <script>loadDoc('new-js.wml');</script>
+</div>
+
+<div class="news-more">
+  <span class="news-loading" id="loader-icon">Loading…</span>
+  <button type="button" id="moreBtn" class="btn-inline" onclick="newsMore(this)">More news</button>
+  <p class="news-end" id="newsEnd">That's all the news for now.</p>
+</div>
+
+<script>
+function newsDone() {
+  var b = document.getElementById('moreBtn');
+  var e = document.getElementById('newsEnd');
+  if (b) { b.style.display = 'none'; }
+  if (e) { e.style.display = 'block'; }
+}
+
+function newsMore(btn) {
+  var box = document.getElementById('xyz');
+  var totalEl = document.querySelector('.total');
+  var pages = document.querySelectorAll('.pagenum');
+  var loader = document.getElementById('loader-icon');
+  if (!box || !totalEl || !pages.length) { return; }
+
+  var total = parseInt(totalEl.value, 10) || 0;
+  var cur = parseInt(pages[pages.length - 1].value, 10) || 0;
+  if (cur >= total) { newsDone(); return; }
+
+  var rc = document.getElementById('rowcount');
+  var url = 'new-js.wml?page=' + (cur + 1);
+  if (rc) { url += '&rowcount=' + encodeURIComponent(rc.value); }
+
+  btn.disabled = true;
+  if (loader) { loader.style.display = 'inline-block'; }
+
+  var x = new XMLHttpRequest();
+  x.onreadystatechange = function() {
+    if (x.readyState != 4) { return; }
+    btn.disabled = false;
+    if (loader) { loader.style.display = 'none'; }
+    if (x.status == 200) {
+      box.insertAdjacentHTML('beforeend', x.responseText);
+      var p = document.querySelectorAll('.pagenum');
+      var t = document.querySelector('.total');
+      if (!p.length || !t || (parseInt(p[p.length - 1].value, 10) >= parseInt(t.value, 10))) {
+        newsDone();
+      }
+    }
+  };
+  x.open('GET', url, true);
+  x.send();
+}
+</script>
+]]>
+    </nowap>
+
+    <block name="content.zz" />
+    <include name="footer" />
+    <include name="asider" />
+    <block name="wapform.zz" />
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+    <block name="breadcrumb" one="'Latest News'" />
+  </card>
+</wml>

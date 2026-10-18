@@ -1,0 +1,264 @@
+﻿<?xml version="1.0"?>
+<wml>
+  <card id="P" device="wapform.html">
+    <setvar name="op" value="''" />
+    <setvar name="gp" value="''" />
+    <if cnd="define(request.op) or define(request.op2)">
+      <setvar name="op" value="request.op" cnd="define(request.op)" />
+      <setvar name="gp" value="request.gp" cnd="define(request.gp)" />
+      <setvar name="op" value="request.op2" cnd="define(request.op2)" />
+      <setvar name="gp" value="request.gp2" cnd="define(request.gp2)" />
+      <else />
+      <setvar name="gp" value="'0000'" />
+      <setvar name="gp" value="request.gp" cnd="define(request.gp)" />
+      <setvar name="op" value="'i'" />
+      <setvar name="op" value="'g'" cnd="gp='0000'" />
+    </if>
+    <setvar name="pg" value="1" />
+    <setvar name="pg" value="val(request.pg)" cnd="define(request.pg)" />
+    <setvar name="az" value="'az'" />
+    <setvar name="az" value="request.az" cnd="define(request.az)" />
+    <setvar name="az" value="'zz'" cnd="gp='0000'" />
+    <setvar name="i" value="0" />
+    <setvar name="s" value="'Product Info'" />
+    <setvar name="b" value="0" />
+    <setvar name="category" value="'Specials'" />
+    <dbquery id="sys">
+      select * from sys
+    </dbquery>
+
+  <if cnd="op='s'">
+      <exit />
+    </if>
+    <if cnd="op='g'">
+      <exit />
+    </if>
+    <dbquery id="pa">
+      <![CDATA[
+      select p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, 0 amount from pa p
+      where (p.gid = '$gp') and (p.active>1) 
+      order by p.active
+    ]]>
+    </dbquery>
+    <dbgroup dataset="pa">
+      <block name="category" category="'Staff Picks'" />
+      <block name="shop.aa" />
+      <block name="shop-list.aa" />
+      <group>
+        <block name="shop-item" />
+      </group>
+      <block name="shop-list.zz" />
+      <block name="shop.zz" />
+    </dbgroup>
+
+    <if cnd="op='s'">
+      <setvar name="category" value="'Search: '+gp" />
+      <block name="control" />
+    </if>
+    <if cnd="op='g'">
+      <setvar name="category" value="'Specials'" />
+      <block name="category" />
+    </if>
+    <if cnd="op='i'">
+      <setvar name="category" value="grp.des" />
+      <block name="control" />
+    </if>
+    <!-- ============================== -->
+    <if cnd="op='s'">
+      <setvar name="i" value="1" />
+      <setvar name="j" value="1" />
+      <setvar name="s" value="''" />
+      <while cnd="j&lt;len(gp)">
+        <if cnd="(mid(gp,j,1)='+') or (mid(gp,j,1)=' ')">
+          <setvar name="s" value="s+' and (p.pno like ''%$(mid(gp,i,j-i))%'' or p.des like ''%$(mid(gp,i,j-i))%'')'" />
+          <setvar name="i" value="j+1" />
+        </if>
+        <setvar name="j" value="j+1" />
+      </while>
+      <setvar name="s" value="s+' and (p.pno like ''%$(mid(gp,i,j-i+1))%'' or p.des like ''%$(mid(gp,i,j-i+1))%'')'" />
+      <if cnd="az='aa'">
+        <dbquery id="pa">
+          <![CDATA[
+      select '9999' sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, sum(s.qty) amount
+      from web w, pa p
+      left join sn s on s.pno = p.pno
+      where (w.id=p.gid) and (w.active=1) and (p.active>=1) $s
+      group by p.pno
+      order by amount desc
+      limit $((pg-1)*20), 20
+    ]]>
+        </dbquery>
+        <else />
+        <dbquery id="pa">
+          <![CDATA[
+      select '9999' sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1 
+      from web w, pa p
+      where (w.id=p.gid) and (w.active=1) and (p.active>=1) $s
+        and (p.pno>='2000') and (p.pno<='9999')
+      order by $(if(az='az','p.pno',if(az='za','p.pno desc',if(az='az','p.pno','p.pno'))))
+      limit $((pg-1)*20), 20
+    ]]>
+        </dbquery>
+      </if>
+      <else />
+      <if cnd="az='aa'">
+        <dbquery id="pa">
+          <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, sum(s.qty) amount from pa p
+      left join sn s on s.pno = p.pno
+      where (p.gid = '$gp') and (p.active>0) 
+      group by p.pno
+      order by amount desc
+      limit $((pg-1)*20), 20
+]]>
+        </dbquery>
+      </if>
+      <if cnd="az='az'">
+        <dbquery id="pa">
+          <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, 0 amount from pa p
+      where (p.gid='$gp') and (p.active>0) 
+      order by p.pno
+      limit $((pg-1)*20), 20
+]]>
+        </dbquery>
+      </if>
+      <if cnd="az='za'">
+        <dbquery id="pa">
+          <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, 0 amount from pa p
+      where (p.gid='$gp') and (p.active>0) 
+      order by p.pno desc
+      limit $((pg-1)*20), 20
+]]>
+        </dbquery>
+      </if>
+      <if cnd="az='zz'">
+        <dbquery id="pa">
+          <![CDATA[
+      select 'a' sub, p.active, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, 0 amount from pa p 
+      where (p.active>1) order by p.active limit $((pg-1)*20), 20
+]]>
+        </dbquery>
+      </if>
+    </if>
+    <dbgroup dataset="pa">
+      <setvar name="row" value="0" />
+      <setvar name="col" value="0" />
+      <block name="shop.aa" />
+      <block name="shop-list.aa" />
+      <setvar name="col" value="0" />
+      <group>
+        <block name="shop-item" />
+      </group>
+      <block name="shop-list.zz" />
+      <block name="shop.zz" />
+    </dbgroup>
+
+    <if cnd="op='s'">
+      <setvar name="i" value="1" />
+      <setvar name="j" value="1" />
+      <setvar name="s" value="''" />
+      <while cnd="j&lt;len(gp)">
+        <if cnd="(mid(gp,j,1)='+') or (mid(gp,j,1)=' ')">
+          <setvar name="s" value="s+' and (p.pno like ''%$(mid(gp,i,j-i))%'' or p.des like ''%$(mid(gp,i,j-i))%'')'" />
+          <setvar name="i" value="j+1" />
+        </if>
+        <setvar name="j" value="j+1" />
+      </while>
+      <setvar name="s" value="s+' and (p.pno like ''%$(mid(gp,i,j-i+1))%'' or p.des like ''%$(mid(gp,i,j-i+1))%'')'" />
+      <if cnd="az='aa'">
+        <dbquery id="nav">
+          <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, sum(s.qty) amount
+      from web w, pa p
+      left join sn s on s.pno = p.pno
+      where (w.id=p.gid) and (w.active=1) and (p.active>=1) $s
+        and (p.pno>='2000') and (p.pno<='9999')
+      group by p.pno
+      order by amount desc
+    ]]>
+        </dbquery>
+        <else />
+        <dbquery id="nav">
+          <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1 
+      from web w, pa p
+      where (w.id=p.gid) and (w.active=1) and (p.active>=1) $s
+        and (p.pno>='2000') and (p.pno<='9999')
+      order by $(if(az='az','p.pno',if(az='za','p.pno desc',if(az='az','p.pno','p.pno'))))
+    ]]>
+        </dbquery>
+      </if>
+      <else />
+      <if cnd="az='aa'">
+        <dbquery id="nav">
+          <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, sum(s.qty) amount from pa p
+      left join sn s on s.pno = p.pno
+      where (p.gid = '$gp') and (p.active>0) 
+        and (p.pno>='1000') and (p.pno<='9999')
+      group by p.pno
+      order by amount desc
+]]>
+        </dbquery>
+      </if>
+      <if cnd="az='az'">
+        <dbquery id="nav">
+          <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1 from pa p
+      where (p.gid='$gp') and (p.active>0) 
+        and (p.pno>='1000') and (p.pno<='9999')
+      order by p.pno
+]]>
+        </dbquery>
+      </if>
+      <if cnd="az='za'">
+        <dbquery id="nav">
+          <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1 from pa p
+      where (p.gid='$gp') and (p.active>0) 
+        and (p.pno>='1000') and (p.pno<='9999')
+      order by p.pno desc
+]]>
+        </dbquery>
+      </if>
+      <if cnd="az='zz'">
+        <dbquery id="nav">
+          <![CDATA[
+      select 'a' sub, p.active, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1 from pa p 
+      where (p.active>1) and (p.pno>='2000') and (p.pno<='9999') order by p.active
+]]>
+        </dbquery>
+      </if>
+    </if>
+    <setvar name="R" value="nav.count" />
+    <setvar name="PAGES" value="CEIL(R/20)" />
+    <setvar name="I" value="0" />
+    <setvar name="J" value="0" />
+    <setvar name="K" value="0" />
+    <setvar name="L" value="1" />
+    <setvar name="L" value="PG-1" cnd="PG&gt;1" />
+    <setvar name="N" value="PG+1" />
+    <setvar name="N" value="PAGES" cnd="N&gt;PAGES" />
+    <setvar name="P" value="0" />
+    <setvar name="P" value="PG-6" cnd="(PG-6)&gt;0" />
+    <setvar name="P" value="PAGES-5" cnd="(PG+5)&gt;PAGES" />
+    <block name="pagination.aa" />
+    <![CDATA[<li class="page-item"><a class="page-link" href="shop.wml?op=$op&gp=$gp&pg=1&az=$az">&laquo;</a></li>]]>
+    <![CDATA[<li class="page-item"><a class="page-link" href="shop.wml?op=$op&gp=$gp&pg=$L&az=$az">&lt;</a></li>]]>
+    <while cnd="K&lt;PAGES">
+      <setvar name="K" value="K+1" />
+      <if cnd="(K&gt;=P+1) and (K&lt;=P+5)">
+        <if cnd="K=PG">
+          <![CDATA[<li class="page-item active"><a class="page-link" href="#">$K</a></li>]]>
+          <else />
+          <![CDATA[<li class="page-item"><a class="page-link" href="shop.wml?op=$op&gp=$gp&pg=$K&az=$az">$K</a></li>]]>
+        </if>
+      </if>
+    </while>
+    <![CDATA[<li class="page-item"><a class="page-link" href="shop.wml?op=$op&gp=$gp&pg=$N&az=$az">&gt;</a></li>]]>
+    <![CDATA[<li class="page-item"><a class="page-link" href="shop.wml?op=$op&gp=$gp&pg=$PAGES&az=$az">&raquo;</a></li>]]>
+    <block name="pagination.zz" />
+  </card>
+</wml>

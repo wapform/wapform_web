@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="footer" device="sub">
+    <block name="footer.aa" />
+    <block name="footer.zz" />
+    <block name="wrapper.zz" />
+  </card>
+</wml>

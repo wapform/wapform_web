@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="WapForm Stationery" device="wapform-js.html">
+    <setvar name="gp" value="'0000'"/>
+    <setvar name="gp" value="request.gp" cnd="define(request.gp)"/>
+    <setvar name="pg" value="1"/>
+    <setvar name="pg" value="val(request.pg)" cnd="define(request.pg)"/>
+    <setvar name="az" value="'zz'"/>
+    <setvar name="az" value="request.az" cnd="define(request.az)"/>
+    <setvar name="B" value="0"/>
+    <setvar name="category" value="'Specials'"/>
+    <dbquery id="grp">select id, title, href from menu where id='$gp'</dbquery>
+    <setvar name="category" value="grp.title"/>
+    <dbquery id="mnu">
+      <![CDATA[select az, id, sub, title from menu where az='a' and sub='$gp' and active>0 order by id]]>
+    </dbquery>
+    <dbgroup dataset="mnu">
+      <setvar name="row" value="0"/>
+      <setvar name="col" value="0"/>
+      <block name="grid.aa"/>
+      <group change="mnu.az">
+        <setvar name="col" value="0"/>
+        <block name="grid-list.aa"/>
+        <group>
+          <if cnd="gp='0000'">
+          <block name="grid-root"/>
+          <else/>
+          <block name="grid-item"/>
+          </if>
+        </group>
+        <block name="grid-list.zz"/>
+      </group>
+      <block name="grid.zz"/>
+    </dbgroup>
+  </card>
+</wml>

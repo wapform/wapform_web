@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wml>
+
+  <card id="chart" title="Chart Examples">
+
+    <!--
+      WapForm for Web — chart component examples (standalone page, no database needed)
+
+      Every chart uses random numbers, so the values change on each refresh; this shows the chart
+      types the engine supports without creating tables first. To use your own data, replace the <point> loop
+      with <dbquery> + <serie dataset="..." fieldnamevalue="..."/>;
+      see the <dbquery> example comments in multiupload.wml.
+
+      Layout rules are the same as multiupload.wml:
+        - Put every class on the outer <div>; <chart>/<serie>/<point> do not recognize class.
+        - A <chart> is drawn on the server and output as an <img>; its actual resolution is set by
+          width/height, and CSS only scales how large it is displayed.
+        - Colors use the brand blue #378ADD and orange #F2994A for contrast;
+          charts with many categories use the C[] color array.
+    -->
+
+    <setvar name="C" value="[0..4]"/>
+    <setvar name="C[0]" value="#378ADD"/>
+    <setvar name="C[1]" value="#F2994A"/>
+    <setvar name="C[2]" value="#1D9E75"/>
+    <setvar name="C[3]" value="#A32D2D"/>
+    <setvar name="C[4]" value="#8858C8"/>
+
+    <div class="wf-head">
+      <div class="wf-badge">WapForm for Web · Example</div>
+      <div class="wf-title">Chart Components</div>
+      <div class="wf-sub">Common chart types supported by the built-in chart engine, all shown with random data — no database connection needed.</div>
+    </div>
+
+    <div class="grid">
+
+      <div class="tile">
+        <div class="tile-tag">line</div>
+        <chart title="Line" width="260" height="190" legend="yes">
+          <serie type="line" linecolor="#378ADD" linewidth="2" marker="yes">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+          <serie type="line" linecolor="#F2994A" linewidth="2" marker="yes">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">bar</div>
+        <chart title="Bar" width="260" height="190">
+          <serie type="bar" color="#378ADD" valuewidth="60">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+          <serie type="bar" color="#F2994A" valuewidth="60">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">area</div>
+        <chart title="Area" width="260" height="190">
+          <serie type="area" color="#378ADD" opacity="150">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+          <serie type="area" color="#F2994A" opacity="150">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">histogram</div>
+        <chart title="Histogram" width="260" height="190">
+          <serie type="histogram" color="#378ADD">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(-300,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">digitalline</div>
+        <chart title="Digital Line" width="260" height="190">
+          <serie type="digitalline" linecolor="#378ADD" linewidth="2">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(-300,300)"/>
+            </while>
+          </serie>
+          <serie type="digitalline" linecolor="#F2994A" linewidth="2">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(-300,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">stackedbar</div>
+        <chart title="Stacked Bar" width="260" height="190">
+          <serie type="stackedbar" color="#378ADD">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+          <serie type="stackedbar" color="#F2994A">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">stackedarea</div>
+        <chart title="Stacked Area" width="260" height="190">
+          <serie type="stackedarea" color="#378ADD">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+          <serie type="stackedarea" color="#F2994A">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=11">
+              <setvar name="I" value="I+1"/>
+              <point label="$(STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">spider</div>
+        <chart title="Radar" width="260" height="190" xaxisposition="none" yaxisposition="none">
+          <serie type="spider" color="#378ADD" pielegend="yes" pieposition="custom"
+                 pieleft="110" pietop="90" pieshowvalues="yes" pieshowlegendonslice="yes"
+                 pievalueposition="outside" piesize="80">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=5">
+              <setvar name="I" value="I+1"/>
+              <point label="$('A'+STR(I))" value="RandomRange(10,20)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">pie</div>
+        <chart title="Pie" width="260" height="190" xaxisposition="none" yaxisposition="none">
+          <serie type="pie" pielegend="yes" pieposition="custom" pieleft="110" pietop="90"
+                 pieshowvalues="yes" pieshowlegendonslice="yes" pievalueposition="outside"
+                 piesize="80">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;5">
+              <point label="$('A'+STR(I))" value="RandomRange(100,300)" color="C[I mod 5]"/>
+              <setvar name="I" value="I+1"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">donut</div>
+        <chart title="Donut" width="260" height="190" autocolor="yes" xaxisposition="none" yaxisposition="none">
+          <serie type="donut" pielegend="yes" pieposition="custom" pieleft="110" pietop="90"
+                 pieshowvalues="yes" pieshowlegendonslice="yes" pievalueposition="outside"
+                 piesize="80">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=5">
+              <setvar name="I" value="I+1"/>
+              <point label="$('A'+STR(I))" value="RandomRange(100,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">sizedpie</div>
+        <chart title="Sized Pie" width="260" height="190" autocolor="yes" xaxisposition="none" yaxisposition="none">
+          <serie type="sizedpie" pielegend="yes" pieposition="custom" pieleft="110" pietop="90"
+                 pieshowvalues="yes" pieshowlegendonslice="yes" pievalueposition="outside"
+                 piesize="80">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=5">
+              <setvar name="I" value="I+1"/>
+              <point label="$('A'+STR(I))" value="RandomRange(200,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+      <div class="tile">
+        <div class="tile-tag">sizeddonut</div>
+        <chart title="Sized Donut" width="260" height="190" autocolor="yes" xaxisposition="none" yaxisposition="none">
+          <serie type="sizeddonut" pielegend="yes" pieposition="custom" pieleft="110" pietop="90"
+                 pieshowvalues="yes" pieshowlegendonslice="yes" pievalueposition="outside"
+                 piesize="80">
+            <setvar name="I" value="0"/>
+            <while cnd="I&lt;=5">
+              <setvar name="I" value="I+1"/>
+              <point label="$('A'+STR(I))" value="RandomRange(200,300)"/>
+            </while>
+          </serie>
+        </chart>
+      </div>
+
+    </div>
+
+    <div class="foot">
+      Layout comes from <code>wapform.htm</code>; the chart definitions come from <code>chart.wml</code>.<br/>
+      Each chart's data is generated randomly on the server and changes on refresh; to use a real database,
+      switch to <code>&lt;dbquery&gt;</code> + <code>dataset=</code>.<br/>
+      More examples: <a href="multiupload.wml">File Upload</a>, <a href="crosstab.wml">Sales Cross Analysis</a>, <a href="report.wml">Grouped Sales Report</a>, <a href="linepush.wml?push_userid=&amp;push_text=">LINE Push</a>, <a href="function.wml">Function Self-Test</a>.
+    </div>
+
+  </card>
+
+</wml>

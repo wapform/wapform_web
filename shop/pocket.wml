@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" device="wapform.html">
+    <setvar name="gp" value="'0000'"/>
+    <setvar name="gp" value="request.gp" cnd="define(request.gp)"/>
+    <setvar name="pg" value="1"/>
+    <setvar name="pg" value="val(request.pg)" cnd="define(request.pg)"/>
+    <setvar name="az" value="'az'"/>
+    <setvar name="az" value="request.sort" cnd="define(request.sort)"/>
+    <setvar name="i" value="0"/>
+    <setvar name="s" value="'Product Info'"/>
+    <setvar name="b" value="0"/>
+    <setvar name="breadcrumb" value="'User Manual'"/>
+    <setvar name="C" value="[0..9]"/>
+    <setvar name="C[0]" value="#ffeeee"/>
+    <setvar name="C[1]" value="#fff4ea"/>
+    <setvar name="C[2]" value="#ffffe3"/>
+    <setvar name="C[3]" value="#ebffec"/>
+    <setvar name="C[4]" value="#f1f4ff"/>
+    <if cnd="DEFINE(session.usr)">
+      <setvar name="B" value="1" cnd="session.usr='admin'"/>
+    </if>
+    <dbquery id="sys">
+      <![CDATA[select * from sys]]>
+    </dbquery>
+    <dbquery id="grp">
+      <![CDATA[select id, sub, title from menu where az='a' and id='$gp' and active=1 order by id]]>
+    </dbquery>
+    <dbquery id="mnu">
+      <![CDATA[select id, sub, title from menu where az='a' and sub='$grp.sub' and active=1 order by id]]>
+    </dbquery>
+    <block name="wapform.aa"/>
+    <block name="normal.aa"/>
+    <block name="content.aa"/>
+    <![CDATA[
+    <div class="card card-custom overflow-hidden my-5">
+      <div class="card-body p-0">
+        <div class="row justify-content-center mt-5">
+          <div class="col-md-10">
+]]>
+    <invoke instance="mnu" method="first"/>
+    <while cnd="not(mnu.eof)">
+      <dbquery id="pa">
+        <![CDATA[
+        select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, p.topic from pa p
+        where (p.gid='$mnu.id') and (p.active>0) 
+        order by p.pno
+  ]]>
+      </dbquery>
+      <invoke instance="pa" method="first"/>
+      <while cnd="not(pa.eof)">
+        <![CDATA[<div _style="background-color:$('#'+COLOR2HEX(C[I mod 5]));">$pa.topic</div>]]>
+        <invoke instance="pa" method="next"/>
+      </while>
+      <invoke instance="mnu" method="next"/>
+    </while>
+    <![CDATA[
+          </div>
+        </div>
+      </div>
+    </div>
+]]>
+    <block name="content.zz"/>
+    <block name="normal.zz"/>
+    <block name="wapform.zz"/>
+  </card>
+</wml>

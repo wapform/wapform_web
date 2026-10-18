@@ -1,0 +1,1625 @@
+<!-- wapform.aa -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stationery Store — Office &amp; Stationery Supplies Online</title>
+    <meta name="description" content="Stationery Store | Office and stationery supplies online — 25 categories, same-day shipping, free shipping over 1,200." />
+    <meta name="theme-color" content="#2E6DA4" />
+    <style>
+        :root{
+  --ink:#232320; --sub:#5F5E5A; --mute:#8B8A83; --line:#E5E3DC;
+  --bg:#FFFFFF; --panel:#F6F5F1; --panel2:#F0EFE9;
+  --blue:#2E6DA4; --blue-dark:#1D4E7D; --blue-tint:#E7F0F8;
+  --sale:#B4392E; --sale-tint:#FBEAE7;
+  --new:#0F6E4F; --new-tint:#E5F3EC;
+  --radius:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;}
+a{color:inherit;text-decoration:none;}
+ul{list-style:none;}
+button{font-family:inherit;cursor:pointer;}
+img,svg{display:block;max-width:100%;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 1.5rem;}
+
+/* ===== announcement ===== */
+.announce{background:var(--ink);color:rgba(255,255,255,.82);font-size:12.5px;text-align:center;padding:.45rem 1rem;letter-spacing:.01em;}
+.announce b{color:#fff;font-weight:600;}
+
+/* ===== top nav ===== */
+.nav{position:sticky;top:0;z-index:300;background:#fff;border-bottom:1px solid var(--line);}
+.nav-row{display:flex;align-items:center;gap:1.25rem;height:64px;}
+.brand{font-size:1.3rem;font-weight:700;letter-spacing:-.01em;color:var(--ink);flex-shrink:0;}
+.brand span{color:var(--blue);}
+.menu-toggle{display:none;background:var(--panel);border:1px solid var(--line);border-radius:7px;width:38px;height:38px;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.search{flex:1;position:relative;max-width:560px;}
+.search input{width:100%;height:40px;border:1.5px solid var(--line);border-radius:8px;padding:0 2.6rem 0 1rem;font-size:14px;color:var(--ink);background:var(--panel);transition:border-color .12s,background .12s;}
+.search input:focus{outline:none;border-color:var(--blue);background:#fff;}
+.search button{position:absolute;right:2px;top:2px;height:36px;width:40px;border:none;background:transparent;color:var(--sub);font-size:16px;border-radius:0 6px 6px 0;}
+.nav-actions{display:flex;align-items:center;gap:.4rem;flex-shrink:0;margin-left:auto;}
+.nav-icon-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:.35rem .65rem;border-radius:7px;font-size:11px;color:var(--sub);background:none;border:none;position:relative;}
+.nav-icon-btn:hover{background:var(--panel);color:var(--ink);}
+.nav-icon-btn .ic{display:flex;align-items:center;justify-content:center;height:22px;font-size:19px;line-height:1;}
+.nav-icon-btn .lbl{line-height:1.2;}
+.cart-badge:empty{display:none;}
+.cart-badge{position:absolute;top:-2px;right:2px;background:var(--sale);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.has-drop{position:relative;}
+.acc-drop{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(30,30,25,.10);min-width:180px;padding:.4rem;display:none;}
+.acc-drop.open{display:block;}
+.acc-drop a{display:block;padding:.55rem .7rem;border-radius:6px;font-size:13.5px;color:var(--sub);}
+.acc-drop a:hover{background:var(--panel);color:var(--ink);}
+.acc-drop hr{border:none;border-top:1px solid var(--line);margin:.35rem 0;}
+
+/* ===== category quick bar (top menu) ===== */
+.quickbar{background:var(--panel);border-bottom:1px solid var(--line);}
+.quickbar-inner{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.15rem .3rem;padding:.6rem 2.5rem;}
+.qb-all{flex-shrink:0;display:flex;align-items:center;gap:.35rem;font-size:13px;font-weight:600;color:#fff;background:var(--blue);padding:.4rem .8rem;border-radius:7px;border:none;white-space:nowrap;margin-right:.2rem;}
+.qb-all:hover{background:var(--blue-dark);}
+.qb-link{flex-shrink:0;font-size:13px;color:var(--sub);padding:.4rem .6rem;border-radius:7px;white-space:nowrap;}
+.qb-link:hover{background:var(--panel2);color:var(--ink);}
+
+/* top menu 25-category dropdown items */
+.qb-item{position:relative;flex-shrink:0;}
+.qb-item-btn{display:flex;align-items:center;gap:.3rem;font-size:13px;color:var(--sub);padding:.4rem .6rem;border-radius:7px;white-space:nowrap;background:none;border:none;}
+.qb-item:hover .qb-item-btn,.qb-item.open .qb-item-btn{background:var(--panel2);color:var(--ink);}
+.qb-panel{position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(30,30,25,.10);width:400px;max-width:calc(100vw - 2rem);max-height:320px;overflow-y:auto;overflow-x:hidden;padding:.4rem;display:none;z-index:250;column-count:2;column-gap:4px;}
+.qb-item:hover .qb-panel,.qb-item.open .qb-panel{display:block;}
+.qb-item.flip .qb-panel{left:auto;right:0;}
+.qb-panel a{display:block;font-size:12.5px;color:var(--sub);padding:.5rem .65rem;border-radius:6px;white-space:normal;word-break:break-word;}
+.qb-panel a:hover{background:var(--panel);color:var(--blue-dark);}
+
+/* ===== Account pages (login / forget / password / result) ===== */
+.auth{display:flex;align-items:center;justify-content:center;padding:3rem 1.5rem 4rem;}
+.auth-card{width:100%;max-width:400px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:2.5rem 2.25rem;box-shadow:0 12px 32px rgba(30,30,25,.06);}
+.auth-card h2{font-size:21px;font-weight:700;margin-bottom:.4rem;text-align:center;}
+.auth-sub{font-size:13px;color:var(--sub);margin-bottom:2rem;text-align:center;}
+.back-home{display:inline-flex;align-items:center;gap:.35rem;font-size:12.5px;color:var(--mute);margin-bottom:1.5rem;}
+.back-home:hover{color:var(--blue);}
+.field{margin-bottom:1.1rem;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:.4rem;}
+.field input{width:100%;height:44px;border:1.5px solid var(--line);border-radius:8px;padding:0 .9rem;font-size:14px;color:var(--ink);background:#fff;transition:border-color .12s;}
+.field input:focus{outline:none;border-color:var(--blue);}
+.field-pw{position:relative;}
+.field-pw .pw-toggle{position:absolute;right:.7rem;top:32px;background:none;border:none;font-size:12px;color:var(--mute);}
+.field-pw .pw-toggle:hover{color:var(--blue);}
+.row-between{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;font-size:12.5px;}
+.remember{display:flex;align-items:center;gap:.45rem;color:var(--sub);}
+.remember input{width:15px;height:15px;accent-color:var(--blue);}
+.forgot{color:var(--blue);}
+.forgot:hover{text-decoration:underline;}
+.btn-primary{display:flex;align-items:center;justify-content:center;width:100%;height:46px;border:none;border-radius:8px;background:var(--blue);color:#fff;font-size:14.5px;font-weight:600;line-height:1;transition:background .12s;}
+.btn-primary:hover{background:var(--blue-dark);}
+.signup-line{text-align:center;font-size:13px;color:var(--sub);margin-top:1.75rem;}
+.signup-line a{color:var(--blue);font-weight:600;}
+.signup-line a:hover{text-decoration:underline;}
+.auth-msg{font-size:15px;color:var(--ink);text-align:center;margin-bottom:1.75rem;}
+
+/* ===== Member profile form (register design) ===== */
+.reg-title{font-size:19px;font-weight:700;text-align:center;margin-bottom:1.5rem;}
+.reg-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:2rem 2.2rem 2.2rem;}
+.reg-notice{list-style:none;font-size:12px;color:var(--sub);padding-bottom:1.1rem;margin-bottom:1.3rem;border-bottom:1px solid var(--line);}
+.reg-notice li{position:relative;padding-left:1rem;line-height:1.7;}
+.reg-notice li::before{content:'•';position:absolute;left:0;color:var(--mute);}
+.reg-form .field{margin-bottom:1.1rem;}
+.reg-form .field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.1rem;}
+.reg-form .field-row .field{margin-bottom:0;}
+.reg-form label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:.4rem;}
+.reg-form .req{color:var(--sale);}
+.reg-form .static-value{display:block;height:40px;line-height:40px;font-size:13.5px;color:var(--ink);font-weight:400;}
+.reg-form input[type="text"],
+.reg-form input[type="email"],
+.reg-form input[type="password"],
+.reg-form input[type="tel"]{width:100%;height:40px;border:1.5px solid var(--line);border-radius:7px;padding:0 .8rem;font-size:13.5px;color:var(--ink);background:#fff;transition:border-color .12s;}
+.reg-form input:focus{outline:none;border-color:var(--blue);}
+.field-narrow input{max-width:160px;}
+.radio-row{display:flex;align-items:center;gap:1.5rem;height:40px;}
+.radio-row label{display:flex;align-items:center;gap:.4rem;font-size:13px;font-weight:400;color:var(--sub);margin-bottom:0;}
+.radio-row input{width:15px;height:15px;accent-color:var(--blue);}
+.reg-actions{display:flex;gap:.7rem;margin-top:1.6rem;padding-top:1.4rem;border-top:1px solid var(--line);}
+.reg-actions.center{justify-content:center;flex-wrap:wrap;}
+.reg-actions .btn-primary{width:auto;background:var(--blue);color:#fff;border:none;height:42px;padding:0 1.8rem;border-radius:7px;font-size:13.5px;font-weight:600;}
+.reg-actions .btn-primary:hover{background:var(--blue-dark);}
+.reg-actions .btn-outline{background:#fff;color:var(--sub);border:1.5px solid var(--line);height:42px;padding:0 1.8rem;border-radius:7px;font-size:13.5px;font-weight:600;}
+.reg-actions .btn-outline:hover{border-color:var(--blue);color:var(--blue);}
+
+/* ===== Order / order form tables ===== */
+.data-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;}
+.data-head h2{font-size:17px;font-weight:700;}
+.table-scroll{overflow-x:auto;margin-bottom:1.5rem;}
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);}
+.data-table th,.data-table td{border-bottom:1px solid var(--line);padding:.55rem .7rem;text-align:left;white-space:nowrap;}
+.data-table th{background:var(--panel);font-weight:600;color:var(--sub);font-size:12px;}
+.data-table tbody tr:nth-child(even) td{background:var(--panel);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table .num{text-align:right;}
+.data-table .ctr{text-align:center;}
+.data-table .wrap-text{white-space:normal;}
+.data-table a{color:var(--blue);}
+.data-table a:hover{text-decoration:underline;}
+.data-table tfoot td{font-weight:600;background:var(--panel2);}
+.data-note{border:1px solid var(--line);border-radius:var(--radius);padding:.9rem 1rem;font-size:12.5px;color:var(--sub);line-height:1.8;}
+.data-note b{color:var(--ink);font-weight:600;}
+.print-bar{display:flex;justify-content:flex-end;gap:.5rem;margin:1rem 0;}
+.btn-outline{display:inline-flex;align-items:center;justify-content:center;background:#fff;color:var(--sub);border:1.5px solid var(--line);height:42px;padding:0 1.8rem;border-radius:7px;font-size:13.5px;font-weight:600;line-height:1;}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);}
+.btn-inline{display:inline-flex;align-items:center;justify-content:center;width:auto;height:42px;padding:0 1.8rem;border:none;border-radius:7px;background:var(--blue);color:#fff;font-size:13.5px;font-weight:600;line-height:1;}
+.btn-inline:hover{background:var(--blue-dark);}
+
+/* ===== Latest news (new.wml + new-js.wml) ===== */
+.news-title{font-size:19px;font-weight:700;text-align:center;margin-bottom:1.5rem;}
+.news{display:flex;flex-direction:column;gap:1rem;}
+.news-item,.news .card{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:1.1rem 1.25rem;}
+.news .card-body{padding:0;}
+.news-item h2,.news-item h3,.news-item h4,.news .card-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:.35rem;line-height:1.5;}
+.news-date{display:block;font-size:11.5px;color:var(--mute);margin-bottom:.55rem;}
+.news-item p,.news .card-text{font-size:13px;color:var(--sub);line-height:1.85;}
+.news-item img,.news .card img{max-width:100%;height:auto;border-radius:var(--radius);margin-top:.7rem;}
+.news-item a{color:var(--blue);}
+.news-item a:hover{text-decoration:underline;}
+.news-item hr{border:none;border-top:1px solid var(--line);margin:.8rem 0;}
+.news-more{display:flex;flex-direction:column;align-items:center;gap:.7rem;margin-top:1.6rem;}
+.news-loading{display:none;font-size:12.5px;color:var(--mute);}
+.news-end{display:none;font-size:12.5px;color:var(--mute);}
+.news-more .btn-inline:disabled{opacity:.5;}
+
+/* ===== Shopping Guide / info pages (info design; content loaded by note-js.wml) ===== */
+.cat-item>a.cat-btn{display:flex;text-decoration:none;}
+.info-head{margin-bottom:1.5rem;}
+.info-head h1{font-size:22px;font-weight:700;margin-bottom:.5rem;}
+.info-head p{font-size:13.5px;color:var(--sub);max-width:56ch;}
+.article .card,.article{background:#fff;}
+.info-section,.article section{margin:2rem 0;padding-top:1.75rem;border-top:1px solid var(--line);}
+.info-section:first-of-type,.article section:first-of-type{border-top:none;padding-top:0;}
+.info-section h2,.article h2{font-size:16px;font-weight:600;margin:1.6rem 0 .8rem;}
+.article h2:first-child{margin-top:0;}
+.article h3{font-size:14.5px;font-weight:600;margin:1.2rem 0 .6rem;}
+.info-section p,.article p{font-size:13.5px;color:var(--sub);line-height:1.8;margin-bottom:.8rem;}
+.info-section p strong,.article strong{color:var(--ink);}
+.article ul,.article ol{padding-left:1.4rem;margin-bottom:.9rem;}
+.article ul li,.article ol li{font-size:13.5px;color:var(--sub);line-height:1.8;list-style:inherit;}
+.article ul{list-style:disc;}
+.article ol{list-style:decimal;}
+.info-table-wrap,.article .table-wrap{overflow-x:auto;}
+.info-table,.article table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:1rem;}
+.info-table th,.info-table td,.article th,.article td{padding:.7rem .9rem;text-align:left;border-bottom:1px solid var(--line);}
+.info-table th,.article th{background:var(--panel);color:var(--ink);font-weight:600;font-size:12.5px;}
+.info-table td,.article td{color:var(--sub);}
+.article img{max-width:100%;height:auto;border-radius:var(--radius);margin:.6rem 0;}
+.article a{color:var(--blue);}
+.article a:hover{text-decoration:underline;}
+.info-steps,.article ol.info-steps,.article ul.info-steps{list-style:none;counter-reset:step;padding-left:0;}
+.info-steps li,.article ol.info-steps li,.article ul.info-steps li{counter-increment:step;position:relative;padding:.6rem 0 .6rem 2.4rem;font-size:13.5px;color:var(--sub);line-height:1.7;border-bottom:1px dashed var(--line);list-style:none;}
+.info-steps li:last-child{border-bottom:none;}
+.info-steps li::before{content:counter(step);position:absolute;left:0;top:.55rem;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--blue-tint);color:var(--blue-dark);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.info-steps li b{color:var(--ink);}
+.faq-list{border-top:1px solid var(--line);}
+.faq-item{border-bottom:1px solid var(--line);}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem;background:none;border:none;padding:.95rem .2rem;font-size:13.5px;font-weight:600;color:var(--ink);text-align:left;}
+.faq-q .faq-chevron{font-size:11px;color:var(--mute);transition:transform .15s;flex-shrink:0;}
+.faq-item.open .faq-chevron{transform:rotate(180deg);}
+.faq-a{display:none;font-size:13px;color:var(--sub);line-height:1.8;padding:0 .2rem 1rem;max-width:70ch;}
+.faq-item.open .faq-a{display:block;}
+.info-cta{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.4rem 1.6rem;margin-top:2rem;}
+.info-cta h3,.article .info-cta h3{font-size:15px;font-weight:600;margin:0 0 .3rem;}
+.info-cta p,.article .info-cta p{font-size:12.5px;color:var(--sub);margin-bottom:0;}
+.hero-btn-alt,.article a.hero-btn-alt{display:inline-flex;align-items:center;gap:.4rem;background:var(--blue);color:#fff;font-size:13.5px;font-weight:600;line-height:1;padding:.75rem 1.3rem;border-radius:8px;flex-shrink:0;text-decoration:none;}
+.hero-btn-alt:hover,.article a.hero-btn-alt:hover{background:var(--blue-dark);color:#fff;text-decoration:none;}
+
+/* ===== Terms of service (member.wml) ===== */
+.terms{counter-reset:term;list-style:none;padding-left:0;margin-bottom:.5rem;}
+.terms li{counter-increment:term;position:relative;padding:.75rem 0 .75rem 2.2rem;font-size:13.5px;color:var(--sub);line-height:1.85;border-bottom:1px dashed var(--line);list-style:none;}
+.terms li:last-child{border-bottom:none;}
+.terms li::before{content:counter(term);position:absolute;left:0;top:.8rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--panel2);color:var(--sub);font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.terms strong{color:var(--ink);font-weight:600;}
+.terms em{color:var(--sale);font-style:normal;font-weight:600;}
+.terms a{color:var(--blue);font-weight:600;}
+.terms a:hover{text-decoration:underline;}
+
+/* ===== Product order page (place.wml) ===== */
+.pdp{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:2.75rem;align-items:start;}
+.pdp-media{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;}
+.pdp-media img{width:100%;height:100%;object-fit:contain;}
+.pdp-cat{display:inline-block;font-size:11.5px;color:var(--blue-dark);background:var(--blue-tint);padding:.2rem .6rem;border-radius:20px;letter-spacing:.02em;}
+.pdp-cat:hover{background:var(--blue);color:#fff;}
+.pdp-title{font-size:21px;font-weight:700;line-height:1.5;margin:.75rem 0 .6rem;}
+.pdp-meta{display:flex;flex-wrap:wrap;gap:1.2rem;font-size:12.5px;color:var(--mute);padding-bottom:1.1rem;border-bottom:1px solid var(--line);}
+.pdp-meta b{color:var(--sub);font-weight:600;}
+.pdp-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:.5rem;margin:1.2rem 0 1.4rem;}
+.pdp-price .now{font-size:32px;font-weight:700;color:var(--sale);line-height:1;letter-spacing:-.01em;}
+.pdp-price .cur{font-size:14px;font-weight:600;color:var(--sale);margin-right:.3rem;}
+.pdp-price del{font-size:12.5px;color:var(--mute);}
+.pdp-price .tax{font-size:11px;color:var(--mute);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:.1rem .4rem;}
+.pdp-info .field{margin-bottom:0;}
+.pdp-info .field label{display:flex;align-items:center;gap:.4rem;}
+.pdp-info .opt{font-size:11px;font-weight:400;color:var(--mute);border:1px solid var(--line);border-radius:3px;padding:0 .3rem;}
+.rem-area{width:100%;border:1.5px solid var(--line);border-radius:7px;padding:.6rem .8rem;font-size:13px;font-family:inherit;color:var(--ink);resize:vertical;}
+.rem-area:focus{outline:none;border-color:var(--blue);}
+.rem-count{font-size:11.5px;color:var(--mute);margin-top:.35rem;}
+.rem-count.warn span{color:var(--sale);font-weight:600;}
+.pdp-buy{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin:1.1rem 0 1.5rem;}
+.qty-input{width:56px;height:40px;border:1.5px solid var(--line);border-radius:6px;padding:0 .3rem;font-size:14px;font-weight:600;text-align:center;color:var(--ink);background:#fff;font-variant-numeric:tabular-nums;-moz-appearance:textfield;}
+.qty-input:focus{outline:none;border-color:var(--blue);}
+.qty-box{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;}
+.qty-box .qty-input{width:56px;height:46px;border:none;border-left:1px solid var(--line);border-right:1px solid var(--line);border-radius:0;}
+.qty-box .qty-input:focus{outline:none;background:var(--blue-tint);}
+.qty-step{width:40px;height:46px;border:none;background:var(--panel);color:var(--ink);font-size:16px;}
+.qty-step:hover{background:var(--panel2);}
+.btn-buy{display:inline-flex;align-items:center;justify-content:center;flex:1;min-width:180px;height:46px;padding:0 1.2rem;border:none;border-radius:8px;background:var(--blue);color:#fff;font-size:15px;font-weight:600;line-height:1;letter-spacing:.02em;transition:background .12s;}
+.btn-buy:hover{background:var(--blue-dark);}
+.pdp-points{list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem 1.2rem;}
+.pdp-points li{position:relative;padding-left:1.3rem;font-size:12.5px;color:var(--sub);line-height:2;list-style:none;}
+.pdp-points li::before{content:"✓";position:absolute;left:0;color:var(--new);font-weight:700;}
+.pdp-points b{color:var(--ink);font-weight:600;}
+.pdp-points a{color:var(--blue);}
+.pdp-back{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1.2rem;font-size:12.5px;}
+.pdp-back a{color:var(--sub);}
+.pdp-back a:hover{color:var(--blue-dark);}
+@media(max-width:860px){.pdp{grid-template-columns:1fr;gap:1.5rem;}.pdp-media{max-width:380px;margin:0 auto;}}
+
+/* ===== Cart ===== */
+.cart-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:2rem;align-items:start;max-width:1040px;margin:0 auto;}
+.cart-head{margin-bottom:1.1rem;}
+.cart-head h1{font-size:21px;font-weight:700;}
+.cart-head span{font-size:12.5px;color:var(--mute);}
+.cart-items{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;}
+.citem{display:grid;grid-template-columns:72px minmax(200px,1fr) 88px 124px 96px 28px;gap:1rem;align-items:center;padding:1rem 1.1rem;border-bottom:1px solid var(--line);}
+.citem:last-child{border-bottom:none;}
+.citem-img{display:block;width:72px;height:72px;border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden;}
+.citem-img img{width:100%;height:100%;object-fit:contain;}
+.citem-body{min-width:0;}
+.citem-no{display:block;font-size:11px;color:var(--mute);letter-spacing:.02em;}
+.citem-name{display:block;font-size:13.5px;color:var(--ink);line-height:1.5;margin:.15rem 0 .45rem;overflow-wrap:anywhere;}
+.citem-name:hover{color:var(--blue-dark);}
+.citem .rem-input{max-width:320px;height:32px;font-size:12px;}
+.citem .lab{display:none;font-size:11px;color:var(--mute);}
+.citem-qty{display:flex;justify-content:center;}
+.citem-price,.citem-sum{text-align:right;font-size:13.5px;color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;}
+.citem-sum .val{font-weight:700;color:var(--ink);}
+.qty-box.small .qty-input{width:44px;height:34px;font-size:13px;}
+.qty-box.small .qty-step{width:32px;height:34px;font-size:14px;}
+.citem-del{justify-self:center;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:16px;line-height:1;}
+.citem-del:hover{background:var(--sale-tint);color:var(--sale);}
+.cart-foot{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1rem;}
+.cart-link{font-size:12.5px;color:var(--sub);}
+.cart-link:hover{color:var(--blue-dark);}
+.btn-outline.sm{height:36px;padding:0 1.1rem;font-size:12.5px;}
+.cart-side{position:sticky;top:1rem;}
+.csum{border:1px solid var(--line);border-radius:12px;background:#fff;padding:1.3rem 1.4rem;box-shadow:0 6px 20px rgba(30,30,25,.05);}
+.csum h2{font-size:14px;font-weight:700;padding-bottom:.9rem;margin-bottom:.4rem;border-bottom:1px solid var(--line);}
+.csum-row{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;font-size:13px;color:var(--sub);padding:.45rem 0;}
+.csum-row small{font-size:11px;color:var(--mute);}
+.csum-row b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;}
+.csum-total{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin:.7rem 0 1.1rem;padding-top:.9rem;border-top:1px solid var(--line);font-size:13.5px;font-weight:600;}
+.csum-total b{font-size:24px;color:var(--sale);font-weight:700;font-variant-numeric:tabular-nums;}
+.csum-total small{font-size:12px;margin-left:.15rem;}
+.csum .btn-buy{width:100%;flex:none;}
+.btn-text{display:block;width:100%;background:none;border:none;margin-top:.7rem;font-size:12.5px;color:var(--mute);text-align:center;}
+.btn-text:hover{color:var(--ink);}
+.btn-text.danger:hover{color:var(--sale);}
+.csum-note{list-style:none;margin-top:1.1rem;padding-top:1rem;border-top:1px solid var(--line);}
+.csum-note li{position:relative;padding-left:.9rem;font-size:11.5px;color:var(--mute);line-height:1.9;list-style:none;}
+.csum-note li::before{content:"・";position:absolute;left:0;}
+@media(max-width:1040px){
+  .cart-grid{grid-template-columns:1fr;}
+  .cart-side{position:static;max-width:380px;margin-left:auto;}
+}
+@media(max-width:640px){
+  .citem{grid-template-columns:64px minmax(0,1fr) 28px;grid-template-areas:"img body del" "price qty sum";row-gap:.75rem;}
+  .citem-img{grid-area:img;width:64px;height:64px;}
+  .citem-body{grid-area:body;}
+  .citem-del{grid-area:del;align-self:start;}
+  .citem-price{grid-area:price;text-align:left;}
+  .citem-qty{grid-area:qty;}
+  .citem-sum{grid-area:sum;}
+  .citem .lab{display:block;}
+}
+
+/* ===== Message page (alert) ===== */
+.msg{display:flex;justify-content:center;padding:2rem 0 3rem;}
+.msg-card{width:100%;max-width:440px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:2.5rem 2.25rem;text-align:center;box-shadow:0 12px 32px rgba(30,30,25,.06);}
+.msg-icon{width:56px;height:56px;margin:0 auto 1.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;}
+.msg-icon span{display:block;line-height:1;transform:translateY(.09em);}
+.msg-icon.ok{background:var(--new-tint);color:var(--new);}
+.msg-icon.warn{background:var(--panel2);color:var(--mute);}
+.msg-icon.err{background:var(--sale-tint);color:var(--sale);}
+.msg-card h1{font-size:18px;font-weight:700;margin-bottom:.7rem;}
+.msg-text{font-size:13.5px;color:var(--sub);line-height:1.9;}
+.msg-actions{display:flex;flex-direction:column;gap:.6rem;margin-top:1.9rem;}
+.msg-actions .btn-buy,.msg-actions .btn-outline{width:100%;flex:none;}
+
+/* ===== Order confirmation (invoice) ===== */
+.co-head{text-align:center;margin-bottom:1.6rem;}
+.co-head h1{font-size:20px;font-weight:700;margin-bottom:.35rem;}
+.co-head p{font-size:12.5px;color:var(--mute);}
+.co{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:2rem;align-items:start;max-width:1040px;margin:0 auto;}
+.co-card{border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:1.25rem;overflow:hidden;}
+.co-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:.95rem 1.2rem;border-bottom:1px solid var(--line);background:var(--panel);}
+.co-card-head h2{font-size:13.5px;font-weight:700;}
+.co-card-head span{font-size:11.5px;color:var(--mute);}
+.co-card-head a{font-size:12px;color:var(--blue);}
+.co-card-head a:hover{text-decoration:underline;}
+.co-info{display:grid;grid-template-columns:1fr 1fr;gap:.1rem 1.5rem;padding:1.1rem 1.2rem;}
+.co-info>div{display:flex;gap:.6rem;padding:.4rem 0;}
+.co-info>div.full{grid-column:1/-1;}
+.co-info dt{flex:0 0 76px;font-size:12px;color:var(--mute);}
+.co-info dd{font-size:13px;color:var(--ink);word-break:break-all;}
+.coitem{display:grid;grid-template-columns:minmax(0,1fr) 110px 64px 96px;gap:1rem;align-items:center;padding:.9rem 1.2rem;border-bottom:1px solid var(--line);}
+.coitem:last-child{border-bottom:none;}
+.coitem.freight{background:var(--panel);}
+.coitem-no{display:block;font-size:11px;color:var(--mute);}
+.coitem-name{display:block;font-size:13.5px;color:var(--ink);line-height:1.5;overflow-wrap:anywhere;}
+.coitem-rem{display:block;font-size:11.5px;color:var(--blue-dark);margin-top:.2rem;}
+.coitem-unit,.coitem-qty,.coitem-sum{text-align:right;font-size:13px;color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;}
+.coitem-unit i{font-style:normal;font-size:11px;color:var(--mute);}
+.coitem-sum{font-weight:700;color:var(--ink);}
+.co-memo{font-size:12px;color:var(--mute);line-height:1.9;}
+.co-side{position:sticky;top:1rem;}
+.co-side .btn-outline.sm{width:100%;margin-top:.8rem;}
+@media(max-width:1040px){
+  .co{grid-template-columns:1fr;}
+  .co-side{position:static;max-width:380px;margin-left:auto;}
+}
+@media(max-width:640px){
+  .co-info{grid-template-columns:1fr;}
+  .coitem{grid-template-columns:minmax(0,1fr) 90px;grid-template-areas:"body body" "unit qty" "sum sum";row-gap:.4rem;}
+  .coitem-body{grid-area:body;}
+  .coitem-unit{grid-area:unit;text-align:left;}
+  .coitem-qty{grid-area:qty;text-align:left;}
+  .coitem-sum{grid-area:sum;}
+}
+@media print{
+  .announce,.nav,.quickbar,.site-footer,.asider,.sidebar-scrim,.breadcrumb,.co-side .btn-buy,.co-side .btn-text,.co-side .btn-outline,.csum-note,.co-card-head a,.co-head p{display:none !important;}
+  .co{grid-template-columns:1fr;}
+  .co-side{position:static;}
+  .co-card,.csum{box-shadow:none;break-inside:avoid;}
+}
+
+/* ===== Order form / shared ===== */
+.rem-input{width:100%;min-width:120px;height:34px;border:1.5px solid var(--line);border-radius:6px;padding:0 .5rem;font-size:12.5px;color:var(--ink);background:#fff;}
+.rem-input:focus{outline:none;border-color:var(--blue);}
+.cart-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:1.75rem;padding-top:1.5rem;border-top:1px solid var(--line);}
+.order-total{text-align:center;font-size:15px;font-weight:700;margin:1.5rem 0 .25rem;}
+.order-total span{color:var(--sale);font-size:19px;}
+.order-memo{font-size:12.5px;color:var(--sub);line-height:1.8;margin:1rem 0;}
+.test-note{background:var(--sale-tint);border:1px solid var(--line);border-radius:var(--radius);padding:.9rem 1.1rem;font-size:12.5px;color:var(--sale);line-height:1.8;margin-bottom:1.25rem;}
+/* ===== layout ===== */
+.layout{display:grid;grid-template-columns:250px 1fr;gap:1.75rem;padding:1.75rem 0 3rem;}
+.sidebar-scrim{display:none;}
+
+/* sidebar */
+.sidebar{align-self:start;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff;}
+.sidebar-head{background:var(--ink);color:#fff;font-size:13.5px;font-weight:600;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;}
+.sidebar-close{display:none;background:none;border:none;color:#fff;font-size:18px;}
+.cat-list{}
+.cat-item{border-bottom:1px solid var(--line);}
+.cat-item:last-child{border-bottom:none;}
+.cat-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:.5rem;background:none;border:none;padding:.62rem 1rem;font-size:13px;color:var(--ink);text-align:left;}
+.cat-btn:hover{background:var(--panel);}
+.cat-item.active>.cat-btn{background:var(--blue-tint);color:var(--blue-dark);font-weight:600;}
+.cat-num{font-size:10.5px;color:var(--mute);font-weight:400;flex-shrink:0;}
+.cat-item.active .cat-num{color:var(--blue-dark);}
+.cat-chevron{font-size:9px;color:var(--mute);transition:transform .15s;flex-shrink:0;}
+.cat-item.open .cat-chevron{transform:rotate(90deg);}
+.sub-list{display:none;background:var(--panel);padding:.3rem 0 .5rem;}
+.cat-item.open .sub-list{display:block;}
+.sub-list a{display:block;font-size:12.5px;color:var(--sub);padding:.4rem 1rem .4rem 2rem;}
+.sub-list a:hover{color:var(--blue-dark);text-decoration:underline;}
+.sub-list a.active{background:var(--blue-tint);color:var(--blue-dark);font-weight:600;}
+
+/* Mobile category drawer (asider, generated dynamically by asider.wml) */
+.asider{display:none;}
+
+/* main */
+.page{padding:1.75rem 0 3rem;}
+.narrow-page{max-width:760px;margin:0 auto;padding:1.75rem 1.5rem 3rem;}
+.narrow-page .breadcrumb{text-align:center;}
+.narrow-page:has(.data-table),
+.narrow-page:has(.cart-grid),
+.narrow-page:has(.co),
+.narrow-page:has(.pdp){max-width:1100px;}
+.main{min-width:0;}
+.breadcrumb{font-size:12px;color:var(--mute);margin-bottom:1rem;}
+.breadcrumb a{color:var(--mute);}
+.breadcrumb a:hover{color:var(--blue);}
+
+
+/* trust strip */
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.75rem;}
+.trust-item{display:flex;align-items:center;gap:.6rem;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:.75rem .9rem;}
+.trust-ic{font-size:18px;flex-shrink:0;}
+.trust-item h4{font-size:12.5px;font-weight:600;}
+.trust-item p{font-size:11px;color:var(--mute);}
+
+/* section head */
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:2rem 0 .9rem;}
+.sec-head h2{font-size:17px;font-weight:600;}
+.sec-head .sec-sub{font-size:12px;color:var(--mute);margin-left:.5rem;font-weight:400;}
+.sec-more{font-size:12.5px;color:var(--blue);}
+.sec-more:hover{text-decoration:underline;}
+
+/* product grid */
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.pcard{border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden;transition:border-color .12s,box-shadow .12s;display:flex;flex-direction:column;}
+.pcard:hover{border-color:#C9D8E5;box-shadow:0 6px 18px rgba(30,30,25,.06);}
+.pthumb{aspect-ratio:1/1;background:var(--panel);position:relative;overflow:hidden;}
+.pthumb img{width:100%;height:100%;object-fit:cover;}
+.ptag{position:absolute;top:8px;left:8px;font-size:10.5px;font-weight:700;padding:.2rem .5rem;border-radius:4px;}
+.ptag.hot{background:var(--sale-tint);color:var(--sale);}
+.ptag.new{background:var(--new-tint);color:var(--new);}
+.pbody{padding:.8rem .85rem .9rem;display:flex;flex-direction:column;gap:.4rem;flex:1;}
+.pcat{font-size:10.5px;color:var(--mute);}
+.pname{display:block;font-size:13px;color:var(--ink);line-height:1.45;min-height:2.6em;}
+.pcard a.pname:hover{color:var(--blue-dark);}
+.pthumb{display:block;}
+.pfoot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
+.pprice{font-size:15px;font-weight:700;color:var(--ink);}
+.pprice .was{font-size:11px;color:var(--mute);text-decoration:line-through;font-weight:400;margin-left:.3rem;}
+.pprice.sale{color:var(--sale);}
+.addbtn{width:30px;height:30px;border-radius:7px;border:1px solid var(--line);background:var(--panel);font-size:15px;color:var(--blue-dark);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s,border-color .12s;}
+.addbtn:hover{background:var(--blue);border-color:var(--blue);color:#fff;}
+.addbtn.added{background:var(--new);border-color:var(--new);color:#fff;}
+
+/* category listing block (like a real shop.wml sub-category page) */
+.catpage-head{display:flex;align-items:baseline;justify-content:space-between;margin:2rem 0 1rem;padding-bottom:.9rem;border-bottom:1px solid var(--line);}
+.catpage-head h2{font-size:19px;font-weight:700;}
+.catpage-sort{font-size:12.5px;color:var(--sub);}
+.catpage-sort a{color:var(--sub);}
+.catpage-sort a:hover{color:var(--blue);text-decoration:underline;}
+.catpage-sort .sep{color:var(--line);margin:0 .35rem;}
+
+/* pagination */
+.pagination-bar{display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;flex-wrap:wrap;gap:.75rem;}
+.pagination-info{font-size:12.5px;color:var(--mute);}
+.pagination{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;}
+.pagination li{list-style:none;}
+.pg-btn,.page-link{min-width:32px;height:32px;padding:0 .5rem;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--sub);font-size:13px;display:flex;align-items:center;justify-content:center;}
+.pg-btn:hover,.page-link:hover{border-color:var(--blue);color:var(--blue);}
+.pg-btn.active,.page-item.active .page-link,.page-link.current{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;}
+.pg-btn:disabled,.pg-btn.disabled,.page-item.disabled .page-link{opacity:.4;pointer-events:none;}
+
+
+
+/* footer */
+.site-footer{background:#1D1D1A;color:rgba(255,255,255,.55);padding:3rem 0 1.25rem;margin-top:3rem;font-size:12.5px;}
+.footer-top{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:2.5rem;padding-bottom:2rem;}
+.footer-brand{font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:.7rem;display:block;}
+.footer-brand span{color:#6FA9DC;}
+.footer-desc{font-size:12.5px;line-height:1.9;color:rgba(255,255,255,.45);margin-bottom:1.2rem;max-width:34ch;}
+.footer-contact{list-style:none;}
+.footer-contact li{display:flex;gap:.6rem;line-height:2;}
+.footer-contact li span{flex:0 0 60px;color:rgba(255,255,255,.35);}
+.footer-contact a{color:rgba(255,255,255,.75);}
+.footer-contact a:hover{color:#fff;}
+.footer-col h4{font-size:12.5px;font-weight:600;color:#fff;margin-bottom:.9rem;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:.5rem;}
+.footer-col ul a{font-size:12.5px;color:rgba(255,255,255,.45);}
+.footer-col ul a:hover{color:#fff;}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.09);padding-top:1.1rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.6rem;font-size:11.5px;color:rgba(255,255,255,.4);}
+.footer-legal{display:flex;flex-wrap:wrap;gap:1.2rem;}
+.footer-legal a{color:rgba(255,255,255,.4);}
+.footer-legal a:hover{color:#fff;}
+
+/* responsive */
+@media(max-width:920px){
+  .layout{grid-template-columns:1fr;}
+  .menu-toggle{display:flex;}
+  .sidebar{display:none;}
+  .asider{display:block;position:fixed;top:0;left:0;bottom:0;width:280px;background:#fff;border-right:1px solid var(--line);z-index:500;transform:translateX(-100%);transition:transform .2s ease;}
+  .asider.open{transform:translateX(0);}
+  .sidebar-close{display:block;}
+  .asider .cat-list{max-height:calc(100vh - 48px);overflow-y:auto;}
+  .sidebar-scrim.open{display:block;position:fixed;inset:0;background:rgba(20,20,18,.4);z-index:400;}
+  .quickbar-inner{padding:.5rem .75rem;}
+  .pgrid{grid-template-columns:repeat(2,1fr);}
+  .trust{grid-template-columns:1fr 1fr;}
+  .footer-top{grid-template-columns:1fr 1fr;gap:1.75rem;}
+}
+@media(max-width:520px){
+  .reg-card{padding:1.5rem 1.3rem;}
+  .reg-form .field-row{grid-template-columns:1fr;}
+  .nav-row{height:56px;gap:.6rem;}
+  .brand{font-size:1.05rem;}
+  .search{order:3;flex-basis:100%;max-width:none;}
+  .nav-row{flex-wrap:wrap;height:auto;padding:.55rem 0;}
+  .nav-icon-btn span.lbl{display:none;}
+  .pgrid{grid-template-columns:1fr 1fr;gap:10px;}
+  .footer-top{grid-template-columns:1fr;gap:1.75rem;}
+  .wrap{padding:0 1rem;}
+}
+</style>
+</head>
+
+<body>
+
+  <script type="text/javascript">
+  var putItThere = null;
+  var chasm = screen.availWidth;
+  var mount = screen.availHeight;
+  var s = '';
+  var w = 0;
+  var h = 0;
+
+  function openwin(s, w, h) {
+    putItThere = window.open(s, 'posB', 'width=' + w + ',height=' + h + ',left=' + ((chasm - w - 10) * .5) + ',top=' + ((mount - h - 30) * .5));
+  }
+
+  function loadDoc(url) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState == 4 && xhttp.status == 200) {
+        document.getElementById('xyz').innerHTML = xhttp.responseText;
+      }
+    }
+    xhttp.open("GET", url, true);
+    xhttp.send();
+  }
+  </script>
+
+    <!-- aside.aa -->
+    <!-- aside-list.aa -->
+    <!-- aside-item.aa -->
+    <!-- aside-item.zz -->
+    <!-- aside-xxxx.aa -->
+    <!-- aside-xxxx.zz -->
+    <!-- aside-list.zz -->
+    <!-- line.aa -->
+    <!-- line-list.aa -->
+    <!-- line-item.aa -->
+    <!-- line-item.zz -->
+    <!-- line-list.zz -->
+    <!-- line.zz -->
+    <!-- aside.zz -->
+    <!-- wrapper.aa -->
+    <!-- header.aa -->
+    <div class="announce">Free shipping over <b>1,200</b> (excl. tax) · Order before <b>12:00 noon</b> for <b>next-day delivery</b> · Customer service 04-12345678</div>
+    <header class="nav">
+        <div class="wrap nav-row">
+            <button class="menu-toggle" id="menuToggle" aria-label="Open the category menu">☰</button>
+            <a class="brand" href="index.wml">Stationery<span>Store</span></a>
+
+            <form class="search" action="index.wml" method="get" role="search">
+                <input type="text" id="searchInput" name="gp" placeholder="Search products, e.g. gel pens, A4 copy paper, folders…" required />
+                <input type="hidden" name="op" value="s" />
+                <button type="submit" aria-label="Search">🔍</button>
+            </form>
+
+            <div class="nav-actions">
+                <div class="has-drop">
+                    <button class="nav-icon-btn" id="acctBtn" onclick="toggleAcct()">
+                        <span class="ic">👤</span><span class="lbl">Account</span>
+                    </button>
+                    <div class="acc-drop" id="acctDrop">
+                        $(IF(DEFINE(session.usr),'<a href="profile.wml">My Account</a>','<a href="login.wml">Sign In</a>'))
+                        $(IF(DEFINE(session.usr),'<a href="profile.wml?op=ord">Order History</a>','<a href="member.wml">Join</a>'))
+                        <hr />
+                        <a href="note.wml?gp=note">Shopping Guide</a>
+                        $(IF(DEFINE(session.usr),'<hr /><a href="login.wml?logout=true">Sign Out</a>',''))
+                    </div>
+                </div>
+                <a class="nav-icon-btn" href="new.wml"><span class="ic">♡</span><span class="lbl">New</span></a>
+                <a class="nav-icon-btn" href="cart.wml" style="position:relative;">
+                    <span class="ic">🛒</span><span class="lbl">Cart</span>
+                    <span class="cart-badge" id="cartBadge">$(IF(QtyTotal>0,STR(QtyTotal),''))</span>
+                </a>
+            </div>
+        </div>
+    </header>
+    <!-- line.aa -->
+    <!-- line-item.aa -->
+    <!-- line-item.zz -->
+    <!-- line.zz -->
+    <!-- Top menu: generated dynamically by header.wml from the pa table (mnu_title[k] / mnu_id[k] / app / column_count) -->
+    <!-- menu.aa -->
+    <div class="quickbar">
+        <div class="wrap quickbar-inner" id="quickbarInner">
+            <!-- menu-list.aa -->
+            <div class="qb-item">
+                <button class="qb-item-btn"><span>$(mnu_title[k])</span></button>
+                <div class="qb-panel" style="width:$(200*column_count)px;column-count:$(column_count);">
+                    <!-- menu-ab.aa -->
+                    <!-- menu-ab.zz -->
+                    <!-- menu-item.aa -->
+                    <a href="$(app).wml?gp=$(mnu_id[k])">$(mnu_title[k])</a>
+                    <!-- menu-item.zz -->
+                </div>
+            </div>
+            <!-- menu-list.zz -->
+            <a class="qb-link" href="example.wml">Advanced Examples</a>
+        </div>
+    </div>
+    <!-- menu.zz -->
+    <!-- header.zz -->
+    <!-- ======================================================================================================================== -->
+    <!-- hero.aa -->
+    <!-- hero.zz -->
+    <!-- home.aa -->
+    <!-- home-list.aa -->
+    <!-- home-item.aa -->
+    <!-- home-item.zz -->
+    <!-- home-list.zz -->
+    <!-- home.zz -->
+    <!-- page.aa -->
+    <!-- page-list.aa -->
+    <!-- page-item.aa -->
+    <!-- page-item.zz -->
+    <!-- page-list.zz -->
+    <!-- page.zz -->
+    <!-- login.aa -->
+    <div class="auth">
+        <div class="auth-card">
+            <a class="back-home" href="index.wml">← Home</a>
+            <h2>Sign In</h2>
+            <p class="auth-sub">Welcome back. Enter your account and password to continue.</p>
+            <form method="post">
+                <input type="hidden" name="op" value="set" />
+                <div class="field">
+                    <label for="loginId">Account / Email / Mobile</label>
+                    <input type="text" name="A" id="loginId" placeholder="Enter your account, email or mobile number" autocomplete="username" required />
+                </div>
+                <div class="field field-pw">
+                    <label for="loginPw">Password</label>
+                    <input type="password" name="B" id="loginPw" placeholder="Enter your password" autocomplete="current-password" required />
+                    <button type="button" class="pw-toggle" data-pw="loginPw">Show</button>
+                </div>
+                <div class="row-between" style="justify-content:flex-end;">
+                    <a class="forgot" href="forget.wml">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn-primary">Sign In</button>
+            </form>
+            <p class="signup-line">Not a member yet? <a href="member.wml">Register now</a></p>
+        </div>
+    </div>
+    <!-- login.zz -->
+    <!-- forget.aa -->
+    <div class="auth">
+        <div class="auth-card">
+            <a class="back-home" href="login.wml">← Back to sign in</a>
+            <h2>Forgot Password</h2>
+            <p class="auth-sub">We will send a reset link to your registered e-mail.</p>
+            <form method="post">
+                <input type="hidden" name="op" value="set" />
+                <div class="field">
+                    <label for="forgetMail">E-mail address</label>
+                    <input type="email" name="email" id="forgetMail" placeholder="Enter your registered e-mail" required />
+                </div>
+                <button type="submit" class="btn-primary">Reset Password</button>
+            </form>
+            <p class="signup-line">Remembered it? <a href="login.wml">Back to sign in</a></p>
+        </div>
+    </div>
+    <!-- forget.zz -->
+    <!-- password.aa -->
+    <div class="auth">
+        <div class="auth-card">
+            <h2>Change Password</h2>
+            <p class="auth-sub">Enter a new password twice.</p>
+            <form method="post">
+                <input type="hidden" name="id" value="$id" />
+                <div class="field field-pw">
+                    <label for="pw1">Password</label>
+                    <input type="password" name="password1" id="pw1" placeholder="Enter a new password" required />
+                    <button type="button" class="pw-toggle" data-pw="pw1">Show</button>
+                </div>
+                <div class="field field-pw">
+                    <label for="pw2">Confirm password</label>
+                    <input type="password" name="password2" id="pw2" placeholder="Enter it again" required />
+                    <button type="button" class="pw-toggle" data-pw="pw2">Show</button>
+                </div>
+                <button type="submit" name="submit" class="btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+    <!-- password.zz -->
+    <!-- result.aa -->
+    <div class="auth">
+        <div class="auth-card">
+            <h2>Message</h2>
+            <p class="auth-msg">$msg</p>
+            <a class="btn-primary" href="index.wml">Back to Home</a>
+        </div>
+    </div>
+    <!-- result.zz -->
+    <!-- ======================================================================================================================== -->
+    <!-- ongrid.aa -->
+    <div class="wrap layout">
+        #(sidebar)
+        <main class="main">
+            #(breadcrumb)
+            #(content)
+        </main>
+    </div>
+    <!-- ongrid.zz -->
+    <!-- onshop.aa -->
+    <div class="wrap layout">
+        #(sidebar)
+        <main class="main">
+            #(breadcrumb)
+            #(recommended)
+            #(content)
+            #(navigator)
+        </main>
+    </div>
+    <!-- onshop.zz -->
+    <!-- onhome.aa -->
+    <!-- onhome.zz -->
+    <!-- onpage.aa -->
+    <div class="wrap page">
+        <main class="main">
+            #(breadcrumb)
+            #(content)
+        </main>
+    </div>
+    <!-- onpage.zz -->
+    <!-- onnote.aa -->
+    <div class="wrap layout">
+        <div class="sidebar-scrim" id="scrim"></div>
+        #(sidebar)
+        <main class="main">
+            #(breadcrumb)
+            #(content)
+        </main>
+    </div>
+    <!-- onnote.zz -->
+    <!-- onship.aa -->
+    <!-- onship.zz -->
+    <!-- onbook.aa -->
+    <!-- onbook.zz -->
+    <!-- ======================================================================================================================== -->
+    <!-- breadcrumb.aa -->
+    <p class="breadcrumb"><a href="index.wml">Home</a> / $one</p>
+    <!-- breadcrumb.zz -->
+    <!-- breadcrumb1.aa -->
+    <!-- breadcrumb1.zz -->
+    <!-- breadcrumb2.aa -->
+    <p class="breadcrumb"><a href="index.wml">Home</a> / <a href="$one_href">$one</a> / $two</p>
+    <!-- breadcrumb2.zz -->
+    <!-- slider.aa -->
+    <!-- slider.zz -->
+    <!-- ======================================================================================================================== -->
+    <!-- content-side.aa -->
+    <!-- nestbar.aa -->
+    <!-- nestbar-list.aa -->
+    <!-- nestbar-item.aa -->
+    <!-- nestbar-item.zz -->
+    <!-- nestbar-aaa.aa -->
+    <!-- nestbar-aaa.zz -->
+    <!-- nestbar-list.zz -->
+    <!-- nestbar.zz -->
+    <!-- Single-level left menu (for the sidebar card; data from the mnu dataset) -->
+    <!-- sidebar.aa -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head">
+            $category
+            <button class="sidebar-close" id="sidebarClose" aria-label="Close">✕</button>
+        </div>
+        <nav class="cat-list" id="noteList">
+            <!-- sidebar-item.aa -->
+            <div class="cat-item"><a class="cat-btn" href="$(app).wml?gp=$mnu.pno">$mnu.des</a></div>
+            <!-- sidebar-item.zz -->
+            <!-- sidebar-active.aa -->
+            <div class="cat-item active"><a class="cat-btn" href="$(app).wml?gp=$mnu.pno">$mnu.des</a></div>
+            <!-- sidebar-active.zz -->
+            <!-- sidebar-note.aa -->
+            <div class="cat-item"><a class="cat-btn" href="javascript:loadDoc('note-js.wml?pg=$mnu.pno')">$mnu.des</a></div>
+            <!-- sidebar-note.zz -->
+        </nav>
+    </aside>
+    <!-- sidebar.zz -->
+    <!-- Left menu: generated dynamically by shop.wml's sidebar card from the mnu_* arrays (categories + subcategories) -->
+    <!-- bookbar.aa -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head">All Categories</div>
+        <nav class="cat-list" id="catList">
+            <!-- bookbar-list.aa -->
+            <div class="cat-item">
+                <button class="cat-btn">
+                    <span>$(mnu_title[k])</span>
+                    <span class="cat-chevron">&#9656;</span>
+                </button>
+                <div class="sub-list">
+                    <!-- bookbar-item.aa -->
+                    <a href="$(app).wml?gp=$(mnu_id[k])">$(mnu_title[k])</a>
+                    <!-- bookbar-item.zz -->
+                    <!-- bookbar-active.aa -->
+                    <a class="active" href="$(app).wml?gp=$(mnu_id[k])">$(mnu_title[k])</a>
+                    <!-- bookbar-active.zz -->
+                </div>
+            </div>
+            <!-- bookbar-list.zz -->
+        </nav>
+    </aside>
+    <!-- bookbar.zz -->
+    <!-- grid.aa -->
+    <!-- grid-list.aa -->
+    <div class="pgrid">
+        <!-- grid-item.aa -->
+        <div class="pcard">
+            <a href="$(app).wml?gp=$mnu.pno">
+                <div class="pthumb">
+                    <img src="300x300.jpg" alt="$mnu.des" width="300" height="300" loading="lazy" />
+                </div>
+                <div class="pbody">
+                    <span class="pcat">$mnu.pno</span>
+                    <span class="pname">$mnu.des</span>
+                </div>
+            </a>
+        </div>
+        <!-- grid-item.zz -->
+    </div>
+    <!-- grid-list.zz -->
+    <!-- grid.zz -->
+    <!-- category.aa -->
+    <div class="catpage-head">
+        <h2>$category</h2>
+    </div>
+    <!-- category.zz -->
+    <!-- control.aa -->
+    <div class="catpage-head">
+        <h2>$category</h2>
+        <div class="catpage-sort">
+            <a href="?op=$op&gp=$gp&pg=$pg&az=za">Newest first</a><span class="sep">|</span><a href="?op=$op&gp=$gp&pg=$pg&az=az">Oldest first</a><span class="sep">|</span><a href="?op=$op&gp=$gp&pg=$pg&az=aa">Best sellers</a>
+        </div>
+    </div>
+    <!-- control.zz -->
+
+    <!-- recommended.aa -->
+    <!-- recommended-list.aa -->
+    <div class="pgrid">
+        <!-- recommended-item.aa -->
+        <div class="pcard">
+            <a class="pthumb" href="javascript:void(0)" onclick="openwin('detail.wml?gp=$(MID(pa.pno,1,4))&id=$pa.pno',460,460)">
+                <span class="ptag sale">Sale</span>
+                <img src="images/$(MID(pa.pno,1,2)+'00')/$(MID(pa.pno,1,4))/$(pa.qno).jpg" onerror="this.onerror=null;this.src='300x300.jpg';" alt="$pa.des" width="300" height="300" loading="lazy" />
+            </a>
+            <div class="pbody">
+                <span class="pcat">$pa.pno</span>
+                <a class="pname" href="javascript:void(0)" onclick="openwin('detail.wml?gp=$(MID(pa.pno,1,4))&id=$pa.pno',460,460)">$pa.des</a>
+                <div class="pfoot">
+                    <span class="pprice sale">$(IF(pa.pricea>pa.price1,99999,pa.price1))<span class="was">$pa.pricec</span></span>
+                    <a class="addbtn" href="place.wml?pno=$pa.pno" aria-label="Add to cart" title="Add to cart">+</a>
+                </div>
+            </div>
+        </div>
+        <!-- recommended-item.zz -->
+    </div>
+    <!-- recommended-list.zz -->
+    <!-- recommended.zz -->
+
+    <!-- shop.aa -->
+    <!-- shop-list.aa -->
+    <div class="pgrid" id="gridCatpage">
+        <!-- shop-item.aa -->
+        <div class="pcard">
+            <a class="pthumb" href="javascript:void(0)" onclick="openwin('detail.wml?gp=$(MID(pa.pno,1,4))&id=$pa.pno',460,460)">
+                <span class="ptag sale">Sale</span>
+                <img src="images/$(MID(pa.pno,1,2)+'00')/$(MID(pa.pno,1,4))/$(pa.qno).jpg" onerror="this.onerror=null;this.src='300x300.jpg';" alt="$pa.des" width="300" height="300" loading="lazy" />
+            </a>
+            <div class="pbody">
+                <span class="pcat">$pa.pno</span>
+                <a class="pname" href="javascript:void(0)" onclick="openwin('detail.wml?gp=$(MID(pa.pno,1,4))&id=$pa.pno',460,460)">$pa.des</a>
+                <div class="pfoot">
+                    <span class="pprice sale">$(IF(pa.pricea>pa.price1,99999,pa.price1))<span class="was">$pa.pricec</span></span>
+                    <a class="addbtn" href="place.wml?pno=$pa.pno" aria-label="Add to cart" title="Add to cart">+</a>
+                </div>
+            </div>
+        </div>
+        <!-- shop-item.zz -->
+    </div>
+    <!-- shop-list.zz -->
+    <!-- shop.zz -->
+    <!-- pagination.aa -->
+    <div class="pagination-bar">
+        <span class="pagination-info">$R items, page $PG of $PAGES</span>
+        <ul class="pagination">
+            <!-- pagination-item.aa -->
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <!-- pagination-item.zz -->
+        </ul>
+    </div>
+    <!-- pagination.zz -->
+    <!-- content-side.zz -->
+    <!-- ======================================================================================================================== -->
+    <!-- content.aa -->
+    <div class="narrow-page">
+        <main class="main">
+            #(breadcrumb)
+    <!-- place.aa -->
+    <div class="pdp">
+        <div class="pdp-media">
+            <img src="images/big/$AA/$BB/$(pa.pno).jpg" onerror="this.onerror=null;this.src='300x300.jpg';" alt="$pa.des" />
+        </div>
+        <div class="pdp-info">
+            <a class="pdp-cat" href="shop.wml?gp=$pa.gid">$grp.des</a>
+            <h1 class="pdp-title">$pa.des</h1>
+            <div class="pdp-meta">
+                <span>Item No. <b>$pa.pno</b></span>
+                $(IF(pa.unit='','','<span>Unit <b>'+pa.unit+'</b></span>'))
+            </div>
+            <div class="pdp-price">
+                <span class="now">$(IF(pa.pricea>pa.price1,99999,pa.price1))</span>
+                <span class="cur"></span>
+                $(IF(pa.pricec>pa.price1,'<del>List '+FORMAT('%6.0n',pa.pricec*1.0)+'</del>',''))
+                <span class="tax">excl. tax</span>
+            </div>
+            <form name="form" method="post" action="order.wml">
+                <input type="hidden" name="id" value="$(MD5(session.usr))" />
+                <input type="hidden" name="pno" value="$pa.pno" />
+                <div class="field">
+                    <label for="rem">Color / specification notes <span class="opt">optional</span></label>
+                    <textarea class="rem-area" id="rem" name="rem" rows="2" maxlength="20" data-count="20" placeholder="e.g. blue, A4, bold" onkeydown="if(event.keyCode==13) return false;"></textarea>
+                    <p class="rem-count">Characters left: <span>20</span></p>
+                </div>
+                <div class="pdp-buy">
+                    <div class="qty-box">
+                        <button class="qty-step" type="button" data-step="-1" aria-label="Decrease">−</button>
+                        <input class="qty-input" id="qty" name="qty" type="text" inputmode="numeric" value="1" />
+                        <button class="qty-step" type="button" data-step="1" aria-label="Increase">+</button>
+                    </div>
+                    <button class="btn-buy" type="submit">Add to Cart</button>
+                </div>
+            </form>
+            <ul class="pdp-points">
+                <li><b>Free shipping over 1,200</b> (excl. tax); otherwise shipping is 100 (copy paper not counted)</li>
+                <li>Order before <b>12:00 noon</b> for <b>next-day delivery</b>, postponed over holidays</li>
+                <li>A tax invoice is issued with the goods; 5% sales tax is added</li>
+                <li>Not sure about a specification? Call customer service at <a href="tel:0412345678">04-12345678</a></li>
+            </ul>
+            <div class="pdp-back">
+                <a href="shop.wml?gp=$pa.gid">← Back to $grp.des</a>
+                <a href="cart.wml">View Cart →</a>
+            </div>
+        </div>
+    </div>
+    <!-- place.zz -->
+    <!-- cart.aa -->
+    <form method="post" action="cart.wml">
+        <div class="cart-grid">
+            <div class="cart-main">
+                <div class="cart-head">
+                    <h1>Cart</h1>
+                    <span>Check the items and quantities, then press "Review Order" to continue to the order form</span>
+                </div>
+                <!-- cart-list.aa -->
+                <div class="cart-items">
+                    <!-- cart-item.aa -->
+                    <div class="citem">
+                        <input name="xyz[]" type="hidden" value="$od.itm" />
+                        <a class="citem-img" href="place.wml?pno=$od.pno">
+                            <img src="images/big/$(MID(od.pno,1,2)+'00')/$(MID(od.pno,1,4))/$(od.pno).jpg" onerror="this.onerror=null;this.src='300x300.jpg';" alt="$od.des" />
+                        </a>
+                        <div class="citem-body">
+                            <span class="citem-no">$od.pno</span>
+                            <a class="citem-name" href="place.wml?pno=$od.pno">$od.des</a>
+                            <input class="rem-input" name="rem[]" type="text" maxlength="20" value="$od.rem" placeholder="Color / specification notes (optional)" />
+                        </div>
+                        <div class="citem-price">
+                            <span class="lab">Unit price</span>
+                            <span class="val">$(FORMAT('%6.1n',od.price*1.0))</span>
+                        </div>
+                        <div class="citem-qty">
+                            <span class="lab">Qty</span>
+                            <div class="qty-box small">
+                                <button class="qty-step" type="button" data-step="-1" aria-label="Decrease">−</button>
+                                <input class="qty-input" name="quantity[]" type="text" inputmode="numeric" value="$od.qty" />
+                                <button class="qty-step" type="button" data-step="1" aria-label="Increase">+</button>
+                            </div>
+                        </div>
+                        <div class="citem-sum">
+                            <span class="lab">Subtotal</span>
+                            <span class="val">$(FORMAT('%8.0n',od.qty*od.price*1.0))</span>
+                        </div>
+                        <a class="citem-del" href="cart.wml?act=del&itemno=$od.itm" title="Remove this item" aria-label="Remove this item">×</a>
+                    </div>
+                    <!-- cart-item.zz -->
+                </div>
+                <div class="cart-foot">
+                    <a class="cart-link" href="index.wml">← Continue Shopping</a>
+                    <button class="btn-outline sm" type="submit" name="upd" value="1">Update quantities and notes</button>
+                </div>
+            </div>
+            <aside class="cart-side">
+            <!-- cart-list.zz -->
+                <!-- cart-calc.aa -->
+                <div class="csum">
+                    <h2>Order Total</h2>
+                    <!-- cart-1000.aa -->
+                    <div class="csum-row">
+                        <span>Shipping<small> (under 1,200 excl. tax)</small></span>
+                        <b>$(FORMAT('%8.0n',100*1.0))</b>
+                    </div>
+                    <!-- cart-1000.zz -->
+                    <div class="csum-row">
+                        <span>Subtotal (excl. tax)</span>
+                        <b>$(FORMAT('%8.0n',TempTotal*1.0))</b>
+                    </div>
+                    <div class="csum-row">
+                        <span>Sales tax 5%</span>
+                        <b>$(FORMAT('%8.0n',Tax*1.0))</b>
+                    </div>
+                    <div class="csum-total">
+                        <span>Amount due</span>
+                        <b>$(FORMAT('%8.0n',(TempTotal+Tax)*1.0))</b>
+                    </div>
+                    <button class="btn-buy" type="submit" name="chk" value="1">Review Order</button>
+                    <!-- cart-calc.zz -->
+                    <button class="btn-text danger" type="submit" name="del" value="1">Empty Cart</button>
+                    <ul class="csum-note">
+                        <li>Free shipping over 1,200 (excl. tax); copy paper not counted</li>
+                        <li>Order before 12:00 noon for next-day delivery</li>
+                        <li>Amounts are final once confirmed by customer service</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </form>
+    <!-- cart.zz -->
+    <!-- profile.aa -->
+    <h1 class="reg-title">$category</h1>
+    <div class="reg-card">
+        <ul class="reg-notice">
+            <li>Your e-mail address is your member account.</li>
+            <li>To change your password, enter the new password in "Password" and "Confirm password".</li>
+        </ul>
+        <form class="reg-form" method="post">
+            <input type="hidden" name="op" value="upd" />
+            <div class="field">
+                <label>E-mail <span class="req">*</span></label>
+                $(IF(DEFINE(session.usr),'<span class="static-value">'+cu.email+'</span>','<input type="email" name="email" value="'+cu.email+'" required />'))
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>Password <span class="req">*</span></label>
+                    <input type="password" name="password1" value="" />
+                </div>
+                <div class="field">
+                    <label>Confirm password <span class="req">*</span></label>
+                    <input type="password" name="password2" value="" />
+                </div>
+            </div>
+            <div class="field">
+                <label>Customer name <span class="req">*</span></label>
+                <input type="text" name="cname" maxlength="255" value="$cu.cname" required />
+            </div>
+            <div class="field">
+                <label>Gender</label>
+                <div class="radio-row">
+                    <label><input type="radio" name="sex" value="1" $(IF(cu.sex=2,'','checked')) /> Male</label>
+                    <label><input type="radio" name="sex" value="2" $(IF(cu.sex=2,'checked','')) /> Female</label>
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>Phone <span class="req">*</span></label>
+                    <input type="tel" name="phone" maxlength="255" value="$cu.phone" required />
+                </div>
+                <div class="field">
+                    <label>Fax</label>
+                    <input type="tel" name="fax" maxlength="255" value="$cu.fax" />
+                </div>
+            </div>
+            <div class="field">
+                <label>Mobile</label>
+                <input type="tel" name="gsm" maxlength="255" value="$cu.gsm" />
+            </div>
+            <div class="field">
+                <label>Delivery address <span class="req">*</span></label>
+                <input type="text" name="addr1" maxlength="255" value="$cu.addr1" required />
+            </div>
+            <div class="field field-narrow">
+                <label>Postal code <span class="req">*</span></label>
+                <input type="text" name="zip" size="5" maxlength="5" value="$cu.zip" required />
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>Tax ID</label>
+                    <input type="text" name="ac" maxlength="255" value="$cu.ac" />
+                </div>
+                <div class="field">
+                    <label>Contact person</label>
+                    <input type="text" name="contact" maxlength="255" value="$cu.contact" />
+                </div>
+            </div>
+            <div class="field">
+                <label>Preferred delivery time</label>
+                <div class="radio-row">
+                    <label><input type="radio" name="ship" value="1" $(IF(cu.ship=1,'checked','')) /> Morning</label>
+                    <label><input type="radio" name="ship" value="2" $(IF(cu.ship=2,'checked','')) /> Afternoon</label>
+                    <label><input type="radio" name="ship" value="3" $(IF((cu.ship=1) or (cu.ship=2),'','checked')) /> Either</label>
+                </div>
+            </div>
+            <div class="field">
+                <label>Notes</label>
+                <input type="text" name="rem" maxlength="255" value="$cu.rem" />
+            </div>
+            <div class="reg-actions">
+                <button type="submit" class="btn-primary">Submit</button>
+                <button type="reset" class="btn-outline">Reset</button>
+            </div>
+        </form>
+    </div>
+    <!-- profile.zz -->
+    <!-- order.aa -->
+    <div class="data-head">
+        <h2>Order History</h2>
+        <span class="pagination-info">Orders from the last nine months</span>
+    </div>
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="ctr">Order No.</th>
+                    <th class="ctr">Order Date</th>
+                    <th class="ctr">Completed</th>
+                    <th class="num">Total (incl. tax)</th>
+                    <th class="ctr">Status</th>
+                    <th class="ctr">Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- order-item.aa -->
+                <tr>
+                    <td class="ctr">$(od.sno)</td>
+                    <td class="ctr">$(MyDate(od.sdate))</td>
+                    <td class="ctr">$(MyDate(od.sdate))</td>
+                    <td class="num">$(FORMAT('%8.0n',(od.amount+od.tax)*1.0))</td>
+                    <td class="ctr">$(if(od.pc='1','Received',if(od.pc='2','Preparing',if(od.pc='3','Shipped',if(od.pc='4','Transferring','')))))</td>
+                    <td class="ctr"><a href="profile.wml?op=itm&od=$od.sno">Print</a></td>
+                </tr>
+                <!-- order-item.zz -->
+            </tbody>
+        </table>
+    </div>
+    <!-- order.zz -->
+    <!-- detail.aa -->
+    <div class="data-head">
+        <h2>Order Form</h2>
+        <span class="pagination-info">Order No. $od.sno</span>
+    </div>
+    <div class="table-scroll">
+        <table class="data-table">
+            <tbody>
+                <tr>
+                    <th>Company</th>
+                    <td class="wrap-text">$od.cname</td>
+                    <th>Tax ID</th>
+                    <td>$od.ac</td>
+                </tr>
+                <tr>
+                    <th>Phone</th>
+                    <td>$od.phone</td>
+                    <th>E-mail</th>
+                    <td class="wrap-text">$od.email</td>
+                </tr>
+                <tr>
+                    <th>Delivery address</th>
+                    <td class="wrap-text" colspan="3">$od.addr1</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-scroll">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="ctr">Item No.</th>
+                    <th>Product</th>
+                    <th class="num">Qty</th>
+                    <th class="ctr">Unit</th>
+                    <th class="num">Unit price</th>
+                    <th class="num">Amount</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- detail-item.aa -->
+                <tr>
+                    <td class="ctr">$od.pno</td>
+                    <td class="wrap-text">$od.des</td>
+                    <td class="num">$od.qty</td>
+                    <td class="ctr">$od.unit</td>
+                    <td class="num">$(FORMAT('%6.1n',od.price*1.0))</td>
+                    <td class="num">$(FORMAT('%8.0n',od.qty*od.price*1.0))</td>
+                    <td class="wrap-text">$od.rem</td>
+                </tr>
+                <!-- detail-item.zz -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="ctr">Subtotal (excl. tax)</td>
+                    <td class="num">$(FORMAT('%8.0n',TempTotal*1.0))</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="ctr">Sales tax</td>
+                    <td class="num">$(FORMAT('%8.0n',Tax*1.0))</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="ctr">Total (incl. tax)</td>
+                    <td class="num">$(FORMAT('%8.0n',(TempTotal+Tax)*1.0))</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="data-note">
+        <b>Order notes: </b>$(od.topic)<br />
+        <b>Free gift (one with every 2,500 excl. tax): </b>$(od.sales)<br />
+        <b>Send me the latest flyer: </b>$(od.dm)
+    </div>
+    <div class="print-bar">
+        <a class="btn-outline" href="javascript:history.back()">Back</a>
+        <a class="btn-inline" href="javascript:window.print()">Print</a>
+    </div>
+    <!-- detail.zz -->
+    <!-- note.aa -->
+    <!-- note-item.aa -->
+    <!-- note-item.zz -->
+    <!-- note.zz -->
+    <!-- member.aa -->
+    <h1 class="news-title">Terms of Service</h1>
+    <div class="reg-card">
+        <form name="form" action="profile.wml" method="post">
+            <input type="hidden" name="op" value="reg" />
+            <ol class="terms">
+                <li><strong>Membership</strong>: please give a correct contact name, phone number and delivery address when registering; any costs from failed delivery due to incorrect details are borne by the member.</li>
+                <li><strong>Products and prices</strong>: product information and images on the website are for reference only; the actual specification, color and price are as confirmed by customer service. Prices may change without notice.</li>
+                <li><strong>Order acceptance</strong>: submitting an order only expresses your intent to buy; it is accepted once we have confirmed stock and price. If stock is insufficient or a price is clearly wrong, we may cancel the order and let you know.</li>
+                <li><strong>Shipping, returns and exchanges</strong>: shipping times, fees and return conditions follow the <a href="note.wml?pg=n103" target="_blank">Terms of Sale</a>; please read them before registering.</li>
+                <li><strong>Account security</strong>: keep your account and password safe; orders sent from your account are treated as placed by you.</li>
+                <li><strong>Personal data</strong>: your data is used only for order processing, delivery and customer service, and is not shared with unrelated third parties.</li>
+                <li><strong>Changes to these terms</strong>: we may change these terms and the Terms of Sale; changes are posted on this website, and continued use means you accept them.</li>
+            </ol>
+            <div class="reg-actions center">
+                <button class="btn-inline" type="submit">I agree — continue</button>
+                <button class="btn-outline" type="button" onclick="history.back()">I do not agree</button>
+            </div>
+        </form>
+    </div>
+    <!-- member.zz -->
+    <!-- alert.aa -->
+    <div class="msg">
+        <div class="msg-card">
+            <div class="msg-icon $(IF(title='Error','err',IF(title='Reminder','warn','ok')))"><span>$(IF(title='Error','!',IF(title='Reminder','!','✓')))</span></div>
+            <h1>$title</h1>
+            <p class="msg-text">$message</p>
+            <div class="msg-actions">
+                <a class="btn-buy" href="index.wml">Back to Home</a>
+                <a class="btn-outline" href="javascript:history.back()">Back</a>
+            </div>
+        </div>
+    </div>
+    <!-- alert.zz -->
+    <!-- invoice.aa -->
+    <form name="form" method="post" action="cart.wml">
+        <div class="co-head">
+            <h1>Review Your Order</h1>
+            <p>Please check the items, quantities and delivery details before submitting; customer service will call you to confirm.</p>
+        </div>
+        <div class="co">
+            <div class="co-main">
+                <section class="co-card">
+                    <div class="co-card-head">
+                        <h2>Delivery and Invoice Details</h2>
+                        <a href="profile.wml">Edit details</a>
+                    </div>
+                    <dl class="co-info">
+                        <div><dt>Company</dt><dd>$od.cname</dd></div>
+                        <div><dt>Contact</dt><dd>$od.contact</dd></div>
+                        <div><dt>Phone</dt><dd>$od.phone</dd></div>
+                        <div><dt>Fax</dt><dd>$od.fax</dd></div>
+                        <div><dt>Tax ID</dt><dd>$od.ac</dd></div>
+                        <div><dt>E-mail</dt><dd>$od.email</dd></div>
+                        <div class="full"><dt>Delivery address</dt><dd>$od.addr1</dd></div>
+                        <div class="full"><dt>Order No.</dt><dd>$od.sno</dd></div>
+                    </dl>
+                </section>
+                <!-- invoice-list.aa -->
+                <section class="co-card">
+                    <div class="co-card-head">
+                        <h2>Order Details</h2>
+                        <span>Unit prices exclude tax</span>
+                    </div>
+                    <div class="co-items">
+                        <!-- invoice-item.aa -->
+                        <div class="coitem">
+                            <div class="coitem-body">
+                                <span class="coitem-no">$(od.pno)</span>
+                                <span class="coitem-name">$(od.des)</span>
+                                $(IF(od.rem='','','<span class="coitem-rem">Notes: '+od.rem+'</span>'))
+                            </div>
+                            <span class="coitem-unit">$(FORMAT('%6.1n',od.price*1.0))<i> / $(od.unit)</i></span>
+                            <span class="coitem-qty">× $od.qty</span>
+                            <span class="coitem-sum">$(FORMAT('%8.0n',od.qty*od.price*1.0))</span>
+                        </div>
+                        <!-- invoice-item.zz -->
+                        <!-- invoice-1000.aa -->
+                        <div class="coitem freight">
+                            <div class="coitem-body">
+                                <span class="coitem-no">Shipping</span>
+                                <span class="coitem-name">Shipping fee for orders under 1,200 (excl. tax)</span>
+                            </div>
+                            <span class="coitem-unit">$(FORMAT('%8.0n',100*1.0))</span>
+                            <span class="coitem-qty">× 1</span>
+                            <span class="coitem-sum">$(FORMAT('%8.0n',100*1.0))</span>
+                        </div>
+                        <!-- invoice-1000.zz -->
+                    </div>
+                </section>
+                <p class="co-memo">$sys.rem</p>
+            </div>
+            <aside class="co-side">
+                <div class="csum">
+                    <h2>Amount Details</h2>
+                    <div class="csum-row"><span>Subtotal (excl. tax)</span><b>$(FORMAT('%8.0n',TempTotal*1.0))</b></div>
+                    <div class="csum-row"><span>Sales tax 5%</span><b>$(FORMAT('%8.0n',Tax*1.0))</b></div>
+                    <div class="csum-total"><span>Amount due</span><b>$(FORMAT('%8.0n',(TempTotal+Tax)*1.0))</b></div>
+                    <!-- invoice-list.zz -->
+                    <!-- invoice-proceed.aa -->
+                    <button class="btn-buy" type="submit" name="ok" value="1">Submit Order</button>
+                    <a class="btn-text" href="cart.wml">← Back to Cart</a>
+                    <ul class="csum-note">
+                        <li>After you submit, customer service will call to confirm items and delivery dates</li>
+                        <li>A tax invoice is issued with the goods</li>
+                        <li>Amounts are final once confirmed by customer service</li>
+                    </ul>
+                    <!-- invoice-proceed.zz -->
+                    <!-- invoice-print.aa -->
+                    <a class="btn-outline sm" href="javascript:window.print()">Print / Fax Order</a>
+                    <!-- invoice-print.zz -->
+                </div>
+            </aside>
+        </div>
+    </form>
+    <!-- invoice.zz -->
+        </main>
+    </div>
+    <!-- content.zz -->
+    <!-- ======================================================================================================================== -->
+    <!-- footer.aa -->
+    <footer class="site-footer">
+        <div class="wrap">
+            <div class="footer-top">
+                <div>
+                    <span class="footer-brand">Stationery<span>Store</span></span>
+                    <p class="footer-desc">Office and stationery supplies online — 25 categories and over ten thousand office and stationery items, for individual buyers and business orders.</p>
+                    <ul class="footer-contact">
+                        <li><span>Customer service</span><a href="tel:0412345678">04-12345678</a></li>
+                        <li><span>Fax</span>04-12345679</li>
+                        <li><span>E-mail</span><a href="mailto:service@example.com.tw">service@example.com.tw</a></li>
+                        <li><span>Store</span>3F, No. 168, Stationery Rd., Xitun Dist., Taichung</li>
+                        <li><span>Hours</span>Mon–Fri 09:00–18:00</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Shopping Guide</h4>
+                    <ul>
+                        <li><a href="note.wml?pg=n101">Ordering Process</a></li>
+                        <li><a href="note.wml?pg=n102">How to Order Online</a></li>
+                        <li><a href="note.wml?pg=n103">Terms of Sale</a></li>
+                        <li><a href="note.wml?pg=n104">Payment Methods</a></li>
+                        <li><a href="note.wml?pg=n105">Shipping</a></li>
+                        <li><a href="note.wml?pg=n106">Returns &amp; Exchanges</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Member Services</h4>
+                    <ul>
+                        <li>$(IF(DEFINE(session.usr),'<a href="profile.wml">My Account</a>','<a href="login.wml">Sign In</a>'))</li>
+                        <li>$(IF(DEFINE(session.usr),'<a href="profile.wml">Edit Details</a>','<a href="member.wml">Join</a>'))</li>
+                        <li><a href="profile.wml?op=ord">Order History</a></li>
+                        <li><a href="cart.wml">Cart</a></li>
+                        <li>$(IF(DEFINE(session.usr),'<a href="login.wml?logout=true">Sign Out</a>',''))</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Browse</h4>
+                    <ul>
+                        <li><a href="index.wml">Specials</a></li>
+                        <li><a href="grid.wml">All Categories</a></li>
+                        <li><a href="new.wml">Latest News</a></li>
+                        <li><a href="member.wml">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- footer-list.aa -->
+            <!-- footer-item.aa -->
+            <!-- footer-item.zz -->
+            <!-- footer-list.zz -->
+            <div class="footer-bottom">
+                <span>© 2026 Stationery Store. All rights reserved.</span>
+                <nav class="footer-legal">
+                    <a href="member.wml">Terms of Service</a>
+                    <a href="note.wml?pg=n103">Terms of Sale</a>
+                    <a href="note.wml?pg=n106">Return Policy</a>
+                    <a href="tel:0412345678">Contact Us</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+    <!-- footer.zz -->
+    <!-- wrapper.zz -->
+    <!-- Mobile left-menu drawer: generated dynamically by asider.wml from the mnu_* arrays -->
+    <!-- asider.aa -->
+    <div class="sidebar-scrim" id="scrim"></div>
+    <aside class="asider" id="asiderMenu">
+        <div class="sidebar-head">
+            All Categories
+            <button class="sidebar-close" id="sidebarClose" aria-label="Close">✕</button>
+        </div>
+        <nav class="cat-list" id="asiderList">
+            <!-- asider-list.aa -->
+            <div class="cat-item">
+                <button class="cat-btn">
+                    <span>$(mnu_title[k])</span>
+                    <span class="cat-chevron">&#9656;</span>
+                </button>
+                <div class="sub-list">
+                    <!-- asider-item.aa -->
+                    <a href="$(app).wml?gp=$(mnu_id[k])">$(mnu_title[k])</a>
+                    <!-- asider-item.zz -->
+                    <!-- asider-xxxx.aa -->
+                    <!-- asider-xxxx.zz -->
+                </div>
+            </div>
+            <!-- asider-list.zz -->
+            <div class="cat-item"><a class="cat-btn" href="example.wml">Advanced Examples</a></div>
+        </nav>
+    </aside>
+    <!-- asider.zz -->
+    <!-- wapform.zz -->
+    
+    <script>
+    /* ---------- Category expand/collapse (shared by the left menu and the mobile drawer) ---------- */
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.cat-btn');
+        if (!btn) return;
+        var list = btn.closest('.cat-list');
+        var item = btn.closest('.cat-item');
+        var wasOpen = item.classList.contains('open');
+        list.querySelectorAll('.cat-item').forEach(function(x) {
+            x.classList.remove('active');
+            x.classList.remove('open');
+        });
+        item.classList.add('active');
+        if (!wasOpen) item.classList.add('open');
+    });
+
+    /* Current category: expand its parent category automatically */
+    document.querySelectorAll('.cat-list .sub-list a.active').forEach(function(a) {
+        var item = a.closest('.cat-item');
+        if (item) {
+            item.classList.add('open');
+            item.classList.add('active');
+        }
+    });
+
+    /* ---------- Top categories: dropdown toggle ---------- */
+    function qbPlace(item) {
+        var panel = item.querySelector('.qb-panel');
+        if (!panel) return;
+        item.classList.remove('flip');
+        var r = panel.getBoundingClientRect();
+        if (r.right > document.documentElement.clientWidth - 8) item.classList.add('flip');
+    }
+    document.addEventListener('mouseover', function(e) {
+        var it = e.target.closest ? e.target.closest('.qb-item') : null;
+        if (it) qbPlace(it);
+    });
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.qb-item-btn');
+        if (btn) {
+            var item = btn.closest('.qb-item');
+            var wasOpen = item.classList.contains('open');
+            document.querySelectorAll('.qb-item').forEach(function(x) { x.classList.remove('open'); });
+            if (!wasOpen) { item.classList.add('open'); qbPlace(item); }
+            return;
+        }
+        if (!e.target.closest('.qb-item')) {
+            document.querySelectorAll('.qb-item').forEach(function(x) { x.classList.remove('open'); });
+        }
+    });
+
+    /* ---------- Member menu ---------- */
+    function toggleAcct() {
+        var d = document.getElementById('acctDrop');
+        if (d) d.classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.has-drop')) {
+            var d = document.getElementById('acctDrop');
+            if (d) d.classList.remove('open');
+        }
+    });
+
+    /* ---------- Mobile category drawer (asider) ---------- */
+    (function() {
+        var asider = document.getElementById('asiderMenu');
+        var scrim = document.getElementById('scrim');
+        var toggle = document.getElementById('menuToggle');
+        var close = document.getElementById('sidebarClose');
+        if (!asider || !toggle) return;
+
+        function open() {
+            asider.classList.add('open');
+            if (scrim) scrim.classList.add('open');
+        }
+
+        function shut() {
+            asider.classList.remove('open');
+            if (scrim) scrim.classList.remove('open');
+        }
+        toggle.addEventListener('click', open);
+        if (close) close.addEventListener('click', shut);
+        if (scrim) scrim.addEventListener('click', shut);
+    })();
+
+    /* ---------- FAQ expand (Shopping Guide content) ---------- */
+    document.addEventListener('click', function(e) {
+        var q = e.target.closest('.faq-q');
+        if (!q) return;
+        var item = q.closest('.faq-item');
+        if (item) item.classList.toggle('open');
+    });
+
+    /* ---------- Characters left in notes (place.wml) ---------- */
+    document.addEventListener('input', function(e) {
+        var t = e.target;
+        if (!t || !t.getAttribute || !t.getAttribute('data-count')) return;
+        var max = parseInt(t.getAttribute('data-count'), 10) || 0;
+        var box = t.parentNode ? t.parentNode.querySelector('.rem-count') : null;
+        if (!box) return;
+        var left = max - t.value.length;
+        if (left < 0) left = 0;
+        box.querySelector('span').textContent = left;
+        box.classList.toggle('warn', left <= 5);
+    });
+
+    /* ---------- Order quantity +/- (place.wml) ---------- */
+    document.addEventListener('click', function(e) {
+        var b = e.target.closest('.qty-step');
+        if (!b) return;
+        var box = b.closest('.qty-box');
+        var input = box ? box.querySelector('.qty-input') : null;
+        if (!input) return;
+        var n = parseInt(input.value, 10);
+        if (isNaN(n)) n = 1;
+        n = n + parseInt(b.getAttribute('data-step'), 10);
+        if (n < 1) n = 1;
+        input.value = n;
+    });
+
+    /* ---------- Show/hide password ---------- */
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.pw-toggle');
+        if (!btn) return;
+        var pw = document.getElementById(btn.getAttribute('data-pw'));
+        if (!pw) return;
+        var isPw = pw.type === 'password';
+        pw.type = isPw ? 'text' : 'password';
+        btn.textContent = isPw ? 'Hide' : 'Show';
+    });
+
+    /* ---------- Search (front-end live filter of loaded product cards) ---------- */
+    (function() {
+        var input = document.getElementById('searchInput');
+        if (!input) return;
+        input.addEventListener('input', function(e) {
+            var q = e.target.value.trim().toLowerCase();
+            document.querySelectorAll('.pcard').forEach(function(card) {
+                var el = card.querySelector('.pname');
+                var text = el ? el.textContent.toLowerCase() : '';
+                card.style.display = (!q || text.indexOf(q) >= 0) ? '' : 'none';
+            });
+        });
+    })();
+    </script>
+</body>
+
+</html>

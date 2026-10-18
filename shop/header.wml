@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="menu" device="sub">
+    <setvar name="i" value="0" />
+    <setvar name="j" value="0" />
+    <setvar name="k" value="0" />
+    <setvar name="p" value="0" />
+    <setvar name="x" value="0" />
+    <setvar name="y" value="0" />
+    <setvar name="mnu_id" value="[0..1023]" />
+    <setvar name="mnu_typ" value="[0..1023]" />
+    <setvar name="mnu_title" value="[0..1023]" />
+    <setvar name="mnu_icon" value="[0..1023]" />
+    <setvar name="mnu_count" value="[0..1023]" />
+    <setvar name="color" value="[0..9]" />
+    <setvar name="color[0]" value="#ffeeee" color="red" />
+    <setvar name="color[1]" value="#fff4ea" color="orange" />
+    <setvar name="color[2]" value="#ffffe3" color="yellow" />
+    <setvar name="color[3]" value="#ebffec" color="green" />
+    <setvar name="color[4]" value="#f1f4ff" color="blue" />
+    <setvar name="color[5]" value="#fcf1ff" color="purple" />
+    <setvar name="color[0]" value="#ffffff" color="red" />
+    <setvar name="color[1]" value="#ffffff" color="orange" />
+    <setvar name="color[2]" value="#ffffff" color="yellow" />
+    <setvar name="color[3]" value="#ffffff" color="green" />
+    <setvar name="color[4]" value="#ffffff" color="blue" />
+    <setvar name="color[5]" value="#ffffff" color="purple" />
+    <dbquery id="mnu">
+      <![CDATA[select pno, gid, typ, des, icon from pa where mnu='m' and gid='0000' and active>0 order by pno]]>
+    </dbquery>
+    <while cnd="not(mnu.eof)">
+      <setvar name="mnu_id[k]" value="mnu.pno" />
+      <setvar name="mnu_typ[k]" value="mnu.typ" />
+      <setvar name="mnu_title[k]" value="mnu.des" />
+      <setvar name="mnu_icon[k]" value="mnu.icon" />
+      <setvar name="i" value="0" />
+      <setvar name="p" value="k" />
+      <setvar name="k" value="k+1" />
+      <dbquery id="itm">
+        <![CDATA[select pno, gid, typ, des, icon from pa where mnu='m' and gid='$mnu.pno' and active>0 order by pno]]>
+      </dbquery>
+      <while cnd="not(itm.eof)">
+        <setvar name="mnu_id[k]" value="itm.pno" />
+        <setvar name="mnu_typ[k]" value="itm.typ" />
+        <setvar name="mnu_title[k]" value="itm.des" />
+        <setvar name="mnu_icon[k]" value="itm.icon" />
+        <invoke instance="itm" method="next" />
+        <setvar name="i" value="i+1" />
+        <setvar name="k" value="k+1" />
+      </while>
+      <setvar name="mnu_count[p]" value="i" />
+      <invoke instance="mnu" method="next" />
+      <setvar name="y" value="y+1" />
+    </while>
+    <setvar name="p" value="k" />
+    <setvar name="mnu_count[p]" value="999999" />
+    <!-- ============================== -->
+    <setvar name="i" value="0" />
+    <setvar name="j" value="0" />
+    <setvar name="k" value="0" />
+    <setvar name="QtyTotal" value="0" />
+    <setvar name="TempTotal" value="0" />
+    <setvar name="Tax" value="0" />
+    <setvar name="TotalTax" value="0" />
+    <if cnd="DEFINE(session.ord)">
+    <dbquery id="od">
+      <![CDATA[
+SELECT ss.sno, ss.itm, ss.cno, cu.cname, cu.addr1, cu.phone, cu.contact, cu.email, cu.ac, 
+  ss.pno, pa.qno, pa.gid, pa.des, pa.unit, ss.qty, ss.price, ss.rem
+FROM rn ss, cu, pa
+WHERE
+ (ss.sno = '$session.ord')
+ AND (cu.cno = ss.cno)
+ AND (pa.pno = ss.pno)
+ORDER BY ss.sno, ss.itm
+    ]]>
+    </dbquery>
+    <block name="line.aa" />
+    <while cnd="not(od.eof)">
+      <block name="line-item" />
+      <setvar name="QtyTotal" value="QtyTotal+1" />
+      <setvar name="TempTotal" value="TempTotal+od.qty*od.price" />
+      <invoke instance="od" method="next" />
+    </while>
+    <if cnd="TempTotal&gt;0">
+    <setvar name="TempTotal" value="TempTotal+90" cnd="TempTotal&lt;1000" />
+    <setvar name="Tax" value="TempTotal*5/100" />
+    <setvar name="TotalTax" value="TempTotal+Tax" />
+    </if>
+    <block name="line.zz" />
+    </if>
+    <!-- ============================== -->
+    <block name="header.aa" />
+    <block name="menu.aa" />
+    <while cnd="not(mnu_count[k]=999999)">
+      <if cnd="1">
+        <setvar name="x" value="mnu_count[k]" />
+        <setvar name="ic" value="'fa fa-th'" />
+        <setvar name="ic" value="mnu_icon[k]" cnd="len(mnu_icon[k])&gt;0" />
+        <setvar name="app" value="'grid'" />
+        <setvar name="column_count" value="ceil(x/10)" />
+        <switch exp="mnu_typ[k]">
+          <case value="b">
+            <setvar name="ic" value="ic+' text-danger'" />
+            <setvar name="app" value="'book'" />
+          </case>
+          <case value="n">
+            <setvar name="ic" value="ic+' text-info'" />
+            <setvar name="app" value="'grid'" />
+          </case>
+          <case value="p">
+            <setvar name="ic" value="ic+' text-blue'" />
+            <setvar name="app" value="'grid'" />
+          </case>
+          <default>
+            <setvar name="ic" value="ic+' text-success'" />
+            <setvar name="app" value="'grid'" />
+          </default>
+        </switch>
+      </if>
+      <block name="menu-list.aa" />
+      <setvar name="i" value="0" />
+      <setvar name="k" value="k+1" />
+      <while cnd="i&lt;x">
+        <if cnd="1">
+          <setvar name="ic" value="''" />
+          <setvar name="app" value="''" />
+          <switch exp="mnu_typ[k]">
+            <case value="b">
+              <setvar name="app" value="'book'" />
+            </case>
+            <case value="n">
+              <setvar name="app" value="'note'" />
+            </case>
+            <case value="p">
+              <setvar name="app" value="'page'" />
+            </case>
+            <case value="s">
+              <setvar name="app" value="'shop'" />
+            </case>
+            <default>
+              <setvar name="app" value="'grid'" />
+            </default>
+          </switch>
+        </if>
+        <block name="menu-item" />
+        <setvar name="i" value="i+1" />
+        <setvar name="k" value="k+1" />
+      </while>
+      <block name="menu-list.zz" />
+      <setvar name="j" value="j+1" />
+    </while>
+    <block name="menu.zz" />
+    <block name="header.zz" />
+    <!--
+    <setvar name="i" value="0"/>
+    <while cnd="i&lt;y">
+      <![CDATA[$(column[i]),$(ceil(column[i]/10)) ]]>
+      <setvar name="i" value="i+1"/>
+    </while>
+    <setvar name="i" value="0"/>
+    <while cnd="i&lt;z">
+      <![CDATA[$(mnu_title[i]) ]]>
+      <setvar name="i" value="i+1"/>
+    </while>
+    <setvar name="i" value="0"/>
+    <while cnd="i&lt;26">
+      <![CDATA[$(column[i]) ]]>
+      <setvar name="i" value="i+1"/>
+    </while>
+    <br/>
+    <setvar name="i" value="0"/>
+    <while cnd="i&lt;26">
+      <![CDATA[$(ceil(column[i]/10)) ]]>
+      <setvar name="i" value="i+1"/>
+    </while>
+-->
+  </card>
+</wml>

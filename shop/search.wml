@@ -1,0 +1,204 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="WapForm Stationery" device="wapform.html">
+    <setvar name="GG" value="''"/>
+    <setvar name="GG" value="request.gp" cnd="DEFINE(request.gp)"/>
+    <setvar name="PG" value="1"/>
+    <setvar name="PG" value="VAL(request.pg)" cnd="DEFINE(request.pg)"/>
+    <setvar name="SR" value="'az'"/>
+    <setvar name="SR" value="request.sort" cnd="DEFINE(request.sort)"/>
+    <include name="mnu.wml"/>
+    <section name="wrapper.prefix"/>
+    <go href="#sidebar"/>
+    <go href="#product"/>
+    <section name="wrapper.suffix"/>
+  </card>
+  <card id="sidebar" device="SUB">
+    <dbquery id="sub">
+      <![CDATA[select * from web where (sub='0000') and (active=1) order by id]]>
+    </dbquery>
+    <section name="avmenu.prefix"/>
+    <output dataset="sub">
+      <group>
+        <if cnd="sub.id=request.gp">
+          <operator>
+            <![CDATA[<li class="list-group-item active"><a href="product.wml?gp=$sub.id">$sub.title</a></li>]]>
+          </operator>
+          <else/>
+          <operator>
+            <![CDATA[<li class="list-group-item"><a href="product.wml?gp=$sub.id">$sub.title</a></li>]]>
+          </operator>
+        </if>
+      </group>
+    </output>
+    <section name="avmenu.suffix"/>
+  </card>
+  <card id="product" device="SUB">
+    <setvar name="I" value="1"/>
+    <setvar name="J" value="1"/>
+    <setvar name="S" value="''"/>
+    <while cnd="J&lt;LEN(GG)">
+      <if cnd="(MID(GG,J,1)='+') or (MID(GG,J,1)=' ')">
+        <setvar name="S" value="S+' AND (p.pno LIKE ''%$(MID(GG,I,J-I))%'' OR p.des LIKE ''%$(MID(GG,I,J-I))%'')'"/>
+        <setvar name="I" value="J+1"/>
+      </if>
+      <setvar name="J" value="J+1"/>
+    </while>
+    <setvar name="S" value="S+' AND (p.pno LIKE ''%$(MID(GG,I,J-I+1))%'' OR p.des LIKE ''%$(MID(GG,I,J-I+1))%'')'"/>
+    <if cnd="SR='best'">
+    <dbquery id="pa">
+      <![CDATA[
+      SELECT p.Pno, p.Qno, p.Des, p.pricea, p.pricec, p.price1, sum(s.qty) amount
+      FROM web w, pa p
+      LEFT JOIN sn s ON s.pno = p.pno
+      WHERE (w.id=p.gid) and (w.active=1) and (p.active>=1) $S
+        AND (p.pno>='2000') AND (p.pno<='9999')
+      GROUP BY p.pno
+      ORDER BY amount DESC
+      LIMIT $((PG-1)*24), 24
+    ]]>
+    </dbquery>
+    <else/>
+    <dbquery id="pa">
+      <![CDATA[
+      SELECT p.Pno, p.Qno, p.Des, p.pricea, p.pricec, p.price1 
+      FROM web w, pa p
+      WHERE (w.id=p.gid) and (w.active=1) and (p.active>=1) $S
+        AND (p.pno>='2000') AND (p.pno<='9999')
+      ORDER BY $(IF(SR='az','p.pno',IF(SR='za','p.pno desc',IF(SR='best','p.pno','p.pno'))))
+      LIMIT $((PG-1)*24), 24
+    ]]>
+    </dbquery>
+    </if>
+
+      <section name="content.prefix"/>
+      <section name="breadcrumb-search"/>
+      <section name="product.prefix"/>
+
+    <if cnd="pa.count=0">
+      <operator>
+        <![CDATA[
+    <div class="wrapper b-b">
+        <div class="alert alert-info" role="alert">No matching items were found in the database.</div>
+    </div>
+        ]]>
+      </operator>
+    </if>
+
+    <output dataset="pa">
+      <setvar name="K" value="0"/>
+      <group>
+        <setvar name="K" value="K+1"/>
+        <setvar name="K" value="1" cnd="K=5"/>
+        <if cnd="K=1"><![CDATA[<div class="col-sm-6"><div class="row">]]></if>
+        <if cnd="K=3"><![CDATA[<div class="col-sm-6"><div class="row">]]></if>
+
+        <section name="col2"/>
+
+        <if cnd="K=2"><![CDATA[</div></div>]]></if>
+        <if cnd="K=4"><![CDATA[</div></div>]]></if>
+      </group>
+      <while cnd="K&lt;4">
+        <setvar name="K" value="K+1"/>
+        <if cnd="K=1"><![CDATA[<div class="col-sm-6"><div class="row">]]></if>
+        <if cnd="K=2"><![CDATA[</div></div>]]></if>
+        <if cnd="K=3"><![CDATA[<div class="col-sm-6">]]></if>
+        <if cnd="K=4"><![CDATA[</div>]]></if>
+      </while>
+    </output>
+
+      <section name="product.suffix"/>
+      <go href="#navigator"/>
+      <section name="content.suffix"/>
+  </card>
+  <card id="mnu" device="SUB">
+    <dbquery id="mnu">
+      <![CDATA[select substring(id,1,2) sub, id, sub, title from web where active=1 order by id]]>
+    </dbquery>
+    <output dataset="mnu">
+      <![CDATA[
+  <!-- aside -->
+  <aside id="aside" class="app-aside hidden-xs bg-success dk">
+          <div class="aside-wrap">
+        <div class="navi-wrap">
+          <!-- nav -->
+          <nav ui-nav class="navi clearfix">
+            <ul class="nav">
+]]>
+      <group change="mnu.sub">
+        <setvar name="K" value="0"/>
+        <operator>
+          <![CDATA[<li><a href="product.wml?gp=$mnu.id">$mnu.title</a><ul class="nav nav-sub dk">]]>
+        </operator>
+      <group>
+        <if cnd="K&gt;0">
+          <operator>
+            <![CDATA[<li><a href="product.wml?gp=$mnu.id">$mnu.title</a></li>]]>
+          </operator>
+        </if>
+        <setvar name="K" value="K+1"/>
+      </group>
+      <![CDATA[</ul></li>]]>
+      </group>
+      <![CDATA[
+            </ul>
+          </nav>
+          <!-- nav -->
+        </div>
+      </div>
+  </aside>
+  <!-- / aside -->
+]]>
+    </output>
+  </card>
+  <card id="navigator" device="SUB">
+    <dbquery id="nav">
+      <![CDATA[
+      SELECT p.Pno, p.Qno, p.Des, p.pricea, p.pricec, p.price1 
+      FROM web w, pa p
+      WHERE (w.id=p.gid) and (w.active=1) and (p.active=1) $S
+        AND (p.pno>='2000') AND (p.pno<='9999')
+      ORDER BY p.pno
+    ]]>
+    </dbquery>
+    <output dataset="nav">
+      <setvar name="R" value="nav.count"/>
+      <setvar name="PAGES" value="CEIL(R / 24)"/>
+      <setvar name="I" value="0"/>
+      <setvar name="J" value="0"/>
+      <setvar name="L" value="1"/>
+      <setvar name="L" value="PG-1" cnd="PG&gt;1"/>
+      <setvar name="N" value="PG+1"/>
+      <setvar name="N" value="PAGES" cnd="N&gt;PAGES"/>
+      <setvar name="P" value="0"/>
+      <setvar name="P" value="PG-11" cnd="(PG-11)&gt;0"/>
+      <setvar name="P" value="PAGES-20" cnd="(PG+10)&gt;PAGES"/>
+      <section name="navigator.prefix"/>
+      <operator>
+        <![CDATA[<li><a href="search.wml?gp=$GP&pg=1">&laquo;</a></li><li><a href="search.wml?gp=$GP&pg=$L">&lt;</a></li>]]>
+      </operator>
+      <group>
+        <setvar name="I" value="I+1"/>
+        <if cnd="(I MOD 12)=1">
+          <setvar name="J" value="J+1"/>
+          <if cnd="(J&gt;=P+1) and (J&lt;=P+20)">
+            <if cnd="J&lt;&gt;PG">
+              <operator>
+                <![CDATA[<li><a href="search.wml?gp=$GP&pg=$J">$J</a></li>]]>
+              </operator>
+            </if>
+            <if cnd="J=PG">
+              <operator>
+                <![CDATA[<li class="active"><a href="#">$J <span class="sr-only">(current)</span></a></li>]]>
+              </operator>
+            </if>
+          </if>
+        </if>
+      </group>
+      <operator>
+        <![CDATA[<li><a href="search.wml?gp=$GP&pg=$N">&gt;</a></li><li><a href="search.wml?gp=$GP&pg=$PAGES">&raquo;</a></li>]]>
+      </operator>
+      <section name="navigator.suffix"/>
+    </output>
+  </card>
+</wml>

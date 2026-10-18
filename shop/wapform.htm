@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WapForm for Web — Examples</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23378ADD'/%3E%3Ctext x='16' y='23' font-size='20' font-family='sans-serif' font-weight='600' fill='%23fff' text-anchor='middle'%3EW%3C/text%3E%3C/svg%3E"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif;background:#fff;color:#2C2C2A;line-height:1.6;}
+a{color:#378ADD;text-decoration:none;}
+a:hover{text-decoration:underline;}
+code{font-family:'SF Mono','Fira Code',monospace;font-size:.82em;background:#F1EFE8;padding:.1rem .4rem;border-radius:4px;}
+
+/* ---- Navigation bar ---- */
+.nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid #E8E7E1;}
+.nav-inner{display:flex;align-items:center;height:52px;max-width:1180px;margin:0 auto;padding:0 2rem;}
+.nav-logo{font-size:1.2rem;font-weight:700;color:#2C2C2A;letter-spacing:-.01em;margin-right:auto;text-decoration:none;}
+.nav-logo span{color:#378ADD;}
+.nav-links{display:flex;align-items:center;gap:1.75rem;margin-right:1.5rem;}
+.nav-link{font-size:13px;font-weight:500;color:#5F5E5A;text-decoration:none;transition:color .12s;}
+.nav-link:hover{color:#378ADD;text-decoration:none;}
+.nav-cta{font-size:12px;font-weight:600;background:#378ADD;color:#fff;padding:.38rem 1rem;border-radius:6px;text-decoration:none;transition:background .12s;}
+.nav-cta:hover{background:#185FA5;text-decoration:none;}
+
+/* ---- Layout container ---- */
+.wrap{max-width:1180px;margin:0 auto;padding:3rem 2rem 4rem;}
+/* Narrows text pages (forms, notes) to a readable width; pages that need horizontal space, such as the chart wall, don't use it */
+.narrow{max-width:720px;margin:0 auto;}
+.wf-head{text-align:center;margin-bottom:2rem;}
+.wf-badge{display:inline-block;background:#E6F1FB;color:#185FA5;font-size:12px;font-weight:500;padding:5px 16px;border-radius:8px;margin-bottom:1rem;}
+.wf-title{font-size:clamp(22px,4vw,30px);font-weight:500;line-height:1.3;margin-bottom:.6rem;}
+.wf-sub{font-size:14px;color:#5F5E5A;line-height:1.7;}
+
+/* ---- Cards ---- */
+.card{border:1px solid #E8E7E1;border-radius:14px;padding:1.75rem;background:#fff;}
+.card-title{font-size:15px;font-weight:600;margin-bottom:.3rem;}
+.card-note{font-size:12px;color:#888780;margin-bottom:1.4rem;}
+
+/* ---- Chart wall (used by chart.wml) ---- */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.75rem;}
+.tile{border:1px solid #E8E7E1;border-radius:14px;padding:1rem;background:#fff;overflow:hidden;}
+.tile-tag{display:inline-block;font-size:11px;font-weight:600;color:#185FA5;background:#E6F1FB;padding:2px 9px;border-radius:6px;margin-bottom:.6rem;}
+.tile img{display:block;width:100%;height:auto;border-radius:8px;}
+
+/* ---- Home page example cards (used by example.wml) ---- */
+.ex-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:1.75rem;}
+.ex-card{display:block;border:1px solid #E8E7E1;border-radius:14px;padding:1.5rem;background:#fff;text-decoration:none;color:inherit;transition:border-color .12s,box-shadow .12s,transform .12s;}
+.ex-card:hover{border-color:#378ADD;box-shadow:0 4px 16px rgba(55,138,221,.12);text-decoration:none;transform:translateY(-1px);}
+.ex-card-tag{display:inline-block;font-size:11px;font-weight:600;color:#185FA5;background:#E6F1FB;padding:2px 9px;border-radius:6px;margin-bottom:.75rem;}
+.ex-card-title{font-size:16px;font-weight:600;margin-bottom:.4rem;color:#2C2C2A;}
+.ex-card-desc{font-size:13px;color:#5F5E5A;line-height:1.7;margin-bottom:1rem;}
+.ex-card-cta{font-size:12px;font-weight:600;color:#378ADD;}
+
+/* ---- Cross table (used by crosstab.wml) ---- */
+.xtab-wrap{overflow-x:auto;border:1px solid #E8E7E1;border-radius:14px;background:#fff;}
+.xtab-table{border-collapse:collapse;width:100%;font-size:12.5px;white-space:nowrap;}
+.xtab-table th,.xtab-table td{padding:.5rem .85rem;border-bottom:1px solid #F1EFE8;text-align:right;}
+.xtab-table th{background:#F7F9FC;color:#5F5E5A;font-weight:600;text-align:center;}
+.xtab-table td:first-child,.xtab-table th:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:1;width:50px;min-width:50px;max-width:50px;}
+.xtab-table th:first-child{background:#F7F9FC;z-index:2;}
+.xtab-table tr:nth-child(odd) td{background:#FAFAF8;}
+.xtab-table tr:nth-child(odd) td:first-child{background:#F5F4F0;}
+.xtab-total-row td,.xtab-total-row th{background:#EAF2FB!important;font-weight:600;border-top:2px solid #B8D6F2!important;}
+.xtab-grand-row td,.xtab-grand-row th{background:#185FA5!important;color:#fff!important;font-weight:700;border-top:3px solid #0F3D6B!important;padding-top:.75rem!important;padding-bottom:.75rem!important;}
+.xtab-grand-row td:first-child,.xtab-grand-row th:first-child{background:#185FA5!important;}
+/* Page-break marker: NewPage() inserts this <p> to make a clear visual break, but the underlying HTML at the page break
+   is not valid itself (a table opened inside a table without closing the previous one); browsers repair it, but the result
+   is not guaranteed to be clean every time — the real fix is to remove crosstab.wml's rows=/cols= attributes. */
+.newpage{margin:1.5rem 0!important;border-top:2px dashed #D0CFC9;position:relative;height:0;}
+
+/* ---- Grouped report (used by report.wml) ---- */
+.rpt-table{border-collapse:collapse;width:100%;font-size:13px;}
+.rpt-table th,.rpt-table td{padding:.5rem .75rem;border-bottom:1px solid #F1EFE8;text-align:right;}
+.rpt-table th{background:#F7F9FC;color:#5F5E5A;font-weight:600;text-align:center;}
+.rpt-table td:first-child{text-align:left;}
+.rpt-group-row td{background:#EAF2FB;color:#185FA5;font-weight:600;text-align:left;border-bottom:1px solid #D6E7F8;}
+.rpt-subgroup-row td{background:#F5FAFE;color:#3E6E96;font-weight:600;text-align:left;padding-left:1.5rem;border-bottom:1px solid #EAF2FB;}
+.rpt-subtotal-row td{background:#FAFAF8;font-weight:600;border-top:1px solid #E8E7E1;}
+.rpt-empsubtotal-row td{background:#F1F6FC;font-weight:700;border-top:1px solid #D6E7F8;}
+.rpt-grand-row td{background:#DCEBFB;font-weight:700;border-top:2px solid #378ADD;}
+
+/* ---- Form fields ---- */
+.field{margin-bottom:1.25rem;}
+.field-label{display:block;font-size:12px;font-weight:600;letter-spacing:.02em;color:#5F5E5A;margin-bottom:.45rem;}
+.field input[type=text]{width:100%;font-family:inherit;font-size:14px;color:#2C2C2A;background:#fff;border:1.5px solid #D0CFC9;border-radius:8px;padding:.6rem .8rem;transition:border-color .12s,box-shadow .12s;}
+.field input[type=text]:focus{outline:none;border-color:#378ADD;box-shadow:0 0 0 3px rgba(55,138,221,.12);}
+
+/* ---- File picker area ---- */
+.drop{position:relative;border:2px dashed #B5D4F4;background:#F7FBFF;border-radius:12px;padding:2rem 1.5rem;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;}
+.drop:hover{border-color:#378ADD;background:#EDF5FD;}
+.drop input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;}
+.drop-ic{font-size:26px;margin-bottom:.5rem;}
+.drop-main{font-size:14px;font-weight:500;color:#185FA5;margin-bottom:.25rem;}
+.drop-hint{font-size:12px;color:#888780;}
+.picked{margin-top:.9rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:.6rem;}
+.thumb{border:1px solid #E8E7E1;border-radius:8px;overflow:hidden;background:#fff;}
+.thumb img{display:block;width:100%;height:76px;object-fit:cover;}
+.thumb-icon{width:100%;height:76px;background:#F1EFE8;color:#888780;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;letter-spacing:.02em;}
+.thumb-name{font-size:10px;color:#5F5E5A;padding:.3rem .4rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ---- Buttons ---- */
+.actions{margin-top:1.6rem;display:flex;gap:.65rem;align-items:center;}
+.actions input[type=submit]{font-family:inherit;font-size:13px;font-weight:600;background:#378ADD;color:#fff;border:none;border-radius:7px;padding:.6rem 1.5rem;cursor:pointer;transition:background .12s;}
+.actions input[type=submit]:hover{background:#185FA5;}
+.actions-note{font-size:12px;color:#888780;}
+
+/* ---- Upload results ---- */
+.res{margin-bottom:2rem;}
+.res-bar{display:flex;align-items:center;gap:.55rem;background:#E1F5EE;border:1px solid #9DDFC9;border-radius:10px;padding:.7rem 1rem;font-size:13px;color:#0F6E56;margin-bottom:.75rem;}
+.res-bar b{font-weight:600;}
+.file{display:flex;align-items:center;gap:.85rem;border:1px solid #E8E7E1;border-radius:10px;padding:.75rem 1rem;margin-bottom:.5rem;background:#fff;}
+.file-ic{width:26px;height:26px;border-radius:50%;background:#E1F5EE;color:#1D9E75;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.file-thumb{width:42px;height:42px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid #E8E7E1;background:#F1EFE8;}
+/* ---- Raw PUT upload (used by upload.wml) ---- */
+.up-preview{max-width:100%;max-height:320px;border-radius:10px;border:1px solid #E8E7E1;background:#F1EFE8;display:block;}
+.code-block{font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:12px;line-height:1.75;color:#2C2C2A;background:#F7F9FC;border:1px solid #E8E7E1;border-radius:8px;padding:.75rem 1rem;margin-bottom:1.4rem;overflow-x:auto;word-break:break-all;}
+.file-body{min-width:0;flex:1;}
+.file-name{font-size:13px;font-weight:500;color:#2C2C2A;word-break:break-all;}
+.file-meta{font-size:11px;color:#888780;margin-top:.1rem;font-family:'SF Mono','Fira Code',monospace;}
+.file-no{font-size:11px;color:#888780;flex-shrink:0;}
+.alert{display:flex;align-items:center;gap:.55rem;background:#FCEDED;border:1px solid #E8B4B4;border-radius:10px;padding:.7rem 1rem;font-size:13px;color:#A32D2D;margin-bottom:.75rem;}
+
+/* ---- Footer ---- */
+.foot{border-top:1px solid #E8E7E1;margin-top:2.5rem;padding-top:1.25rem;font-size:11px;color:#a8a398;line-height:1.9;}
+.foot code{font-size:11px;}
+
+@media(max-width:960px){
+  .grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:640px){
+  .ex-grid{grid-template-columns:1fr;}
+}
+@media(max-width:560px){
+  .grid{grid-template-columns:1fr;}
+}
+@media(max-width:480px){
+  .wrap{padding:2rem 1.25rem 3rem;}
+  .card{padding:1.25rem;}
+  .nav-inner{padding:0 1.25rem;}
+  .nav-links{gap:1rem;margin-right:.75rem;}
+  .nav-link{font-size:12px;}
+  .nav-cta{padding:.34rem .8rem;}
+}
+@media(max-width:400px){
+  .nav-inner{flex-wrap:wrap;height:auto;padding:.6rem 1.25rem;}
+  .nav-links{gap:.6rem .9rem;margin-right:0;order:3;width:100%;flex-wrap:wrap;}
+}
+@media print{
+  /* Browsers drop background colors when printing by default; this forces the on-screen colors to print,
+     otherwise the shaded TOTAL/AMOUNT design would disappear or fade in a PDF. */
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
+  .nav,.nav-cta{display:none!important;}
+  .xtab-wrap{overflow:visible!important;border:none!important;}
+  .xtab-table td:first-child,.xtab-table th:first-child{position:static!important;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="example.wml">Wap<span>Form</span></a>
+    <div class="nav-links">
+      <a class="nav-link" href="multiupload.wml">Upload</a>
+      <a class="nav-link" href="chart.wml">Charts</a>
+      <a class="nav-link" href="crosstab.wml">Cross Analysis</a>
+      <a class="nav-link" href="report.wml">Grouped Report</a>
+      <a class="nav-link" href="linepush.wml?push_userid=&amp;push_text=">LINE Push</a>
+      <a class="nav-link" href="function.wml">Function Test</a>
+    </div>
+    <a class="nav-cta" href="example.wml">Home</a>
+  </div>
+</nav>
+
+<div class="wrap">
+<!-- main.prefix -->
+<!-- main.suffix -->
+</div>
+
+<script>
+// After files are chosen, show thumbnail previews; this is purely front-end (URL.createObjectURL, the files are not sent)
+// and does not affect the actual upload. Non-image files (such as pdf/docx) have no thumbnail and show a small icon card
+// instead, rather than a plain-text list of file names.
+document.addEventListener('change', function (e) {
+  if (!e.target.matches('input[type=file]')) return;
+  var box = document.getElementById('picked');
+  if (!box) return;
+
+  // Before showing a new batch, release the blob URLs used for the previous thumbnails, so browser memory does not build up
+  var old = box.querySelectorAll('img[data-blob]');
+  for (var k = 0; k < old.length; k++) URL.revokeObjectURL(old[k].src);
+
+  box.innerHTML = '';
+  var fs = e.target.files;
+  if (!fs || !fs.length) return;
+
+  for (var i = 0; i < fs.length; i++) {
+    var f = fs[i];
+    var card = document.createElement('div');
+    card.className = 'thumb';
+
+    if (f.type && f.type.indexOf('image/') === 0) {
+      var img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      img.dataset.blob = '1';
+      card.appendChild(img);
+    } else {
+      var icon = document.createElement('div');
+      icon.className = 'thumb-icon';
+      icon.textContent = (f.name.split('.').pop() || '').slice(0, 4).toUpperCase();
+      card.appendChild(icon);
+    }
+
+    var name = document.createElement('div');
+    name.className = 'thumb-name';
+    name.textContent = f.name;
+    card.appendChild(name);
+
+    box.appendChild(card);
+  }
+});
+</script>
+
+</body>
+</html>

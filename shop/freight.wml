@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="how" device="wapform.html">
+    <include name="mnu.wml"/>
+    <section name="wrapper.prefix"/>
+    <![CDATA[
+<div class="bg-light lter b-b wrapper-md">
+  <h1 class="m-n font-thin h3">Shipping:</h1>
+</div>
+<div class="wrapper-md" style="height:500px;">
+  <div class="row">
+    <div class="col-lg-3">
+      <div class="panel panel-default">
+        <div class="panel-body">
+<ul class="folder-list" style="padding:0">
+<li><a href="process.wml">Ordering Process</a></li>
+<li><a href="manual.wml">How to Order Online</a></li>
+<li><a href="faq.wml">Terms of Sale</a></li>
+<li><a href="payment.wml">Payment Methods</a></li>
+<li><a href="freight.wml">Shipping</a></li>
+<li><a href="return.wml">Returns &amp; Exchanges</a></li>
+</ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-9">
+      <div class="panel panel-default">
+        <div class="panel-body art-main">
+
+<div id="faq">
+
+<p><a name="2"></a><font color="#FF0000">Shipping</font></p>
+<ol class="decimal">
+  <li>Orders of <b><font color="#FF0000">1000</font></b> or more ship free (copy paper excluded).</li>
+  <li>Orders under <b><font color="#FF0000">1000</font></b> pay a shipping fee of <b><font color="#FF0000">90</font></b> (all amounts exclude tax).</li>
+  <li><font color="#0000FF">Remote areas</font> have a shipping surcharge (based on the courier's rates; please call us).</li>
+</ol>
+
+</div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+]]>
+    <section name="wrapper.suffix"/>
+  </card>
+  <card id="mnu" device="SUB">
+    <dbquery id="mnu">
+      <![CDATA[select substring(id,1,2) sub, id, sub, title from web where active=1 order by id]]>
+    </dbquery>
+    <output dataset="mnu">
+      <![CDATA[
+  <!-- aside -->
+  <aside id="aside" class="app-aside hidden-xs bg-success dk">
+          <div class="aside-wrap">
+        <div class="navi-wrap">
+          <!-- nav -->
+          <nav ui-nav class="navi clearfix">
+            <ul class="nav">
+]]>
+      <group change="mnu.sub">
+        <setvar name="K" value="0"/>
+        <operator>
+          <![CDATA[<li><a href="product.wml?gp=$mnu.id">$mnu.title</a><ul class="nav nav-sub dk">]]>
+        </operator>
+      <group>
+        <if cnd="K&gt;0">
+          <operator>
+            <![CDATA[<li><a href="product.wml?gp=$mnu.id">$mnu.title</a></li>]]>
+          </operator>
+        </if>
+        <setvar name="K" value="K+1"/>
+      </group>
+      <![CDATA[</ul></li>]]>
+      </group>
+      <![CDATA[
+            </ul>
+          </nav>
+          <!-- nav -->
+        </div>
+      </div>
+  </aside>
+  <!-- / aside -->
+]]>
+    </output>
+  </card>
+</wml>

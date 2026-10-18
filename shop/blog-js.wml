@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="WapForm Stationery" type="sub">
+    <setvar name="perPage" value="10"/>
+    <setvar name="page" value="1"/>
+    <setvar name="page" value="VAL(request.page)" cnd="DEFINE(request.page)"/>
+    <setvar name="start" value="(page-1)*perPage"/>
+    <setvar name="start" value="0" cnd="start&lt;0"/>
+
+    <dbquery id="topic">SELECT * FROM topic ORDER BY topic_id</dbquery>
+
+    <setvar name="rowcount" value="topic.count"/>
+
+    <dbquery id="topic">SELECT * FROM topic ORDER BY topic_id DESC LIMIT $start, $perPage</dbquery>
+
+    <setvar name="pages" value="ceil(rowcount/perPage)"/>
+
+    <![CDATA[<input type="hidden" class="pagenum" value="$page"/><input type="hidden" class="total" value="$pages"/>]]>
+
+    <output dataset="topic">
+      <setvar name="I" value="0"/>
+      <setvar name="J" value="0"/>
+      <setvar name="K" value="0"/>
+      <setvar name="N" value="0"/>
+      <setvar name="S" value="''"/>
+      <setvar name="X" value="'a007'"/>
+      <setvar name="Y" value="''"/>
+      <setvar name="Z" value="''"/>
+      <group>
+        <setvar name="K" value="0"/>
+        <setvar name="N" value="N+1"/>
+        <setvar name="S" value="topic.topic_text"/>
+ 
+        <if cnd="DEFINE(session.usr)">
+          <if cnd="session.usr='admin@wapform.com'">
+            <setvar name="K" value="1"/>
+          </if>
+        </if>
+
+        <if cnd="K=1">
+<![CDATA[
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="message-box" id="message_$topic.topic_id">
+            <div>
+              <button class="btn btn-sm u-btn-darkgray" name="edit" onClick="showEditBox(this,$topic.topic_id)">Edit</button>
+              <button class="btn btn-sm u-btn-darkgray" name="delete" onClick="callCrudAction('delete',$topic.topic_id)">Delete</button>
+            </div>
+            <div>$topic.topic_time</div>
+            <div class="message-content">$S</div>
+          </div>
+        </div>
+      </div>
+]]>
+          <else/>
+          <!-- HEX -->
+          <setvar name="I" value="0"/>
+          <setvar name="L" value="' '"/>
+          <setvar name="C" value="''"/>
+          <setvar name="X" value="''"/>
+          <setvar name="Y" value="''"/>
+          <setvar name="Z" value="S"/>
+
+      <while cnd="I&lt;LEN(S)">
+        <setvar name="I" value="I+1"/>
+        <setvar name="C" value="MID(S,I,1)"/>
+        <break cnd="(C&lt;&gt;' ')"/>
+      </while>
+      <if cnd="C='#'">
+        <setvar name="X" value="''"/>
+        <while cnd="I&lt;LEN(S)">
+          <setvar name="I" value="I+1"/>
+          <setvar name="C" value="MID(S,I,1)"/>
+          <if cnd="ASC(C)=32">
+            <setvar name="I" value="I+1"/>
+            <break/>
+          </if>
+          <if cnd="ASC(C)=13">
+            <setvar name="I" value="I+1"/>
+            <setvar name="I" value="I+1"/>
+            <break/>
+          </if>
+          <if cnd="ASC(C)=10">
+            <setvar name="I" value="I+1"/>
+            <break/>
+          </if>
+          <setvar name="X" value="X+C"/>
+        </while>
+      </if>
+      <setvar name="Z" value="MID(S,I,LEN(S)-I+1)"/>
+          <!-- HEX -->
+            <![CDATA[
+<div class="card mb-5">
+<div class="card-body">
+<div class="article">
+      <div>$topic.topic_time</div>
+      <div class="message-content">$Z</div>
+</div>
+</div>
+</div>
+]]>
+        </if>
+      </group>
+    </output>
+  </card>
+</wml>

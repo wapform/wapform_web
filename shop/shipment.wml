@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P1" title="Shipping Order" device="wapform.html">
+    <setvar name="color" value="[0..9]" />
+    <setvar name="color[0]" value="#ffeeee" color="red" />
+    <setvar name="color[1]" value="#fff4ea" color="orange" />
+    <setvar name="color[2]" value="#ffffe3" color="yellow" />
+    <setvar name="color[3]" value="#ebffec" color="green" />
+    <setvar name="color[4]" value="#f1f4ff" color="blue" />
+    <setvar name="color[5]" value="#fcf1ff" color="purple" />
+    <setvar name="color[0]" value="#ffffff" color="red" />
+    <setvar name="color[1]" value="#ffffff" color="orange" />
+    <setvar name="color[2]" value="#ffffff" color="yellow" />
+    <setvar name="color[3]" value="#ffffff" color="green" />
+    <setvar name="color[4]" value="#ffffff" color="blue" />
+    <setvar name="color[5]" value="#ffffff" color="purple" />
+    <setvar name="total" value="0" />
+    <setvar name="tax" value="0" />
+    <dbquery id="sys">select * from sys</dbquery>
+    <block name="wapform.aa" />
+    <block name="onpage" />
+    <block name="wapform.zz" />
+  </card>
+  <card id="slider" device="sub">
+  </card>
+  <card id="breadcrumb" device="sub">
+  </card>
+  <card id="content" device="sub">
+    <dbquery id="od">
+      <![CDATA[
+SELECT ss.sno, ss.itm, ss.sdate, ss.cno, cu.cname, cu.addr1, cu.phone, cu.fax, cu.contact, cu.email, cu.ac, cu.rem curem, 
+  ss.pno, pa.Sub, pa.des, pa.unit, ss.qty, ss.price, pa.price1, ss.qty*ss.price total, ss.rem
+FROM rn ss, cu, pa
+WHERE
+ (ss.sno = '$session.ord')
+ AND (cu.cno = ss.cno)
+ AND (pa.pno = ss.pno)
+ORDER BY pa.Sub, ss.sno, ss.itm
+    ]]>
+    </dbquery>
+    <block name="invoice.aa" />
+    <block name="invoice-list.aa" />
+    <output dataset="od">
+      <setvar name="I" value="0" />
+      <setvar name="TempTotal" value="0" />
+      <group change="od.sub">
+        <setvar name="I" value="0" />
+        <group>
+          <block name="invoice-item" />
+          <setvar name="I" value="I+1" />
+          <setvar name="TempTotal" value="TempTotal+od.qty*od.price" />
+        </group>
+      </group>
+      <if cnd="TempTotal&lt;1000">
+        <setvar name="TempTotal" value="TempTotal+90" />
+        <block name="invoice-1000" />
+      </if>
+      <setvar name="Tax" value="TempTotal*5/100" />
+    </output>
+    <block name="invoice-list.zz" />
+    <block name="invoice-print" />
+    <block name="invoice.zz" />
+  </card>
+</wml>

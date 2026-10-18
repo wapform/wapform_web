@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="Detail" device="wapform.html">
+    <setvar name="gp" value="0"/>
+    <setvar name="gp" value="VAL(request.gp)" cnd="DEFINE(request.gp)"/>
+    <dbquery id="sys">
+      select * from sys
+    </dbquery>
+    <dbquery id="pa">
+      <![CDATA[select pno, qno, des, unit, topic from pa where pno = '$request.id']]>
+    </dbquery>
+
+    <block name="wapform.aa"/>
+    <![CDATA[
+<div class="mt-3 text-center">
+<a href="javascript:void(0)" onclick="window.close()">
+  <img src="http://61.219.149.75:90/images/big/$((gp div 100)*100)/$gp/$(pa.pno).jpg" alt="Click the image to close the window" width="300" height="300" class="border-0 mb-3"/></a>
+<div class="mb-2">$pa.pno</div>
+<div class="mb-3">$pa.des</div>
+<button type="button" class="btn btn-outline-success" onclick="window.close()">Close</button>
+</div>
+]]>
+    <block name="wapform.zz"/>
+  </card>
+</wml>

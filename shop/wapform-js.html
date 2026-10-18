@@ -1,0 +1,158 @@
+﻿                        <!-- grid.aa -->
+<!-- grid-list.aa -->
+                        <div class="d-flex justify-content-between align-items-center border-bottom border-color-1 flex-lg-nowrap flex-wrap mb-4">
+                            <h3 class="section-title section-title__full mb-0 pb-2 font-size-22">$category $gp</h3>
+                        </div>
+                        <ul class="row list-unstyled products-group no-gutters mb-6">
+<!-- grid-root.aa -->
+                            <li class="col-6 col-md-2gdot4 product-item">
+                                <div class="product-item__outer h-100 w-100">
+                                    <div class="product-item__inner px-xl-4 p-3">
+                                        <div class="product-item__body pb-xl-2">
+                                            <div class="mb-2">
+                                                <a href="grid.wml?gp=$mnu.id" class="d-block text-center"><img class="img-fluid" src="assets/img/300X300/img8.jpg" alt="Image Description"></a>
+                                            </div>
+                                            <h5 class="text-center mb-1 product-item__title"><a href="javascript:loadDoc('index-js.wml?gp=$mnu.id&az=az')" class="font-size-15 text-gray-90">$(mnu.title)</a></h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+<!-- grid-root.zz -->
+<!-- grid-item.aa -->
+                            <li class="col-6 col-md-2gdot4 product-item">
+                                <div class="product-item__outer h-100 w-100">
+                                    <div class="product-item__inner px-xl-4 p-3">
+                                        <div class="product-item__body pb-xl-2">
+                                            <div class="mb-2">
+                                                <a href="index.wml?gp=$mnu.id&az=az" class="d-block text-center"><img class="img-fluid" src="assets/img/300X300/img8.jpg" alt="Image Description"></a>
+                                            </div>
+                                            <h5 class="text-center mb-1 product-item__title"><a href="javascript:loadDoc('index-js.wml?gp=$mnu.id&az=az')" class="font-size-15 text-gray-90">$(mnu.title)</a></h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+<!-- grid-item.zz -->
+                        </ul>
+<!-- grid-list.zz -->
+                        <!-- grid.zz -->
+
+                        <!-- shop-control-bar.aa -->
+                        <div class="bg-gray-1 flex-center-between borders-radius-9 py-1">
+                            <div class="d-xl-none">
+                                <!-- Account Sidebar Toggle Button -->
+                                <a id="sidebarNavToggler1" class="btn btn-sm py-1 font-weight-normal" href="javascript:;" role="button"
+                                    aria-controls="sidebarContent1"
+                                    aria-haspopup="true"
+                                    aria-expanded="false"
+                                    data-unfold-event="click"
+                                    data-unfold-hide-on-scroll="false"
+                                    data-unfold-target="#sidebarContent1"
+                                    data-unfold-type="css-animation"
+                                    data-unfold-animation-in="fadeInLeft"
+                                    data-unfold-animation-out="fadeOutLeft"
+                                    data-unfold-duration="500">
+                                    <i class="fas fa-sliders-h"></i> <span class="ml-1">Filters</span>
+                                </a>
+                                <!-- End Account Sidebar Toggle Button -->
+                            </div>
+                            <div class="px-3 d-none d-xl-block">
+                                <ul class="nav nav-tab-shop" id="pills-tab" role="tablist">
+                                    <li class="nav-item">
+                                            <div class="d-md-flex justify-content-md-center align-items-md-center">
+                                                <i class="fa fa-th"></i>
+                                            </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="d-flex">
+                                <form method="post">
+                                    <!-- Select -->
+                                    <select class="js-select selectpicker dropdown-select max-width-200 max-width-160-sm right-dropdown-0 px-2 px-xl-0"
+                                        data-style="btn-sm bg-white font-weight-normal py-2 border text-gray-20 bg-lg-down-transparent border-lg-down-0" onchange="myChangeHandler.apply(this)">
+                                        <option value="/index.wml?gp=$gp&sort=aa">Best sellers</option>
+                                        <option value="/index.wml?gp=$gp&sort=za">Newest first</option>
+                                        <option value="/index.wml?gp=$gp&sort=az">Oldest first</option>
+                                    </select>
+                                    <!-- End Select -->
+                                </form>
+                                <form method="POST" class="ml-2 d-none d-xl-block">
+                                    <!-- Select -->
+                                    <select class="js-select selectpicker dropdown-select max-width-120"
+                                        data-style="btn-sm bg-white font-weight-normal py-2 border text-gray-20 bg-lg-down-transparent border-lg-down-0">
+                                        <option value="one" selected>Show 20</option>
+                                        <option value="two">Show 40</option>
+                                        <option value="three">Show All</option>
+                                    </select>
+                                    <!-- End Select -->
+                                </form>
+                            </div>
+                            <nav class="px-3 flex-horizontal-center text-gray-20 d-none d-xl-flex">
+                                <form method="post" class="min-width-50 mr-1">
+                                    <input size="2" min="1" max="3" step="1" type="number" class="form-control text-center px-2 height-35" value="1">
+                                </form> of 3
+                                <a class="text-gray-30 font-size-20 ml-2" href="#">→</a>
+                            </nav>
+                        </div>
+                        <!-- shop-control-bar.zz -->
+
+                        <!-- shop.aa -->
+                        <dv class="d-flex justify-content-between border-bottom border-color-1 flex-md-nowrap flex-wrap border-sm-bottom-0">
+                            <h3 class="section-title section-title__full mb-0 pb-2 font-size-22">$category</h3>
+                        </dv>
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade pt-2 show active" id="pills-one-example1" role="tabpanel" aria-labelledby="pills-one-example1-tab" data-target-group="groups">
+                                <!-- shop-list.aa -->
+                                <ul class="row list-unstyled products-group no-gutters">
+                                    <!-- shop-item.aa -->
+                                    <li class="col-6 col-md-3 col-wd-2gdot4 product-item">
+                                        <div class="product-item__outer h-100 text-center">
+                                            <div class="product-item__inner px-xl-4 p-3">
+                                                <div class="product-item__body pb-xl-2">
+                                                    <div class="font-size-12 text-gray-5">$pa.pno</div>
+                                                    <h5 class="product-item__title mb-1"><a href="javascript:void(0)" onclick="openwin('detail.wml?gp=$(MID(pa.pno,1,4))&id=$pa.pno',450,450)" class="text-blue font-weight-bold">$(pa.des)</a></h5>
+                                                    <div class="mb-1">
+                                                        <a href="javascript:void(0)" onclick="openwin('detail.wml?gp=$(MID(pa.pno,1,4))&id=$pa.pno',450,450)" class="d-block text-center"><img class="img-fluid" src="http://61.219.149.75:90/images/$(MID(pa.pno,1,2)+'00')/$(MID(pa.pno,1,4))/$(pa.qno).jpg" width="135" height="135" alt="Image Description"></a>
+                                                    </div>
+                                                    <div class="text-gray-100 mb-1"><div style="height:25px;font-size:14px;overflow:hidden;word-break:break-all;">List $pa.pricec / Special <span style="color:red;">$(IF(pa.pricea>pa.price1,99999,pa.price1))</span></div></div>
+                                                    <div><button type="button" class="btn btn-success btn-sm">Order</button></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!-- shop-item.zz -->
+                                </ul>
+                                <!-- shop-list.zz -->
+                            </div>
+                        </div>
+                        <!-- shop.zz -->
+
+                        <!-- pagination.aa -->
+                        <nav class="d-md-flex justify-content-between align-items-center border-top pt-3" aria-label="Page navigation example">
+                            <div class="text-center text-md-left mb-3 mb-md-0">$R items, page $PG of $PAGES</div>
+                            <ul class="pagination mb-0 pagination-shop justify-content-center justify-content-md-start">
+                                <!-- page-item.aa -->
+                                <li class="page-item">
+                                  <a class="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                  </a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                <li class="page-item"><a class="page-link" href="#">5</a></li>
+                                <li class="page-item"><a class="page-link" href="#">6</a></li>
+                                <li class="page-item"><a class="page-link" href="#">7</a></li>
+                                <li class="page-item"><a class="page-link" href="#">8</a></li>
+                                <li class="page-item"><a class="page-link" href="#">9</a></li>
+                                <li class="page-item">
+                                  <a class="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                  </a>
+                                </li>
+                                <!-- page-item.zz -->
+                            </ul>
+                        </nav>
+                        <!-- pagination.zz -->

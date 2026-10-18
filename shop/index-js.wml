@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" title="WapForm Stationery" device="wapform-js.html">
+    <setvar name="gp" value="'0000'"/>
+    <setvar name="gp" value="request.gp" cnd="define(request.gp)"/>
+    <setvar name="pg" value="1"/>
+    <setvar name="pg" value="val(request.pg)" cnd="define(request.pg)"/>
+    <setvar name="az" value="'zz'"/>
+    <setvar name="az" value="request.az" cnd="define(request.az)"/>
+    <setvar name="category" value="'Specials'"/>
+    <setvar name="B" value="0"/>
+
+    <if cnd="DEFINE(session.usr)">
+      <setvar name="B" value="1" cnd="session.usr='admin'"/>
+    </if>
+    <if cnd="NOT(DEFINE(request.gp))">
+      <dbquery>
+        <![CDATA[update counter set no=no+1]]>
+      </dbquery>
+    </if>
+
+    <dbquery id="sys">select * from sys</dbquery>
+    <dbquery id="counter">select no from counter</dbquery>
+
+    <dbquery id="grp">select id, title, href from menu where id='$gp'</dbquery>
+
+    <if cnd="az='aa'">
+    <![CDATA[qq]]>
+    <dbquery id="pa">
+      <![CDATA[
+      select p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1, sum(s.qty) amount
+      from pa p
+      left join sn s on s.pno = p.pno
+      where (p.gid = $gp) and (p.active>0) 
+        and (p.pno>='1000') and (p.pno<='9999')
+      group by p.pno
+      order by amount desc
+      limit $((pg-1)*20), 20
+]]>
+    </dbquery>
+    </if>
+
+    <if cnd="az='az'">
+    <![CDATA[az]]>
+    <dbquery id="pa">
+      <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1 from pa p
+      where (p.gid='$gp') and (p.active>0) 
+        and (p.pno>='1000') and (p.pno<='9999')
+      order by p.pno
+      limit $((pg-1)*20), 20
+]]>
+    </dbquery>
+    </if>
+
+    <if cnd="az='za'">
+    <![CDATA[za]]>
+    <dbquery id="pa">
+      <![CDATA[
+      select p.sid sub, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1 from pa p
+      where (p.gid='$gp') and (p.active>0) 
+        and (p.pno>='1000') and (p.pno<='9999')
+      order by p.pno desc
+      limit $((pg-1)*20), 20
+]]>
+    </dbquery>
+    </if>
+
+    <if cnd="az='zz'">
+    <dbquery id="pa">
+      <![CDATA[
+      select 'a' sub, p.active, p.pno, p.qno, p.des, p.pricea, p.pricec, p.price1 from pa p 
+      where (p.active>1) and (p.pno>='2000') and (p.pno<='9999') order by p.active limit $((pg-1)*20), 20
+]]>
+    </dbquery>
+    </if>
+
+    <dbgroup dataset="pa">
+      <setvar name="row" value="0"/>
+      <setvar name="col" value="0"/>
+      <block name="shop.aa"/>
+      <group change="pa.sub">
+        <setvar name="col" value="0"/>
+        <block name="shop-list.aa"/>
+        <group>
+          <block name="shop-item"/>
+        </group>
+        <block name="shop-list.zz"/>
+      </group>
+      <block name="shop.zz"/>
+    </dbgroup>
+
+    <go href="#navigator"/>
+  </card>
+  <card id="navigator" device="SUB">
+    <dbquery id="nav">
+      <![CDATA[
+      SELECT p.Pno, p.Qno, p.Des, p.pricea, p.pricec, p.price1 FROM pa p
+      WHERE (p.active>1) 
+        AND (p.pno>='2000') AND (p.pno<='9999')
+      ORDER BY p.active
+    ]]>
+    </dbquery>
+    <output dataset="nav">
+      <setvar name="R" value="nav.count"/>
+      <setvar name="PAGES" value="CEIL(R/24)"/>
+      <setvar name="I" value="0"/>
+      <setvar name="J" value="0"/>
+      <setvar name="L" value="1"/>
+      <setvar name="L" value="PG-1" cnd="PG&gt;1"/>
+      <setvar name="N" value="PG+1"/>
+      <setvar name="N" value="PAGES" cnd="N&gt;PAGES"/>                                    
+      <setvar name="P" value="0"/>
+      <setvar name="P" value="PG-11" cnd="(PG-11)&gt;0"/>
+      <setvar name="P" value="PAGES-20" cnd="(PG+10)&gt;PAGES"/>
+      <section name="pagination.prefix"/>
+      <![CDATA[<li class="page-item"><a class="page-link" href="javascript:loadDoc('index-js.wml?pg=1')">&laquo;</a></li><li class="page-item"><a class="page-link" href="javascript:loadDoc('index-js.wml?pg=$L')">&lt;</a></li>]]>
+      <group>
+        <setvar name="I" value="I+1"/>
+        <if cnd="(I MOD 12)=1">
+          <setvar name="J" value="J+1"/>
+          <if cnd="(J&gt;=P+1) and (J&lt;=P+20)">
+            <if cnd="J&lt;&gt;PG">
+              <![CDATA[<li class="page-item"><a class="page-link" href="javascript:loadDoc('index-js.wml?pg=$J')">$J</a></li>]]>
+            </if>
+            <if cnd="J=PG">
+              <![CDATA[<li class="page-item active"><a class="page-link" href="#">$J<span class="sr-only">(current)</span></a></li>]]>
+            </if>
+          </if>
+        </if>
+      </group>
+      <![CDATA[<li class="page-item"><a class="page-link" href="javascript:loadDoc('index-js.wml?pg=$N')">&gt;</a></li><li class="page-item"><a class="page-link" href="javascript:loadDoc('index-js.wml?pg=$PAGES')">&raquo;</a></li>]]>
+      <section name="pagination.suffix"/>
+    </output>
+  </card>
+</wml>

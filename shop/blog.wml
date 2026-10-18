@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<wml>
+  <card id="P" device="wapform.html">
+    <setvar name="gp" value="'2902'"/>
+    <setvar name="gp" value="request.gp" cnd="define(request.gp)"/>
+    <setvar name="pg" value="1"/>
+    <setvar name="pg" value="val(request.pg)" cnd="define(request.pg)"/>
+    <setvar name="az" value="'az'"/>
+    <setvar name="az" value="request.sort" cnd="define(request.sort)"/>
+    <setvar name="i" value="0"/>
+    <setvar name="s" value="'Product Info'"/>
+    <setvar name="b" value="0"/>
+    <setvar name="gtitle" value="mid(gp,1,2)+'00'"/>
+    <setvar name="breadcrumb" value="'User Manual'"/>
+
+    <if cnd="DEFINE(session.usr)">
+      <setvar name="B" value="1" cnd="session.usr='admin'"/>
+    </if>
+
+    <dbquery id="sys">select * from sys</dbquery>
+
+    <block name="wapform.aa"/>
+    <include name="header"/>
+    <block name="normal.aa"/>
+    <go href="#breadcrumb"/>
+    <block name="content.aa"/>
+    <block name="onpage"/>
+    <block name="content.zz"/>
+    <block name="normal.zz"/>
+    <include name="footer"/>
+    <block name="wapform.zz"/>
+  </card>
+
+  <card id="breadcrumb" device="sub">
+<![CDATA[
+            <div class="bg-gray-13 bg-md-transparent">
+                <div class="container">
+                    <div class="my-md-3">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-3 flex-nowrap flex-xl-wrap overflow-auto overflow-xl-visble">
+                                <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1"><a href="index.wml">Home</a></li>
+                                <li class="breadcrumb-item flex-shrink-0 flex-xl-shrink-1 active" aria-current="page">Latest News</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+]]>
+  </card>
+
+  <card id="content" device="sub">
+    <![CDATA[
+    <div class="row justify-content-center mt-5">
+    	<div class="col-md-8">
+          <div id="faq-result">
+    ]]>
+
+    <setvar name="C" value="[0..9]"/>
+    <setvar name="C[0]" value="#00aedb"/>
+    <setvar name="C[1]" value="#a200ff"/>
+    <setvar name="C[2]" value="#f47835"/>
+    <setvar name="C[3]" value="#d41243"/>
+    <setvar name="C[4]" value="#8ec127"/>
+    <setvar name="C[0]" value="#ffeeee"/>
+    <setvar name="C[1]" value="#fff4ea"/>
+    <setvar name="C[2]" value="#ffffe3"/>
+    <setvar name="C[3]" value="#ebffec"/>
+    <setvar name="C[4]" value="#f1f4ff"/>
+
+    <dbquery id="topic">SELECT * FROM topic ORDER BY topic_id DESC LIMIT 10</dbquery>
+
+    <dbgroup dataset="topic">
+      <setvar name="i" value="0"/>
+      <group>
+            <![CDATA[
+                                                <div class="card card-custom gutter-b mb-5" _style="background-color:$('#'+COLOR2HEX(C[I mod 5]));">
+                                                    <!--begin::Body-->
+                                                    <div class="card-body">
+                                                        <!--begin::Top-->
+                                                        <div class="d-flex align-items-center">
+                                                            <!--begin::Symbol-->
+                                                            <div class="symbol symbol-40 symbol-light-success mr-5">
+                                                                <span class="symbol-label">
+                                                                    <img src="assets/media/svg/avatars/047-girl-25.svg" class="h-75 align-self-end" alt="" />
+                                                                </span>
+                                                            </div>
+                                                            <!--end::Symbol-->
+                                                            <!--begin::Info-->
+                                                            <div class="d-flex flex-column flex-grow-1">
+                                                                <a href="#" class="text-dark-75 text-hover-primary mb-1 font-size-lg font-weight-bolder">Ruby Liam</a>
+                                                                <span class="text-muted font-weight-bold">$topic.topic_time</span>
+                                                            </div>
+                                                            <!--end::Info-->
+                                                        </div>
+                                                        <!--end::Top-->
+                                                        <!--begin::Bottom-->
+                                                        <div class="pt-4">
+                                                            <!--begin::Image-->
+                                                            <div class="bgi-no-repeat bgi-size-cover rounded min-h-265px" style="background-image: url(images/5.jpg)"></div>
+                                                            <!--end::Image-->
+                                                            <!--begin::Text-->
+                                                            <p class="text-dark-75 font-size-lg font-weight-normal pt-5 mb-2">$topic.topic_text</p>
+                                                            <!--end::Text-->
+                                                        </div>
+                                                        <!--end::Bottom-->
+                                                        <!--begin::Separator-->
+                                                        <div class="separator separator-solid mt-2 mb-4"></div>
+                                                        <!--end::Separator-->
+                                                    </div>
+                                                    <!--end::Body-->
+                                                </div>
+
+]]>
+
+        <setvar name="i" value="i+1"/>
+      </group>
+    </dbgroup>
+
+    <![CDATA[
+          </div>
+        </div>
+    </div>
+    ]]>
+  </card>
+</wml>
