@@ -123,7 +123,7 @@ CharHeight=13
 ; Unicode (UTF-8 / utf8mb4) database connection: keep this line for
 ; utf8mb4 databases such as the sample; the line itself switches it on.
 unicode=yes
-; Interface language: en, tw or jp (default en); translations in language.txt
+; Interface language: en, tw or jp (default en)
 language=en
 ; LINE Messaging API - only for the LINE samples (linebot, linepush)
 line_bot_id=
@@ -142,20 +142,13 @@ line_channel_access_token=</pre>
 <tr><td><code>charwidth</code></td><td><code>7</code></td><td><em>Optional</em> (default 7). Width of one character cell in pixels, used to convert WML widths given in characters</td></tr>
 <tr><td><code>charheight</code></td><td><code>13</code></td><td><em>Optional</em> (default 13). Height of one character cell in pixels, used for row heights and layout</td></tr>
 <tr><td><code>unicode</code></td><td><code>yes</code></td><td><em>Optional</em>, but keep it for utf8mb4 databases such as the sample: the presence of the line switches Unicode on (the value is not checked); without it the connection is not Unicode. Connect and store data as Unicode (UTF-8 / utf8mb4); keep <code>yes</code> for new databases</td></tr>
-<tr><td><code>language</code></td><td><code>en</code></td><td><em>Optional</em> (default en). Interface language of WapForm Toolkit / Runtime: <code>en</code> (English, default), <code>tw</code> (Traditional Chinese) or <code>jp</code> (Japanese). Built-in captions (navigator bar, search bar) are translated automatically; other texts come from <code>language.txt</code> (below)</td></tr>
+<tr><td><code>language</code></td><td><code>en</code></td><td><em>Optional</em> (default en). Interface language of WapForm Toolkit / Runtime: <code>en</code> (English, default), <code>tw</code> (Traditional Chinese) or <code>jp</code> (Japanese). Built-in captions (navigator bar, search bar) are translated automatically</td></tr>
 <tr><td><code>line_bot_id</code></td><td>(empty)</td><td><em>Optional</em> (LINE samples only). LINE Official Account ID (used by the linebot and linepush samples)</td></tr>
 <tr><td><code>line_channel_secret</code></td><td>(empty)</td><td><em>Optional</em> (LINE samples only). LINE Messaging API channel secret, verifies the webhook signature (<code>X-Line-Signature</code>)</td></tr>
 <tr><td><code>line_channel_access_token</code></td><td>(empty)</td><td><em>Optional</em> (LINE samples only). LINE channel access token for the push / reply API</td></tr>
 <tr><td><code>loginusr</code> / <code>loginpwd</code></td><td><code>admin</code> / <code>123</code></td><td>Only in <code>shop\wapform.ini</code>: default sign-in of the store's management pages</td></tr>
 </table>
 <div class="warn"><code>wapform.ini</code> holds the database password and LINE keys: never publish it on a website or commit it to GitHub. IIS does not serve <code>.ini</code> files by default &mdash; do not move it to a downloadable location. Get the LINE keys from the LINE Developers console and re-issue them at once if they leak.</div>
-<h3>Interface languages: language.txt</h3>
-<p><code>language.txt</code> sits next to <code>wapform.ini</code> (UTF-8). One entry per line, <strong>English is the key</strong>, followed by the Traditional Chinese and Japanese translations separated by a comma; lines starting with <code>;</code> are comments:</p>
-<pre>; English=Traditional Chinese,Japanese
-Item No=料號,品番
-Item Name / Spec=品名規格,品名・仕様
-Search=查詢,検索</pre>
-<p>Write the labels and titles in your WML in English; with <code>language=tw</code> or <code>jp</code> they are shown translated. A missing or empty translation shows the English text. In WapForm Toolkit, <strong>Languages &gt; Interface Languages…</strong> sets <code>language=</code> and edits <code>language.txt</code>; <em>Add texts from last run</em> lists every text met while running the WML, ready to translate.</p>
 <p>The store's password-reset mail (<code>shop\forget.wml</code>) uses Gmail: replace <code>your-account@gmail.com</code> and <code>your-gmail-app-password</code> with your Gmail account and an app password.</p>
 
 <h2 id="run">6. Running the samples</h2>
@@ -315,7 +308,7 @@ CharHeight=13
 ; Unicode (UTF-8 / utf8mb4) database connection: keep this line for
 ; utf8mb4 databases such as the sample; the line itself switches it on.
 unicode=yes
-; Interface language: en, tw or jp (default en); translations in language.txt
+; Interface language: en, tw or jp (default en)
 language=en
 ; LINE Messaging API - only for the LINE samples (linebot, linepush)
 line_bot_id=
@@ -334,20 +327,13 @@ line_channel_access_token=</pre>
 <tr><td><code>charwidth</code></td><td><code>7</code></td><td><em>可省略</em>（預設 7）。一個字元格的寬度（像素），WML 以「字元數」指定欄寬時換算用</td></tr>
 <tr><td><code>charheight</code></td><td><code>13</code></td><td><em>可省略</em>（預設 13）。一個字元格的高度（像素），用於換算列高與版面</td></tr>
 <tr><td><code>unicode</code></td><td><code>yes</code></td><td><em>可省略</em>，但 utf8mb4 資料庫（例如範例）請保留：只要有這一行就開啟 Unicode（不看值），沒有這一行就不是 Unicode 連線。以 Unicode（UTF-8 / utf8mb4）連線與存取資料；新資料庫請保持 <code>yes</code></td></tr>
-<tr><td><code>language</code></td><td><code>en</code></td><td><em>可省略</em>（預設 en）。WapForm Toolkit／Runtime 的介面語言：<code>en</code>（英文，預設）、<code>tw</code>（繁體中文）、<code>jp</code>（日文）。引擎內建文字（資料導覽列、查詢列）自動翻譯，其他文字由 <code>language.txt</code> 提供（見下方）</td></tr>
+<tr><td><code>language</code></td><td><code>en</code></td><td><em>可省略</em>（預設 en）。WapForm Toolkit／Runtime 的介面語言：<code>en</code>（英文，預設）、<code>tw</code>（繁體中文）、<code>jp</code>（日文）。引擎內建文字（資料導覽列、查詢列）自動翻譯</td></tr>
 <tr><td><code>line_bot_id</code></td><td>（空白）</td><td><em>可省略</em>（僅 LINE 範例使用）。LINE 官方帳號 ID（linebot、linepush 範例使用）</td></tr>
 <tr><td><code>line_channel_secret</code></td><td>（空白）</td><td><em>可省略</em>（僅 LINE 範例使用）。LINE Messaging API 的 Channel secret，用來驗證 webhook 簽章（<code>X-Line-Signature</code>）</td></tr>
 <tr><td><code>line_channel_access_token</code></td><td>（空白）</td><td><em>可省略</em>（僅 LINE 範例使用）。LINE 的 Channel access token，用來呼叫推播／回覆 API</td></tr>
 <tr><td><code>loginusr</code> / <code>loginpwd</code></td><td><code>admin</code> / <code>123</code></td><td>只在 <code>shop\wapform.ini</code>：商店後台功能使用的預設登入</td></tr>
 </table>
 <div class="warn"><code>wapform.ini</code> 含有資料庫密碼與 LINE 金鑰：不要放到公開網站、不要上傳到 GitHub。IIS 預設不會提供 <code>.ini</code> 下載，但請勿把它改放到可直接下載的位置。LINE 金鑰到 LINE Developers 主控台取得；外流時請立即「重新發行」。</div>
-<h3>多國語言介面：language.txt</h3>
-<p><code>language.txt</code> 與 <code>wapform.ini</code> 放在同一個資料夾（UTF-8）。一行一筆，<strong>以英文為主要索引</strong>，等號後依序是繁體中文、日文的翻譯，以逗號分隔；<code>;</code> 開頭為註解：</p>
-<pre>; English=繁體中文,日本語
-Item No=料號,品番
-Item Name / Spec=品名規格,品名・仕様
-Search=查詢,検索</pre>
-<p>WML 裡的標籤與標題用英文撰寫，<code>language=tw</code> 或 <code>jp</code> 時就會顯示翻譯；沒有翻譯或留空則顯示英文。WapForm Toolkit 的 <strong>Languages &gt; Interface Languages…</strong> 可以設定 <code>language=</code> 並編輯 <code>language.txt</code>；<em>Add texts from last run</em> 會列出執行 WML 時遇到的所有文字，直接填入翻譯即可。</p>
 <p>商店的「忘記密碼」信件（<code>shop\forget.wml</code>）使用 Gmail：把 <code>your-account@gmail.com</code> 與 <code>your-gmail-app-password</code> 換成你的帳號與「應用程式密碼」。</p>
 
 <h2 id="zh-run">6. 執行範例</h2>
@@ -508,7 +494,7 @@ CharHeight=13
 ; Unicode (UTF-8 / utf8mb4) database connection: keep this line for
 ; utf8mb4 databases such as the sample; the line itself switches it on.
 unicode=yes
-; Interface language: en, tw or jp (default en); translations in language.txt
+; Interface language: en, tw or jp (default en)
 language=en
 ; LINE Messaging API - only for the LINE samples (linebot, linepush)
 line_bot_id=
@@ -527,20 +513,13 @@ line_channel_access_token=</pre>
 <tr><td><code>charwidth</code></td><td><code>7</code></td><td><em>省略可</em>（既定 7）。文字セル 1 つの幅（ピクセル）。WML で列幅を「文字数」で指定したときの換算に使います</td></tr>
 <tr><td><code>charheight</code></td><td><code>13</code></td><td><em>省略可</em>（既定 13）。文字セル 1 つの高さ（ピクセル）。行の高さとレイアウトの換算に使います</td></tr>
 <tr><td><code>unicode</code></td><td><code>yes</code></td><td><em>省略可</em>。ただし utf8mb4 のデータベース（サンプルなど）では残してください：この行があるだけで Unicode が有効になり（値は見ません）、行がなければ Unicode 接続になりません。Unicode（UTF-8 / utf8mb4）で接続・入出力します。新しいデータベースでは <code>yes</code> のままにしてください</td></tr>
-<tr><td><code>language</code></td><td><code>en</code></td><td><em>省略可</em>（既定 en）。WapForm Toolkit／Runtime の画面の言語：<code>en</code>（英語、既定）、<code>tw</code>（繁体字中国語）、<code>jp</code>（日本語）。エンジン内蔵の文字（データナビゲーター、検索バー）は自動で翻訳され、それ以外は <code>language.txt</code> で指定します（下記参照）</td></tr>
+<tr><td><code>language</code></td><td><code>en</code></td><td><em>省略可</em>（既定 en）。WapForm Toolkit／Runtime の画面の言語：<code>en</code>（英語、既定）、<code>tw</code>（繁体字中国語）、<code>jp</code>（日本語）。エンジン内蔵の文字（データナビゲーター、検索バー）は自動で翻訳されます</td></tr>
 <tr><td><code>line_bot_id</code></td><td>（空欄）</td><td><em>省略可</em>（LINE サンプルのみ）。LINE 公式アカウントの ID（linebot、linepush サンプルで使用）</td></tr>
 <tr><td><code>line_channel_secret</code></td><td>（空欄）</td><td><em>省略可</em>（LINE サンプルのみ）。LINE Messaging API の Channel secret。webhook の署名（<code>X-Line-Signature</code>）の検証に使います</td></tr>
 <tr><td><code>line_channel_access_token</code></td><td>（空欄）</td><td><em>省略可</em>（LINE サンプルのみ）。LINE の Channel access token。プッシュ／応答 API の呼び出しに使います</td></tr>
 <tr><td><code>loginusr</code> / <code>loginpwd</code></td><td><code>admin</code> / <code>123</code></td><td><code>shop\wapform.ini</code> のみ：ショップの管理機能で使う既定のログイン</td></tr>
 </table>
 <div class="warn"><code>wapform.ini</code> にはデータベースのパスワードと LINE のキーが含まれます。公開サイトに置いたり GitHub にアップロードしたりしないでください。IIS は既定で <code>.ini</code> をダウンロードさせませんが、直接ダウンロードできる場所に移さないでください。LINE のキーは LINE Developers コンソールで取得し、漏れた場合はすぐに「再発行」してください。</div>
-<h3>画面の多言語化：language.txt</h3>
-<p><code>language.txt</code> は <code>wapform.ini</code> と同じフォルダーに置きます（UTF-8）。1 行に 1 項目、<strong>英語がキー</strong>で、等号の後に繁体字中国語、日本語の順にカンマで区切って翻訳を書きます。<code>;</code> で始まる行はコメントです：</p>
-<pre>; English=繁體中文,日本語
-Item No=料號,品番
-Item Name / Spec=品名規格,品名・仕様
-Search=查詢,検索</pre>
-<p>WML のラベルとタイトルは英語で書いておけば、<code>language=tw</code> または <code>jp</code> のときに翻訳して表示されます。翻訳がない・空欄のときは英語のまま表示されます。WapForm Toolkit の <strong>Languages &gt; Interface Languages…</strong> で <code>language=</code> の設定と <code>language.txt</code> の編集ができます。<em>Add texts from last run</em> で WML の実行中に出てきた文字が一覧になるので、そのまま翻訳を入力できます。</p>
 <p>ショップの「パスワードを忘れた場合」のメール（<code>shop\forget.wml</code>）は Gmail を使います。<code>your-account@gmail.com</code> と <code>your-gmail-app-password</code> をご自身のアカウントと「アプリ パスワード」に置き換えてください。</p>
 
 <h2 id="ja-run">6. サンプルの実行</h2>

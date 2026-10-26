@@ -21,7 +21,6 @@ can read them, compare versions or start your own project from them.
 - [Installation](#installation)
 - [Sample database](#sample-database)
 - [wapform.ini](#wapformini)
-- [Interface languages: language.txt](#interface-languages-languagetxt)
 - [Running the samples](#running-the-samples)
 - [Setting up Flutter](#setting-up-flutter)
 - [License and trial](#license-and-trial)
@@ -205,7 +204,7 @@ line_channel_access_token=
 | `charwidth` | `7` | Optional (default 7). Width of one character cell in pixels, used to convert WML widths given in characters. |
 | `charheight` | `13` | Optional (default 13). Height of one character cell in pixels, used for row heights and layout. |
 | `unicode` | `yes` | Keep it for utf8mb4 databases such as the sample: the presence of the line switches Unicode (UTF-8 / utf8mb4) on — the value is not checked; without it the connection is not Unicode. |
-| `language` | `en` | Optional (default `en`). Interface language of WapForm Toolkit / Runtime: `en`, `tw` (Traditional Chinese) or `jp` (Japanese). Built-in captions are translated automatically; other texts come from `language.txt`. |
+| `language` | `en` | Optional (default `en`). Interface language of WapForm Toolkit / Runtime: `en`, `tw` (Traditional Chinese) or `jp` (Japanese). |
 | `line_bot_id` | *(empty)* | LINE samples only. LINE Official Account ID (linebot, linepush). |
 | `line_channel_secret` | *(empty)* | LINE samples only. Messaging API channel secret; verifies the webhook signature (`X-Line-Signature`). |
 | `line_channel_access_token` | *(empty)* | LINE samples only. Channel access token for the push / reply API. |
@@ -219,23 +218,6 @@ line_channel_access_token=
 
 The store's password-reset mail (`shop\forget.wml`) uses Gmail: replace
 `your-account@gmail.com` and `your-gmail-app-password` with your own account and an app password.
-
-## Interface languages: language.txt
-
-`language.txt` sits next to `wapform.ini` (UTF-8). One entry per line: the English text is the
-key, followed by the Traditional Chinese and Japanese translations separated by a comma:
-
-```
-; English=Traditional Chinese,Japanese
-Item No=料號,品番
-Item Name / Spec=品名規格,品名・仕様
-Search=查詢,検索
-```
-
-Write labels and titles in your WML in English; with `language=tw` or `jp` they are shown
-translated. A missing translation shows the English text. In WapForm Toolkit,
-*Languages › Interface Languages…* sets `language=` and edits `language.txt`; *Add texts from
-last run* lists every text met while running the WML, ready to translate.
 
 ## Running the samples
 
@@ -306,6 +288,13 @@ WapForm for Web: open `http://localhost/license.wml` on the server itself and en
 - Enter your own LINE and Gmail settings (never the sample values).
 - Delete or edit the sample products, customers and articles.
 - Serve the site over HTTPS.
+
+## License
+
+The sample files in this repository are released under the [MIT License](LICENSE): you may copy,
+change and use them in your own projects, including commercial ones. The WapForm products
+themselves (WapForm Toolkit, WapForm Runtime, WapForm for Web) are commercial software, licensed
+separately — see [wapform.com/terms](https://wapform.com/terms).
 
 ---
 

@@ -19,7 +19,6 @@
 - [安裝](#安裝)
 - [範例資料庫](#範例資料庫)
 - [wapform.ini 參數說明](#wapformini-參數說明)
-- [多國語言介面：language.txt](#多國語言介面languagetxt)
 - [執行範例](#執行範例)
 - [Flutter 開發環境](#flutter-開發環境)
 - [授權與試用](#授權與試用)
@@ -191,7 +190,7 @@ line_channel_access_token=
 | `charwidth` | `7` | 選用（預設 7）。一個字元格的寬度（像素），用來換算 WML 中以字數表示的寬度。 |
 | `charheight` | `13` | 選用（預設 13）。一個字元格的高度（像素），用於列高與版面。 |
 | `unicode` | `yes` | 像範例這樣的 utf8mb4 資料庫請保留：**有這一行**就啟用 Unicode（UTF-8／utf8mb4），值不檢查；沒有這行則不是 Unicode 連線。 |
-| `language` | `en` | 選用（預設 `en`）。WapForm Toolkit／Runtime 的介面語言：`en`、`tw`（繁體中文）、`jp`（日文）。內建字樣自動翻譯，其他文字來自 `language.txt`。 |
+| `language` | `en` | 選用（預設 `en`）。WapForm Toolkit／Runtime 的介面語言：`en`、`tw`（繁體中文）、`jp`（日文）。 |
 | `line_bot_id` | （空白） | 僅 LINE 範例使用。LINE 官方帳號 ID（linebot、linepush）。 |
 | `line_channel_secret` | （空白） | 僅 LINE 範例使用。Messaging API 的 channel secret，用來驗證 webhook 簽章（`X-Line-Signature`）。 |
 | `line_channel_access_token` | （空白） | 僅 LINE 範例使用。推播／回覆 API 的 channel access token。 |
@@ -203,21 +202,6 @@ line_channel_access_token=
 
 商店的忘記密碼信（`shop\forget.wml`）使用 Gmail：請把 `your-account@gmail.com` 與
 `your-gmail-app-password` 換成你自己的帳號與應用程式密碼。
-
-## 多國語言介面：language.txt
-
-`language.txt` 放在 `wapform.ini` 旁（UTF-8）。每行一筆：英文為鍵，後面接繁體中文與日文翻譯，以逗號分隔：
-
-```
-; English=Traditional Chinese,Japanese
-Item No=料號,品番
-Item Name / Spec=品名規格,品名・仕様
-Search=查詢,検索
-```
-
-WML 中的標籤與標題用英文寫；設定 `language=tw` 或 `jp` 時就顯示翻譯，缺少的翻譯會顯示英文。
-在 WapForm Toolkit 的 *Languages › Interface Languages…* 可以設定 `language=` 並編輯 `language.txt`；
-*Add texts from last run* 會列出上次執行 WML 時遇到的所有文字，方便翻譯。
 
 ## 執行範例
 
@@ -280,6 +264,12 @@ WapForm for Web：在伺服器本機開啟 `http://localhost/license.wml` 輸入
 - 填入你自己的 LINE 與 Gmail 設定（不要用範例值）。
 - 刪除或修改範例商品、客戶與文章。
 - 網站改用 HTTPS。
+
+## 授權
+
+本 repo 的範例檔案以 [MIT 授權](LICENSE) 釋出：可以自由複製、修改並用在你自己的專案，包括商業用途。
+WapForm 產品本身（WapForm Toolkit、WapForm Runtime、WapForm for Web）是商業軟體，另行授權——
+見 [wapform.com/tw/terms](https://wapform.com/tw/terms)。
 
 ---
 
